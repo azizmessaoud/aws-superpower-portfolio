@@ -1,0 +1,48 @@
+# Machine mirror of docs/evidence-register.md for claims that reach the page.
+# Only `supported` and `caveated` may be published. A `caveated` claim needs limitations.
+- { id: TR-01, projectId: traffix, status: supported, sources: [traffix-readme], limitations: ["Simulation only; synthetic demand."] }
+- { id: TR-02, projectId: traffix, status: supported, sources: [traffix-readme, traffix-validation], limitations: [] }
+- id: TR-03
+  projectId: traffix
+  status: caveated
+  sources: [traffix-validation]
+  metric: { name: Car greens started during a pedestrian crossing, value: "≈18 vs 331–405 per run", definition: Car green phases that began while pedestrians were crossing, conditions: "Tunis map; 3 scenarios × 3 seeds; models of 20 Oct 2026", baseline: SUMO actuated signals }
+  limitations: ["Not significant at p < 0.05.", "Simulated, synthetic demand."]
+- id: TR-04
+  projectId: traffix
+  status: caveated
+  sources: [traffix-validation]
+  metric: { name: Mean pedestrian wait, value: "116.3 s vs 144.1 s", definition: Mean wait of pedestrians before crossing, conditions: "Morning-peak scenario; 3 seeds", baseline: SUMO actuated signals }
+  limitations: ["One scenario; not significant."]
+- id: TR-05
+  projectId: traffix
+  status: caveated
+  sources: [traffix-validation]
+  metric: { name: Emergency-vehicle trip time, value: "240.0 s vs 213.2 s (actuated) and 197.0 s (fixed)", definition: Mean trip time of the emergency vehicle, conditions: "Emergency scenario; 3 seeds", baseline: SUMO actuated and fixed-time signals }
+  limitations: ["Slower; objective not met; cause unknown."]
+- { id: TR-06, projectId: traffix, status: caveated, sources: [traffix-validation], limitations: ["Three seeds; none significant."] }
+- { id: TR-08, projectId: traffix, status: supported, sources: [traffix-readme], limitations: ["Roles rotate."] }
+- { id: TR-09, projectId: traffix, status: supported, sources: [traffix-validation, traffix-readme], limitations: [] }
+- { id: FR-07, projectId: flyrank, status: supported, sources: [flyrank-capstone], limitations: ["Observational, not causal."] }
+- id: FR-02
+  projectId: flyrank
+  status: caveated
+  sources: [flyrank-w05, flyrank-capstone]
+  metric: { name: Precision@50, value: "0.94 vs 0.76", definition: "Share of the top 50 ranked pages with ≥ 8 clicks in the next week (training 75th percentile)", conditions: "1,583 held-out rows from 8 unseen clients; features 31 Mar 2026; clicks 1–7 Apr 2026", baseline: Fixed stale-plus-visible rule }
+  limitations: ["One decision date and one outcome week.", "Observational, not causal.", "Gated warehouse limits public reproduction."]
+- { id: FR-06, projectId: flyrank, status: supported, sources: [flyrank-capstone], limitations: [] }
+- { id: FR-08, projectId: flyrank, status: caveated, sources: [flyrank-capstone], limitations: ["A planted leakage test, not an accidental leak."] }
+- id: FR-05
+  projectId: flyrank
+  status: caveated
+  sources: [flyrank-capstone]
+  metric: { name: R² and MAE on next-week clicks, value: "R² 0.50, MAE 2.51 vs R² 0.26", definition: Regression fit on the count of next-week clicks, conditions: Same held-out rows as FR-02, baseline: Calibrated baseline score }
+  limitations: ["A separate rerun reports R² 0.52; kept apart."]
+- { id: HR-01, projectId: hr-docs, status: supported, sources: [hr-readme], limitations: ["Synthetic sample documents only."] }
+- { id: HR-04, projectId: hr-docs, status: supported, sources: [live-site-data, hr-system-record], limitations: ["No accuracy figure exists."] }
+- { id: HR-05, projectId: hr-docs, status: supported, sources: [hr-readme], limitations: ["Planned services are not built."] }
+- { id: HR-06, projectId: hr-docs, status: supported, sources: [hr-readme], limitations: [] }
+# Held back (see register §B). Listed so the validator can prove they never render.
+- { id: FR-01, projectId: flyrank, status: unresolved, sources: [flyrank-capstone], limitations: ["Starter-repo reference result; authorship unconfirmed (D3)."] }
+- { id: TR-10, projectId: traffix, status: unresolved, sources: [traffix-readme], limitations: ["Conflicts with README line 97 (Q8)."] }
+- { id: HR-03, projectId: hr-docs, status: unresolved, sources: [hr-readme], limitations: ["No evaluation artifact."] }

@@ -1,0 +1,15 @@
+- id: traffix
+  title: TraffiX
+  framing: A multi-agent traffic-control simulation on six Tunis junctions. Team course project; my pair owned control.
+  layout: control-hierarchy
+  repoUrl: https://github.com/azizmessaoud/traffix
+- id: flyrank
+  title: FlyRank capstone
+  framing: Ranking webpages for human review from one day of signals, judged on clients the model never saw.
+  layout: ranking-queue
+  repoUrl: https://github.com/azizmessaoud/flyrank
+- id: hr-docs
+  title: HR document checks
+  framing: A local prototype that checks HR documents and explains every flag before a person decides.
+  layout: pipeline
+  repoUrl: https://github.com/azizmessaoud/hr-anomaly-detection

@@ -1,0 +1,7 @@
+# gitleaks: default rules, skipping dependencies and build output.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "third-party and generated files"
+paths = ['''node_modules/''', '''dist/''', '''test-results/''', '''playwright-report/''']

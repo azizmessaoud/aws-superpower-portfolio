@@ -1,0 +1,1 @@
+content validation passed: 16 passages, 20 claims, 15 judged questions

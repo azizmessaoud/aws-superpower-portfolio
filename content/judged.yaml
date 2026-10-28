@@ -1,0 +1,54 @@
+# Judged questions for "Ask my brain". relevant = passages a good answer must show (any order).
+# An empty list means the honest answer is "no verified passage".
+- id: q01
+  question: Is TraffiX deployed in Tunis?
+  relevant: [tr-simulation]
+  note: trap — it is a simulation
+- id: q02
+  question: How do you keep pedestrians safe at crossings?
+  relevant: [tr-pedestrian]
+- id: q03
+  question: Are ambulances faster with TraffiX?
+  relevant: [tr-ambulance]
+  note: trap — they are slower
+- id: q04
+  question: What did you personally build in the TraffiX team?
+  relevant: [tr-role]
+- id: q05
+  question: Are the traffic results statistically significant?
+  relevant: [tr-mixed, tr-pedestrian]
+- id: q06
+  question: How do you decide which pages editors should review first?
+  relevant: [fr-question, fr-p50]
+- id: q07
+  question: What precision did the ranking model reach?
+  relevant: [fr-p50]
+- id: q08
+  question: How did you avoid data leakage?
+  relevant: [fr-leakage]
+- id: q09
+  question: Does refreshing a page cause more traffic?
+  relevant: [fr-question]
+  note: trap — observational, not causal
+- id: q10
+  question: How do you process scanned documents?
+  relevant: [hr-pipeline]
+- id: q11
+  question: What is the OCR accuracy on real documents?
+  relevant: [hr-accuracy]
+  note: trap — not measured
+- id: q12
+  question: Comment détectez-vous les anomalies dans les documents RH ?
+  relevant: [hr-pipeline]
+  note: French paraphrase
+- id: q13
+  question: Does the HR system run in production with PostgreSQL?
+  relevant: [hr-runtime]
+  note: trap — demo runtime, PostgreSQL only planned
+- id: q14
+  question: What is your favourite food?
+  relevant: []
+  note: out of scope
+- id: q15
+  question: How was the ranking model validated on new clients?
+  relevant: [fr-method]

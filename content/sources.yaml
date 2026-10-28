@@ -1,0 +1,36 @@
+# Every source a public claim may cite. `ref` pins the exact commit that was opened.
+- id: traffix-readme
+  kind: repo
+  url: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md
+  ref: d54b071
+  checkedOn: "2026-10-28"
+- id: traffix-validation
+  kind: report
+  url: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md
+  ref: d54b071 §5.3–5.5
+  checkedOn: "2026-10-28"
+- id: flyrank-capstone
+  kind: report
+  url: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md
+  ref: a220b9e
+  checkedOn: "2026-10-28"
+- id: flyrank-w05
+  kind: notebook
+  url: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/notebooks/w05_model.ipynb
+  ref: a220b9e (cell output 0.9400 / 0.7600, n = 1583)
+  checkedOn: "2026-10-28"
+- id: hr-readme
+  kind: repo
+  url: https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md
+  ref: 437a514
+  checkedOn: "2026-10-28"
+- id: hr-system-record
+  kind: repo
+  url: https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/docs/system-record.md
+  ref: 437a514 line 34
+  checkedOn: "2026-10-28"
+- id: live-site-data
+  kind: site
+  url: https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts
+  ref: projectx0 main@bd6e84d (source of azizmessaoud.github.io/projectx0)
+  checkedOn: "2026-10-28"

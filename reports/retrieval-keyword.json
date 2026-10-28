@@ -1,0 +1,165 @@
+{
+  "rows": [
+    {
+      "id": "q01",
+      "question": "Is TraffiX deployed in Tunis?",
+      "top": [
+        "tr-simulation"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q02",
+      "question": "How do you keep pedestrians safe at crossings?",
+      "top": [
+        "tr-pedestrian"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q03",
+      "question": "Are ambulances faster with TraffiX?",
+      "top": [
+        "tr-ambulance"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q04",
+      "question": "What did you personally build in the TraffiX team?",
+      "top": [
+        "tr-role"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q05",
+      "question": "Are the traffic results statistically significant?",
+      "top": [
+        "tr-mixed",
+        "fr-p50"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q06",
+      "question": "How do you decide which pages editors should review first?",
+      "top": [
+        "fr-question"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q07",
+      "question": "What precision did the ranking model reach?",
+      "top": [
+        "fr-question",
+        "fr-p50"
+      ],
+      "rank": 2,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q08",
+      "question": "How did you avoid data leakage?",
+      "top": [
+        "fr-leakage"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q09",
+      "question": "Does refreshing a page cause more traffic?",
+      "top": [
+        "fr-question",
+        "fr-p50"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q10",
+      "question": "How do you process scanned documents?",
+      "top": [
+        "hr-pipeline",
+        "hr-accuracy"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q11",
+      "question": "What is the OCR accuracy on real documents?",
+      "top": [
+        "hr-accuracy",
+        "hr-pipeline"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q12",
+      "question": "Comment détectez-vous les anomalies dans les documents RH ?",
+      "top": [
+        "hr-pipeline",
+        "hr-accuracy"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q13",
+      "question": "Does the HR system run in production with PostgreSQL?",
+      "top": [
+        "hr-runtime"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q14",
+      "question": "What is your favourite food?",
+      "top": [],
+      "rank": null,
+      "ok": true,
+      "abstain": true
+    },
+    {
+      "id": "q15",
+      "question": "How was the ranking model validated on new clients?",
+      "top": [
+        "fr-method",
+        "fr-question"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    }
+  ],
+  "answerable": 14,
+  "hit1": 0.9285714285714286,
+  "hit3": 1,
+  "mrr": 0.9642857142857143,
+  "abstainOk": 1,
+  "abstainTotal": 1
+}

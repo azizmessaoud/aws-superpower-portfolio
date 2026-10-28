@@ -1,0 +1,52 @@
+/* "Ask my brain": finds verified portfolio passages for a question. It retrieves evidence;
+ * it never generates answers and never scores the person. */
+import type { Corpus, CorpusPassage } from "../content/schema";
+import { buildIndex, score } from "./bm25";
+import { stem, tokenize } from "./tokenize";
+
+export interface Result {
+  passage: CorpusPassage;
+  score: number;
+  why: { matchedTerms: string[]; fields: string[]; mode: "keyword" };
+}
+
+/* Below this a match is too weak to show as evidence: the honest answer is "no verified passage". */
+export const MIN_SCORE = 2.2;
+/* Results scoring under this share of the best one are dropped as noise. */
+export const RELATIVE_CUTOFF = 0.4;
+
+export function createRetriever(corpus: Corpus) {
+  const index = buildIndex(
+    corpus.passages.map((p) => ({ id: p.id, fields: { tags: p.tags.join(" "), title: p.title, text: p.text, context: p.context } })),
+  );
+  const byId = new Map(corpus.passages.map((p) => [p.id, p]));
+  const synonyms = new Map(Object.entries(corpus.synonyms).map(([k, v]) => [stem(k), v.map(stem)]));
+
+  function expand(query: string) {
+    const typed = tokenize(query);
+    const terms = typed.map((term) => ({ term, weight: 1, via: undefined as string | undefined }));
+    for (const t of typed)
+      for (const s of synonyms.get(t) ?? [])
+        if (!terms.some((x) => x.term === s)) terms.push({ term: s, weight: 0.6, via: t });
+    return terms;
+  }
+
+  function search(query: string, k = 3): Result[] {
+    const hits = score(index, expand(query));
+    if (!hits.length || hits[0].score < MIN_SCORE) return [];
+    return hits
+      .filter((h) => h.score >= hits[0].score * RELATIVE_CUTOFF)
+      .slice(0, k)
+      .map((h) => ({
+        passage: byId.get(h.id)!,
+        score: Math.round(h.score * 100) / 100,
+        why: {
+          matchedTerms: h.matched.map((m) => (m.via ? `${m.term} (from “${m.via}”)` : m.term)),
+          fields: [...new Set(h.matched.map((m) => m.field))],
+          mode: "keyword" as const,
+        },
+      }));
+  }
+
+  return { search, mode: "keyword" as const, status: "ready" as const };
+}

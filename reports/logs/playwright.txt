@@ -1,0 +1,34 @@
+
+Running 28 tests using 2 workers
+
+  ✓   1 [mobile] › tests/e2e/site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow (4.1s)
+  ✓   2 [desktop] › tests/e2e/site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow (4.2s)
+  ✓   3 [mobile] › tests/e2e/site.spec.ts:35:1 › full page renders without horizontal overflow (1.7s)
+  ✓   4 [desktop] › tests/e2e/site.spec.ts:35:1 › full page renders without horizontal overflow (2.0s)
+  ✓   5 [mobile] › tests/e2e/site.spec.ts:44:1 › pause stops the scene and nothing resumes it except the visitor (3.6s)
+  ✓   6 [desktop] › tests/e2e/site.spec.ts:44:1 › pause stops the scene and nothing resumes it except the visitor (3.6s)
+  ✓   7 [mobile] › tests/e2e/site.spec.ts:70:1 › scene stops while the hero is offscreen (2.0s)
+  ✓   8 [desktop] › tests/e2e/site.spec.ts:70:1 › scene stops while the hero is offscreen (2.0s)
+  ✓   9 [mobile] › tests/e2e/site.spec.ts:82:3 › reduced motion › one still frame, no pinning, no pause button, content visible (1.7s)
+  ✓  10 [desktop] › tests/e2e/site.spec.ts:82:3 › reduced motion › one still frame, no pinning, no pause button, content visible (1.7s)
+  ✓  11 [mobile] › tests/e2e/site.spec.ts:95:1 › ask my brain: results with evidence, honest no-result state, keyboard (2.2s)
+  ✓  13 [mobile] › tests/e2e/site.spec.ts:117:1 › hero hint hands its question to ask my brain (415ms)
+  -  14 [mobile] › tests/e2e/site.spec.ts:123:1 › keyboard focus is always visible
+  ✓  12 [desktop] › tests/e2e/site.spec.ts:95:1 › ask my brain: results with evidence, honest no-result state, keyboard (2.2s)
+  ✓  16 [desktop] › tests/e2e/site.spec.ts:117:1 › hero hint hands its question to ask my brain (471ms)
+  ✓  15 [mobile] › tests/e2e/site.spec.ts:137:1 › mobile menu opens, closes with Escape and returns focus (894ms)
+  ✓  17 [desktop] › tests/e2e/site.spec.ts:123:1 › keyboard focus is always visible (480ms)
+  -  19 [desktop] › tests/e2e/site.spec.ts:137:1 › mobile menu opens, closes with Escape and returns focus
+  -  20 [desktop] › tests/e2e/site.spec.ts:153:1 › touch drag on the hero scrolls the page
+  ✓  18 [mobile] › tests/e2e/site.spec.ts:153:1 › touch drag on the hero scrolls the page (1.0s)
+  ✓  21 [desktop] › tests/e2e/site.spec.ts:164:1 › no layout shift while loading (2.7s)
+  ✓  22 [mobile] › tests/e2e/site.spec.ts:164:1 › no layout shift while loading (2.7s)
+  ✓  23 [desktop] › tests/e2e/site.spec.ts:174:1 › axe-core: no serious or critical violations (4.2s)
+  ✓  24 [mobile] › tests/e2e/site.spec.ts:174:1 › axe-core: no serious or critical violations (4.1s)
+  ✓  25 [desktop] › tests/e2e/site.spec.ts:185:1 › hero text is readable within 800 ms (the intro never hides it for long) (1.1s)
+  ✓  26 [mobile] › tests/e2e/site.spec.ts:185:1 › hero text is readable within 800 ms (the intro never hides it for long) (1.1s)
+  ✓  27 [desktop] › tests/e2e/site.spec.ts:192:1 › runs under the production CSP from customHttp.yml without violations (1.8s)
+  ✓  28 [mobile] › tests/e2e/site.spec.ts:192:1 › runs under the production CSP from customHttp.yml without violations (1.9s)
+
+  3 skipped
+  25 passed (28.9s)

@@ -1,0 +1,18 @@
+# AWS Amplify Hosting build spec. Prepared only: nothing is deployed until Aziz connects the repo
+# in the Amplify console. `npm run build` validates content, rebuilds the corpus, type-checks and builds.
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - node_modules/**/*

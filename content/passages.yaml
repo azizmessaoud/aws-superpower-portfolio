@@ -1,0 +1,221 @@
+# Each passage is retrievable by "Ask my brain". Text paraphrases its source closely;
+# limitations ship on the same screen as the passage. Status follows docs/evidence-register.md.
+- id: tr-simulation
+  projectId: traffix
+  claimIds: [TR-01]
+  title: A simulation, not a deployment
+  text: >-
+    TraffiX is a multi-agent traffic-control simulation of six signalised junctions (J1–J6) on the
+    real OpenStreetMap streets of central Tunis, built on Eclipse SUMO and driven through TraCI. It is
+    not deployed on any street: road demand is synthetic and nothing in the project is deployment evidence.
+  context: ESPRIT 4DS course project, Intelligent Multi-Agent Traffic Management (team of six).
+  limitations:
+    - Simulation only. Road demand is synthetic; emissions are proxies, not measured air quality.
+  sources: [traffix-readme]
+  anchors: ["#L1-L11"]
+  tags: [traffix, traffic, simulation, sumo, traci, tunis, junction, deployment, deployed, city, multi-agent]
+- id: tr-control
+  projectId: traffix
+  claimIds: [TR-02]
+  title: One writer per light, a reason for every decision
+  text: >-
+    Only one controller per traffic light may change it, a supermaster coordinates the junctions,
+    and every decision is logged with a reason code. A language layer, Synapse, explains decisions
+    from that log and never acts on the simulation.
+  context: Architecture adopted by the team from aymenhamzik/traffix3.
+  limitations:
+    - The agent architecture was adopted from aymenhamzik/traffix3, not designed by me alone.
+  sources: [traffix-readme, traffix-validation]
+  anchors: ["#L6-L8", ""]
+  tags: [traffix, controller, supermaster, reason, log, synapse, llm, explain, explanation, architecture, safety]
+- id: tr-role
+  projectId: traffix
+  claimIds: [TR-08]
+  title: My part of the team
+  text: >-
+    I worked in the Control pair with Fares Ben Kacem, covering SUMO, observations, the A1 agent,
+    safety and the controllers. Pairs build, test and demo each work item, and roles rotate.
+  context: Team of six ESPRIT 4DS students; README section 11.
+  limitations:
+    - Roles rotate, so other pairs also touched these areas.
+  sources: [traffix-readme]
+  anchors: ["#L635-L648"]
+  tags: [traffix, role, contribution, team, pair, control, sumo, safety, controllers, built, did]
+- id: tr-pedestrian
+  projectId: traffix
+  claimIds: [TR-03]
+  title: Fewer car greens while people cross
+  text: >-
+    With the trained models, about 18 car green phases per run started while pedestrians were
+    crossing, against 331–405 with SUMO's actuated signals (−95%). The number is not zero.
+  context: Tunis map, mean of seeds 1–3, three scenarios, models and network of 20 October 2026.
+  limitations:
+    - Three seeds and three scenarios; no difference is significant at p < 0.05.
+    - Simulated with synthetic demand; not a safety result for real streets.
+  sources: [traffix-validation]
+  anchors: [""]
+  tags: [traffix, pedestrian, crossing, safety, safe, green, conflict, walk]
+- id: tr-ped-wait
+  projectId: traffix
+  claimIds: [TR-04]
+  title: Pedestrian wait in the morning peak
+  text: >-
+    In the morning-peak scenario, mean pedestrian wait was 116.3 s with the trained models against
+    144.1 s with actuated signals (−19%).
+  context: One scenario, mean of 3 seeds, 20 October 2026 run.
+  limitations:
+    - One scenario and three seeds; not statistically significant.
+  sources: [traffix-validation]
+  anchors: [""]
+  tags: [traffix, pedestrian, wait, waiting, morning, peak, time]
+- id: tr-ambulance
+  projectId: traffix
+  claimIds: [TR-05]
+  title: Ambulances are slower, and that is not explained yet
+  text: >-
+    Emergency-vehicle trips were slower with TraffiX: 240.0 s against 213.2 s with actuated signals
+    and 197.0 s with fixed-time signals. The objective was not met, and the cause is not yet known.
+  context: Emergency scenario, mean of 3 seeds, 20 October 2026 run.
+  limitations:
+    - Possible causes named in the report (preparation horizon, extra car wait, routes) are untested.
+  sources: [traffix-validation]
+  anchors: [""]
+  tags: [traffix, ambulance, emergency, vehicle, priority, faster, slower, trip]
+- id: tr-mixed
+  projectId: traffix
+  claimIds: [TR-06]
+  title: Mixed results, none significant
+  text: >-
+    Against actuated signals, mean car wait fell 11% in the morning peak and 24% in the incident
+    scenario but rose 20% in the emergency scenario; pedestrian wait rose 11% in the incident scenario.
+    None of the paired t-tests is significant at p < 0.05 with three seeds.
+  context: Validation report §5.3–5.4.
+  limitations:
+    - Three seeds; synthetic demand; 18 of 21 junction roads use unverified lane counts.
+  sources: [traffix-validation]
+  anchors: [""]
+  tags: [traffix, results, car, wait, significant, significance, statistics, test, better, improve]
+- id: tr-limits
+  projectId: traffix
+  claimIds: [TR-09]
+  title: Known limitations
+  text: >-
+    Demand is synthetic, 18 of 21 junction roads use unverified lane counts, it is a course project
+    until December 2026, and the models must be retrained when the road network changes.
+  context: Validation report §5.5 and README.
+  limitations: []
+  sources: [traffix-validation, traffix-readme]
+  anchors: ["", ""]
+  tags: [traffix, limitation, limitations, weakness, lanes, synthetic, retrain]
+- id: fr-question
+  projectId: flyrank
+  claimIds: [FR-07]
+  title: Which pages should a person review first
+  text: >-
+    The FlyRank capstone asks whether same-day performance and content signals can rank webpages for
+    a more useful next-seven-day editorial review queue than a transparent age-plus-visibility rule.
+    It is a prioritisation signal for human review, not a causal estimate of what a refresh does.
+  context: FlyRank ML internship capstone (ML-11 research paper), pseudonymised internship warehouse.
+  limitations:
+    - Observational, not causal. It does not show that editing a page increases traffic.
+  sources: [flyrank-capstone]
+  anchors: ["#L1-L18"]
+  tags: [flyrank, ranking, rank, prioritise, review, editor, editorial, queue, pages, seo, causal, traffic]
+- id: fr-p50
+  projectId: flyrank
+  claimIds: [FR-02]
+  title: Precision@50 of 0.94 against 0.76
+  text: >-
+    On 1,583 held-out pages from 8 clients the model never saw, a Random Forest put higher-traffic
+    pages in its top 50 with Precision@50 of 0.94, against 0.76 for the fixed baseline. A hit is a page
+    with at least 8 clicks in the following week, the 75th percentile of the training rows.
+  context: Features from 31 March 2026; outcome = Google Search Console clicks 1–7 April 2026.
+  limitations:
+    - One decision date and one outcome week; observational, not causal.
+    - The internship warehouse is gated, so the result cannot be fully reproduced in public.
+  sources: [flyrank-w05, flyrank-capstone]
+  anchors: ["", "#L55"]
+  tags: [flyrank, precision, precision50, p50, metric, accuracy, result, model, random, forest, baseline, top]
+- id: fr-method
+  projectId: flyrank
+  claimIds: [FR-06]
+  title: Clients kept apart, baseline fixed first
+  text: >-
+    The baseline was fixed before the label was used. GroupShuffleSplit kept whole clients on one side:
+    11,802 training rows from 21 clients and 1,583 test rows from 8 unseen clients, with no overlap.
+    The model is a Random Forest with 150 trees, depth 14, minimum leaf 3 and seed 42.
+  context: Capstone report, method section.
+  limitations:
+    - A grouped split tests transfer to new clients, not performance over time.
+  sources: [flyrank-capstone]
+  anchors: ["#L38-L42"]
+  tags: [flyrank, method, split, groupshufflesplit, clients, holdout, evaluation, validation, random, forest]
+- id: fr-leakage
+  projectId: flyrank
+  claimIds: [FR-08]
+  title: A deliberate leakage test
+  text: >-
+    Leakage checks confirm that April data appears only in the label, every feature row is from
+    31 March and no identifier is a predictor. A deliberately leaked label feature produced an
+    inflated score and was removed before the honest run.
+  context: Capstone report, method section.
+  limitations:
+    - The leaked feature was a planted test, not an accidental leak found in production.
+  sources: [flyrank-capstone]
+  anchors: ["#L44"]
+  tags: [flyrank, leakage, leak, leaked, label, future, check, honest]
+- id: fr-r2
+  projectId: flyrank
+  claimIds: [FR-05]
+  title: Error on the count of clicks
+  text: >-
+    On the same held-out rows the Random Forest reached R² 0.50 and MAE 2.51 clicks, against R² 0.26
+    for the calibrated baseline. A separate validation-audit rerun reports R² 0.52, kept apart.
+  context: Capstone report, results table; held-out mean outcome 3.42 clicks.
+  limitations:
+    - A one-day snapshot misses later demand spikes; clicks are not revenue.
+  sources: [flyrank-capstone]
+  anchors: ["#L47-L61"]
+  tags: [flyrank, r2, mae, error, regression, clicks, predict, prediction]
+- id: hr-pipeline
+  projectId: hr-docs
+  claimIds: [HR-01]
+  title: Every flag is explained, a person decides
+  text: >-
+    Uploaded PDFs and scans pass pre-flight checks, then Docling extraction with a RapidOCR fallback
+    when confidence is low, schema and business validation, and cohort anomaly detection. Each flag
+    carries a rule, severity, explanation and remediation, with sensitive values masked. The system
+    never writes to an HR information system on its own.
+  context: Local, self-hosted prototype; README architecture section.
+  limitations:
+    - Prototype tested on synthetic sample documents only.
+  sources: [hr-readme]
+  anchors: ["#L1-L16"]
+  tags: [hr, document, documents, ocr, scanned, scan, pdf, anomaly, anomalies, docling, rapidocr, extraction, validation, hris, payroll, contract]
+- id: hr-runtime
+  projectId: hr-docs
+  claimIds: [HR-05, HR-06]
+  title: What actually runs today
+  text: >-
+    The current runtime is a synchronous FastAPI demo with in-memory jobs. Celery, Redis and PostgreSQL
+    appear only in the planned full-stack mode. CSV and Excel files are outside the current OCR contract.
+  context: README, runtime modes.
+  limitations:
+    - Planned services are not built.
+  sources: [hr-readme]
+  anchors: ["#L36-L40"]
+  tags: [hr, fastapi, api, runtime, stack, tools, celery, redis, postgresql, csv, excel, production]
+- id: hr-accuracy
+  projectId: hr-docs
+  claimIds: [HR-04]
+  title: OCR accuracy has not been measured
+  text: >-
+    OCR accuracy on real HR documents has not been measured. The prototype's checks run on synthetic
+    PDFs and images with deterministic local tests, and one extractor's confidence is fixed at 0.6
+    until measured confidence is implemented.
+  context: Live portfolio HR card; system record line 34.
+  limitations:
+    - No accuracy figure exists for this project.
+  sources: [live-site-data, hr-system-record]
+  anchors: ["#L196-L204", "#L34"]
+  tags: [hr, ocr, accuracy, accurate, measured, precision, evaluation, real, documents, test]

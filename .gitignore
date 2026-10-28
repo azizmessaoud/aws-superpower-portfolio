@@ -1,0 +1,33 @@
+# secrets and local config — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+amplify/.config/local-*
+amplify/team-provider-info.json
+amplify/backend/amplify-meta.json
+.aws/
+
+# build output and caches
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.vite/
+__pycache__/
+.venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# private working notes: kept locally, not published with the portfolio (opt in deliberately)
+reference/
+START_HERE.md
+# evidence notes that discuss CV conflicts: kept private
+docs/evidence-register.md
+docs/source-inventory.md
