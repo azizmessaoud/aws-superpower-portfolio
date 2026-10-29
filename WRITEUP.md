@@ -47,7 +47,7 @@ hosting (prepared, NOT deployed): GitHub --> AWS Amplify Hosting build (npm ci, 
 
 | Check | Result | Log |
 |---|---|---|
-| Vitest (answer engine, typos and recruiter questions, mind state, retrieval, terminal) | 79 passed | `vitest.txt` |
+| Vitest (answer engine, typos and recruiter questions, mind state, retrieval, terminal) | 83 passed | `vitest.txt` |
 | Playwright at 1280 and 390 px, incl. axe-core and the demo flow | 66 passed, 8 skipped by design | `playwright.txt` |
 | Content validation | passed (22 passages, 25 claims, 26 judged questions) | `validate.txt` |
 | Contrast, text and focus pairs from the tokens | 38 pass | `contrast.txt` |
