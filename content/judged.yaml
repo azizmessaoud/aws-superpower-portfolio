@@ -96,3 +96,11 @@
   question: Does he have a PhD?
   relevant: []
   note: added 29 Oct; no evidence
+- id: q27
+  question: What is ALIA?
+  relevant: [al-overview]
+  note: added 29 Oct; NDA project
+- id: q28
+  question: Has ALIA been tested with real users?
+  relevant: [al-limits]
+  note: added 29 Oct; trap, it has not

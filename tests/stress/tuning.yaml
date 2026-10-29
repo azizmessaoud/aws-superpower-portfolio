@@ -120,3 +120,13 @@
 - { cat: fuzz, q: "qwertyuiop", expect: [not_verified, clarify] }
 - { cat: fuzz, q: "😀😀😀", expect: [not_verified, clarify, greet] }
 - { cat: fuzz, q: "", expect: [error, clarify] }
+- { cat: alia, q: "what is alia", expect: answer, passage: al-overview }
+- { cat: alia, q: "alia", expect: answer, intent: entity }
+- { cat: alia, q: "tell me about vital laboratories", expect: answer, passage: al-overview }
+- { cat: alia, q: "did you work on an avatar", expect: answer, passage: al-role }
+- { cat: alia, q: "what did he do in alia", expect: answer, passage: al-role }
+- { cat: alia, q: "was alia tested with users", expect: answer, passage: al-limits }
+- { cat: alia, q: "alia accuracy score", expect: [answer, related, not_verified] }
+- { cat: alia, q: "can i see the alia code", expect: [answer, not_verified, related] }
+- { cat: alia, q: "is there an nda project", expect: [answer, related] }
+

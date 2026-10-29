@@ -78,13 +78,13 @@ Refusals, greetings and clarifications handled safely: 32/32 (100%)
 ### All failures
 
 - [rambling] `my professor told me to ask about leakage in your ranking project, how did you handle it?` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted fr-leakage
-- [skeptic2] `only 3 seeds? that's not enough` → retrieval/related: Ambulances are slower, and that is not explained yet — class related, wanted answer; passages [tr-ambulance,tr-pedestrian], wanted tr-mixed
+- [skeptic2] `only 3 seeds? that's not enough` → retrieval/related: Ambulances are slower, and that is not explained yet — class related, wanted answer; passages [tr-ambulance,al-limits], wanted tr-mixed
 
 ## heldout4
 
 Cases: 63 · passed 62 (98%)
-In-scope answers routed correctly: 42/43 (98%)
-Refusals, greetings and clarifications handled safely: 18/20 (90%)
+In-scope answers routed correctly: 43/44 (98%)
+Refusals, greetings and clarifications handled safely: 17/19 (89%)
 **False support** (a real-looking answer where none was right): 0
 
 | category | cases | passed |
@@ -105,8 +105,8 @@ Refusals, greetings and clarifications handled safely: 18/20 (90%)
 
 ## tuning
 
-Cases: 120 · passed 120 (100%)
-In-scope answers routed correctly: 69/69 (100%)
+Cases: 129 · passed 129 (100%)
+In-scope answers routed correctly: 78/78 (100%)
 Refusals, greetings and clarifications handled safely: 50/51 (98%)
 **False support** (a real-looking answer where none was right): 0
 
@@ -131,3 +131,4 @@ Refusals, greetings and clarifications handled safely: 50/51 (98%)
 | career | 7 | 7 |
 | noise | 6 | 6 |
 | fuzz | 3 | 3 |
+| alia | 9 | 9 |

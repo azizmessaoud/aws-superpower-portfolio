@@ -5,20 +5,20 @@
 
  RUN  v2.1.8 /home/user/aws-superpower-portfolio
 
- ✓ tests/unit/terminal.test.ts (19 tests) 86ms
- ✓ tests/unit/assistant.test.ts (17 tests) 102ms
- ✓ tests/unit/human-language.test.ts (21 tests) 92ms
- ✓ tests/unit/retriever.test.ts (8 tests) 37ms
- ✓ tests/unit/geometry.test.ts (6 tests) 15ms
+ ✓ tests/unit/terminal.test.ts (19 tests) 90ms
+ ✓ tests/unit/assistant.test.ts (23 tests) 128ms
+ ✓ tests/unit/human-language.test.ts (21 tests) 119ms
+ ✓ tests/unit/retriever.test.ts (8 tests) 50ms
  ✓ tests/unit/mind.test.ts (5 tests) 5ms
- ✓ tests/unit/tokenize.test.ts (3 tests) 6ms
+ ✓ tests/unit/geometry.test.ts (6 tests) 24ms
  ✓ tests/unit/bm25.test.ts (4 tests) 5ms
- ✓ tests/unit/stress.test.ts (14 tests) 2806ms
-   ✓ fuzz and property checks > never throws and is fast: 1,000 questions in well under two seconds 1395ms
-   ✓ fuzz and property checks > every answer that claims something carries a source link, and nothing claims with no evidence 752ms
+ ✓ tests/unit/tokenize.test.ts (3 tests) 5ms
+ ✓ tests/unit/stress.test.ts (14 tests) 3275ms
+   ✓ fuzz and property checks > never throws and is fast: 1,000 questions in well under two seconds 1647ms
+   ✓ fuzz and property checks > every answer that claims something carries a source link, and nothing claims with no evidence 855ms
 
  Test Files  9 passed (9)
-      Tests  97 passed (97)
-   Start at  04:44:39
-   Duration  3.45s (transform 495ms, setup 0ms, collect 1.21s, tests 3.16s, environment 2ms, prepare 784ms)
+      Tests  103 passed (103)
+   Start at  04:55:52
+   Duration  3.97s (transform 536ms, setup 0ms, collect 1.37s, tests 3.70s, environment 3ms, prepare 968ms)
 

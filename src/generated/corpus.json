@@ -777,6 +777,118 @@
     "timezone"
    ],
    "challenges": []
+  },
+  {
+   "id": "al-overview",
+   "projectId": "alia",
+   "projectTitle": "ALIA",
+   "title": "ALIA, a practice avatar for sales representatives",
+   "text": "ALIA is a team prototype for sales representatives who need realistic practice conversations and structured feedback. A trainee talks to an avatar in the browser; a real-time session connects the browser and the backend over WebSockets, a Groq-hosted language model generates the conversation replies, and a PowerPoint debrief deck is built after the session. It was built for Vital Laboratories Tunisia, and the code is under NDA.",
+   "context": "Team prototype; description from my earlier portfolio's case card.",
+   "limitations": [
+    "The code is under NDA, so there is no public repository to inspect.",
+    "Speech components are not described: the public materials do not document them."
+   ],
+   "evidence": [
+    {
+     "label": "Live portfolio source · portfolioData.ts @ projectx0",
+     "url": "https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts"
+    }
+   ],
+   "tags": [
+    "alia",
+    "avatar",
+    "vital",
+    "laboratories",
+    "vital-laboratories",
+    "nda",
+    "sales",
+    "representatives",
+    "training",
+    "trainer",
+    "practice",
+    "conversation",
+    "debrief",
+    "deck",
+    "powerpoint",
+    "websockets",
+    "groq",
+    "llm",
+    "talkinghead",
+    "three",
+    "prototype",
+    "bootcamp"
+   ],
+   "challenges": []
+  },
+  {
+   "id": "al-role",
+   "projectId": "alia",
+   "projectTitle": "ALIA",
+   "title": "My part of ALIA",
+   "text": "I built the browser avatar fallback (TalkingHead.js with Three.js), which exists because browsers did not handle the preferred avatar rendering path consistently, and the agent that turns a finished session into a PowerPoint debrief. The team built the browser practice conversation, the real-time session over WebSockets and the Groq-hosted conversation replies.",
+   "context": "Contribution split as stated on my earlier portfolio.",
+   "limitations": [
+    "Team prototype: the real-time session and the conversation replies were the team's work, not mine.",
+    "No public artifact shows my part, because the code is under NDA."
+   ],
+   "evidence": [
+    {
+     "label": "Live portfolio source · portfolioData.ts @ projectx0",
+     "url": "https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts"
+    }
+   ],
+   "tags": [
+    "alia",
+    "role",
+    "contribution",
+    "built",
+    "build",
+    "did",
+    "personally",
+    "avatar",
+    "fallback",
+    "talkinghead",
+    "three",
+    "threejs",
+    "browser",
+    "debrief",
+    "agent",
+    "powerpoint",
+    "deck",
+    "team",
+    "ownership",
+    "mine"
+   ],
+   "challenges": []
+  },
+  {
+   "id": "al-limits",
+   "projectId": "alia",
+   "projectTitle": "ALIA",
+   "title": "ALIA has not been tested with real users",
+   "text": "ALIA has not been evaluated with real trainers or sales representatives. The only check was an internal visual check of the generated debrief decks on synthetic sessions, and no result from it is published here.",
+   "context": "Limitations as stated on my earlier portfolio.",
+   "limitations": [
+    "Not evaluated with real trainers or representatives, so there is no evidence about usefulness.",
+    "The code is under NDA, so none of this can be re-run or inspected in public."
+   ],
+   "evidence": [
+    {
+     "label": "Live portfolio source · portfolioData.ts @ projectx0",
+     "url": "https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts"
+    }
+   ],
+   "tags": [
+    "alia",
+    "limitation",
+    "limitations",
+    "weakness",
+    "evaluation",
+    "evaluated",
+    "nda"
+   ],
+   "challenges": []
   }
  ],
  "synonyms": {

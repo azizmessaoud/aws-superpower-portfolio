@@ -1,6 +1,7 @@
 import Traffix from "./projects/Traffix";
 import Flyrank from "./projects/Flyrank";
 import HrDocs from "./projects/HrDocs";
+import Alia from "./projects/Alia";
 import Icon from "../ui/Icon";
 import type { Portfolio } from "../content/schema";
 import portfolio from "../generated/portfolio.json";
@@ -13,14 +14,15 @@ export default function Projects() {
     <section id="projects" className="section projects" aria-labelledby="projects-title">
       <div className="inner">
         <p className="sec-label">Projects</p>
-        <h2 id="projects-title" className="sec-h2">Three projects, with the evidence next to each.</h2>
+        <h2 id="projects-title" className="sec-h2">Four projects, with the evidence next to each.</h2>
         <p className="sec-lead">
-          A team simulation, an internship capstone and a prototype. Each ends with the same label: where the data came from,
+          A team simulation, an internship capstone, an internship prototype and a team prototype under NDA. Each ends with the same label: where the data came from,
           how it was judged, where it fails, and who reviews the output.
         </p>
         <Traffix />
         <Flyrank />
         <HrDocs />
+        <Alia />
         <div className="small-projects">
           <h3>Smaller projects</h3>
           <ul className="small-grid">

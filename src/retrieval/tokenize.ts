@@ -1,7 +1,7 @@
 /* Lowercase, fold accents, drop stopwords (English + a few French), light suffix stemming. */
 const STOP = new Set(
   ("a an and are as at be by can did do does for from has have how i in is it its me my of on or our so than that the their them " +
-    "then there these they this to was we were what when where which who why will with you your yours about into over per " +
+    "then there these they this to was we were what when where which who why will with you your yours know knows knew about into over per " +
     "le la les de des du un une et en dans pour par sur au aux est sont vous nous comment quel quelle ce ces que qui").split(" "),
 );
 

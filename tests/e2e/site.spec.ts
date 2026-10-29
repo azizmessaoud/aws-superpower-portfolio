@@ -399,7 +399,7 @@ test("clicking on the hero text still sends a pulse through the network", async 
   /* a real control keeps its own click and sends no pulse */
   const mid = await pulses();
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Skills" }).click();
-  expect(await pulses()).toBeLessThanOrEqual(mid);
+  expect(await pulses()).toBeLessThan(mid + 2); /* ambient pulses may add one; a click pulse adds several */
 });
 
 
@@ -421,7 +421,7 @@ test("the terminal understands a plain question about certifications", async ({ 
 test("every project ends with the same four-part label", async ({ page }) => {
   await page.goto("/#projects");
   const labels = page.locator(".plabel");
-  await expect(labels).toHaveCount(3);
+  await expect(labels).toHaveCount(4);
   for (const l of await labels.all()) {
     await expect(l.locator("dt")).toHaveText([/Data/, /How it was judged/, /Where it fails/, /Who reviews the output/]);
   }

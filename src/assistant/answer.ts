@@ -38,9 +38,9 @@ export const MAX_QUESTION = 200;
 const SUGGESTIONS = ["What did Aziz personally build in TraffiX?", "Did TraffiX make ambulances faster?", "Where did he do internships?", "What is the AWS hosting status?", "What are his certifications?"];
 const SUGGEST = "Ask about my projects (TraffiX, FlyRank, the HR prototype), internships, languages, certifications or AWS hosting status, or type help for the commands.";
 const REPO = "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/main";
-const PROJECT_OF: [string, LabelKey][] = [["tr-", "traffix"], ["fr-", "flyrank"], ["hr-", "hr"]];
+const PROJECT_OF: [string, LabelKey][] = [["tr-", "traffix"], ["fr-", "flyrank"], ["hr-", "hr"], ["al-", "alia"]];
 const projectOf = (ids: string[]): LabelKey | undefined => PROJECT_OF.find(([p]) => ids.some((i) => i.startsWith(p)))?.[1];
-const PROJECT_NAME: Record<LabelKey, string> = { traffix: "TraffiX", flyrank: "FlyRank", hr: "HR document checks" };
+const PROJECT_NAME: Record<LabelKey, string> = { traffix: "TraffiX", flyrank: "FlyRank", hr: "HR document checks", alia: "ALIA" };
 const ISSUER_ALIAS: Record<string, string> = { azure: "microsoft", oci: "oracle" };
 const CERT_WORDS = /certif|credential|badge|diploma|accredit|\bcerts?\b|\bcourses?\b|practitioner/;
 const STOP = new Set(["what", "whats", "what's", "is", "are", "the", "a", "an", "do", "does", "you", "your", "aziz", "azizs", "have", "has", "his", "he", "any", "of", "to", "and", "or", "with", "got", "show", "me", "list", "all", "my", "i", "please", "tell", "about", "certified", "in", "certificate", "certification", "certifications", "certifs", "cert", "certs", "credential", "credentials", "cloud", "practitioner", "badges", "badge", "cloud"]);
@@ -203,7 +203,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
   }
   function limitations(project?: LabelKey): Answer {
     if (project) {
-      const ids = project === "traffix" ? ["tr-limits", "tr-ambulance"] : project === "flyrank" ? ["fr-p50"] : ["hr-accuracy", "hr-runtime"];
+      const ids = project === "traffix" ? ["tr-limits", "tr-ambulance"] : project === "flyrank" ? ["fr-p50"] : project === "alia" ? ["al-limits"] : ["hr-accuracy", "hr-runtime"];
       return make({ outcome: "supported", intent: "limitations", title: `Limits: ${PROJECT_NAME[project]}`, answer: LABELS[project].fails.join(" "), evidence: uniq(ids.flatMap((i) => P(i).evidence.slice(0, 1)), (e) => e.url), passageIds: ids, limitations: [] });
     }
     const lim = LABEL_KEYS.flatMap((k) => LABELS[k].fails.slice(0, 2).map((f) => `${PROJECT_NAME[k]}: ${f}`));
@@ -238,19 +238,19 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     });
   }
   function projectsOverview(): Answer {
-    const ids = ["tr-simulation", "fr-question", "hr-pipeline"];
+    const ids = ["tr-simulation", "fr-question", "hr-pipeline", "al-overview"];
     const small = portfolio.smallProjects.map((x) => x.title).join(", ");
     return make({
       outcome: "supported", intent: "projects", title: "Projects",
-      answer: `Three case studies: TraffiX (a multi-agent traffic-control simulation, team project), the FlyRank capstone (ranking pages for human review) and HR document checks (a prototype on synthetic documents). Also: ${small}. Ask about any of them for its result and its limits.`,
+      answer: `Four case studies: TraffiX (a multi-agent traffic-control simulation, team project), the FlyRank capstone (ranking pages for human review), HR document checks (a prototype on synthetic documents) and ALIA (a team prototype of a practice avatar, under NDA). Also: ${small}. Ask about any of them for its result and its limits.`,
       evidence: ids.flatMap((i) => P(i).evidence.slice(0, 1)), passageIds: ids, limitations: ["Each case study ends with where it fails; the team projects name only my part."],
     });
   }
   function compare(): Answer {
-    const ids = ["tr-ambulance", "fr-p50", "hr-accuracy"];
+    const ids = ["tr-ambulance", "fr-p50", "hr-accuracy", "al-limits"];
     return make({
       outcome: "supported", intent: "compare", title: "I do not rank my projects",
-      answer: "They measure different things under different conditions, so a ranking would be invented. Headline result and main limit of each. TraffiX: pedestrians waited 116.3 s against 144.1 s in the morning peak, but ambulance trips were slower (240.0 s against 213.2 s). FlyRank: Precision@50 0.94 against 0.76 on clients the model never saw, on one decision date. HR document checks: no accuracy figure exists; OCR accuracy on real documents has not been measured.",
+      answer: "They measure different things under different conditions, so a ranking would be invented. Headline result and main limit of each. TraffiX: pedestrians waited 116.3 s against 144.1 s in the morning peak, but ambulance trips were slower (240.0 s against 213.2 s). FlyRank: Precision@50 0.94 against 0.76 on clients the model never saw, on one decision date. HR document checks: no accuracy figure exists; OCR accuracy on real documents has not been measured. ALIA: no result is published and it was never tested with real users, and its code is under NDA.",
       evidence: ids.flatMap((i) => P(i).evidence.slice(0, 1)), passageIds: ids, limitations: ["None of the TraffiX differences is significant at p < 0.05 with three seeds.", "The numbers are not comparable across projects."],
     });
   }
@@ -364,7 +364,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
   function retrieve(q: string): Answer {
     const info2 = retriever.inspect(q, 4);
     const want = ENTITIES.find((e) => e.key !== "esprit" && e.re.test(q))?.key;
-    const projectId = want === "flyrank" ? "flyrank" : want === "hr" ? "hr-docs" : want ? "traffix" : undefined;
+    const projectId = want === "flyrank" ? "flyrank" : want === "hr" ? "hr-docs" : want === "alia" ? "alia" : want ? "traffix" : undefined;
     if (projectId) {
       const first = info2.results.filter((r) => r.passage.projectId === projectId);
       if (first.length) info2.results.splice(0, info2.results.length, ...first, ...info2.results.filter((r) => r.passage.projectId !== projectId));
@@ -387,7 +387,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
       return make({ outcome: "not_verified", intent: "retrieval", title: "Nothing verified", answer: `No verified passage answers that, so I won't guess. ${SUGGEST}`, limitations: ["Missing evidence, not a 'no': the answer may exist outside what this site can show."] });
     const results = info2.results;
     const asked = new Set(words(q));
-    const contradicted = strong && results.some((r) => r.passage.challenges.some((c) => asked.has(c)));
+    const contradicted = strong && PROJECT_WORDS.test(q) && results.some((r) => r.passage.challenges.some((c) => asked.has(c)));
     const lead = (contradicted ? results.find((r) => r.passage.challenges.some((c) => asked.has(c)))!.passage : results[0].passage) as CorpusPassage;
     const rest = results.map((r) => r.passage).filter((p) => p.id !== lead.id);
     return make({
@@ -433,10 +433,11 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     const pr = premise(q);
     if (pr) return pr;
     const key = ENTITIES.find((e) => e.key !== "esprit" && e.re.test(q))?.key;
-    const pk: LabelKey | undefined = key === "flyrank" ? "flyrank" : key === "hr" ? "hr" : key ? "traffix" : undefined;
+    const pk: LabelKey | undefined = key === "flyrank" ? "flyrank" : key === "hr" ? "hr" : key === "alia" ? "alia" : key ? "traffix" : undefined;
     if (pk && re.weakest.test(q)) return limitations(pk);
     if (pk === "traffix" && re.roleAsk.test(q)) return fromPassage("tr-role", "role");
-    if (pk && re.resultAsk.test(q) && !re.roleAsk.test(q)) return fromPassage(pk === "flyrank" ? "fr-p50" : pk === "hr" ? "hr-accuracy" : "tr-mixed", "result");
+    if (pk === "alia" && re.roleAsk.test(q)) return fromPassage("al-role", "role");
+    if (pk && re.resultAsk.test(q) && !re.roleAsk.test(q)) return fromPassage(pk === "flyrank" ? "fr-p50" : pk === "hr" ? "hr-accuracy" : pk === "alia" ? "al-limits" : "tr-mixed", "result");
     if (!project) { const t = toolLookup(q); if (t) return t; }
     if (!project && re.cloud.test(q)) return cloud();
     if (!project && (near(q, ["limitation", "limitations", "weakness", "weaknesses", "caveat"]) || re.limitations.test(q))) return limitations(ctx?.project);
@@ -451,7 +452,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     const ent = entityAnswer(q);
     if (ent) return ent;
     if (re.reviewAsk.test(q)) return make({ outcome: "not_verified", intent: "validation", title: "No independent review is recorded", answer: "Nobody else has reviewed these results on record. I ran the evaluations and wrote the test questions myself, and each result links to the file it came from so you can check it.", evidence: [readmeEvidence], limitations: ["The retrieval scores are optimistic for that reason."] });
-    if (pk && re.triedAsk.test(q)) { const id = pk === "flyrank" ? "fr-method" : pk === "hr" ? "hr-pipeline" : "tr-control"; return make({ outcome: "not_verified", intent: "tried", title: "Not verified: only the documented approach", answer: `Other approaches are not documented, so I do not claim them. What the evidence shows is the approach I used: ${P(id).text}`, evidence: P(id).evidence, passageIds: [id], limitations: P(id).limitations }); }
+    if (pk && re.triedAsk.test(q)) { const id = pk === "flyrank" ? "fr-method" : pk === "hr" ? "hr-pipeline" : pk === "alia" ? "al-overview" : "tr-control"; return make({ outcome: "not_verified", intent: "tried", title: "Not verified: only the documented approach", answer: `Other approaches are not documented, so I do not claim them. What the evidence shows is the approach I used: ${P(id).text}`, evidence: P(id).evidence, passageIds: [id], limitations: P(id).limitations }); }
     if (re.offTopic.test(q)) return offTopic("task");
     if (re.softInjection.test(q)) return offTopic("instruction");
     return retrieve(q);

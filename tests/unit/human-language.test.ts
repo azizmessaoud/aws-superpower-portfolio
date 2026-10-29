@@ -65,10 +65,10 @@ describe("questions a recruiter or HR person asks", () => {
     expect(where.answer).not.toMatch(/Ariana|Nabeul/);
     expect(bot.ask("Any volunteering or clubs?").answer).toContain("DeepFlow");
   });
-  it("a project overview lists the three case studies and the smaller ones", () => {
+  it("a project overview lists the four case studies and the smaller ones", () => {
     const a = bot.ask("What projects has he done?");
     expect(a.intent).toBe("projects");
-    for (const t of ["TraffiX", "FlyRank", "HR document checks", "InnoTravel"]) expect(a.answer).toContain(t);
+    for (const t of ["TraffiX", "FlyRank", "HR document checks", "ALIA", "InnoTravel"]) expect(a.answer).toContain(t);
   });
   it("judgements and money are not facts: no claim, but the evidence is offered", () => {
     for (const q of ["Why should we hire you?", "What are his strengths?", "What is your salary expectation?", "How much do you want to be paid?"]) {

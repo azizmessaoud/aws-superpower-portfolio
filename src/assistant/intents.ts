@@ -34,7 +34,7 @@ export const re = {
   seeking: /\b(join|joining|(from|in|by|starting|before|after) (january|february|march|april|may|june|july|august|september|october|november|december)|interested|interest|opportunit\w*|offer|recruit\w*|wondering|next (summer|year|month)|summer|looking for|looking to|seeking|available|availability|start|begin|open to|opening|pfe|what kind of (job|role|work)|what (job|role|position)|career goals?|goals?|hire me)\b/,
   experience: /\b(worked|work experience|where (did|has|does) he work|employer|companies|company|sopra|banque|career|background|work history|previous (jobs?|roles?)|past (jobs?|roles?)|years of experience|how much experience|professional experience|internships?|interns?|jobs|stages?)\b/,
   roleAsk: /\bwhat (did|do|does|was|is) (you|he|aziz|i|your|his)\b.{0,25}\b(do|did|build|built|make|made|work on|contribut\w*|own|owned|role|part)\b|\b(your|his|my) (role|part|contribution)\b|\bcontribut\w*\b/,
-  resultAsk: /\b(work(ed|s)?|success\w*|results?|perform\w*|accurate|accuracy|effective|score|did it help)\b/,
+  resultAsk: /\b(work(ed|s)?(?! (on|in|at|with|for|as|from))|success\w*|results?|perform\w*|accurate|accuracy|effective|score|did it help)\b/,
   volunteer: /\b(volunteer\w*|clubs?|communit(y|ies)|ieee|deepflow|atia|association|extracurricular|activities|student (clubs?|organi[sz]ations?)|societ(y|ies))\b/,
   spoken: /\b(speak|speaks|spoken|bilingual|multilingual|fluent|arabic|french|english|languages? (does|can|do|is|he)|work in (french|arabic|english))\b/,
   location: /\b(where (is|does|do|are)|based|located|location|country|city|relocat\w*|remote(ly)?|hybrid|on-?site|abroad|tunisia|tunis|work from|time ?zone|does he live|do you live|(live|lives|living) in)\b/,
@@ -57,13 +57,14 @@ export const GENERIC = new Set(("aziz he his him her project projects tell more 
   "many much long use used using did does do built is are was were it its the a an to of in on at for with from and or but if so then also just really very " +
   "good great nice best well new old first last other another one two three any some all each every way ways kind sort type anyone else model models verify check confirm enough not no only really actually sure right mean means basically whether might could would should read still understand summarise summarize summary simple words professor told ask asked asking wondering take took taken long go went come came give gave say said see saw have having need needs find try tried yo bro man dude mate bruh hey hi hello after anywhere ever never still already now today when where which what why how who whom does anyone anything something").split(" "));
 
-export const PROJECT_WORDS = /\b(traffix|trafix|traffic|flyrank|fly rank|hr|ocr|docling|rapidocr|sumo|traci|synapse|capstone|ambulances?|pedestrians?|precision|leakage|holdout|baseline|seeds?)\b/;
+export const PROJECT_WORDS = /\b(alia|vital|avatar|talkinghead|traffix|trafix|traffic|flyrank|fly rank|hr|ocr|docling|rapidocr|sumo|traci|synapse|capstone|ambulances?|pedestrians?|precision|leakage|holdout|baseline|seeds?)\b/;
 
 export interface Entity { key: string; re: RegExp; passages: string[]; title: string }
 export const ENTITIES: Entity[] = [
   { key: "traffix", title: "TraffiX", re: /\b(traffix|trafix|traffic simulation|traffic thing|traffic project|traffic lights?)\b/, passages: ["tr-simulation", "tr-role"] },
   { key: "flyrank", title: "The FlyRank capstone", re: /\b(flyrank|fly rank|capstone|ranking (project|model|thing))\b/, passages: ["fr-question", "fr-p50"] },
   { key: "hr", title: "HR document checks", re: /\b(hr|hrdocs|hr documents?|docling|rapidocr|ocr|document ai)\b/, passages: ["hr-pipeline", "hr-accuracy"] },
+  { key: "alia", title: "ALIA", re: /\b(alia|vital laboratories|vital labs?|avatar|talkinghead)\b/, passages: ["al-overview", "al-role"] },
   { key: "esprit", title: "ESPRIT", re: /\besprit\b/, passages: ["pr-about"] },
   { key: "sumo", title: "TraffiX", re: /\b(sumo|traci|synapse)\b/, passages: ["tr-simulation", "tr-control"] },
 ];

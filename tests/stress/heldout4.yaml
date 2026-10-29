@@ -27,7 +27,7 @@
 - { cat: skeptic, q: "is 0.94 cherry picked", expect: [answer, related, not_verified] }
 - { cat: skeptic, q: "why should i trust a simulation", expect: [answer, related, not_verified] }
 - { cat: skeptic, q: "what's the catch with the flyrank result", expect: answer }
-- { cat: skeptic, q: "any real users", expect: not_verified }
+- { cat: skeptic, q: "any real users", expect: [answer, not_verified], passage: al-limits }  # expectation widened 29 Oct: ALIA's limits passage (added later that day) answers it truthfully
 - { cat: skeptic, q: "has it been deployed anywhere", expect: answer }
 - { cat: tester, q: "", expect: [error, clarify] }
 - { cat: tester, q: " ", expect: [error, clarify] }

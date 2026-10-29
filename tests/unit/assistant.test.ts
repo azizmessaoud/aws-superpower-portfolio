@@ -59,13 +59,36 @@ describe("the required demo questions", () => {
     const a = bot.ask("What are the limitations of the results?");
     expect(a.intent).toBe("limitations");
     const t = a.limitations.join("\n");
-    ["TraffiX:", "FlyRank:", "HR document checks:"].forEach((x) => expect(t).toContain(x));
+    ["TraffiX:", "FlyRank:", "HR document checks:", "ALIA:"].forEach((x) => expect(t).toContain(x));
   });
   it("interview: suggested questions tied to passages, labelled as not claims", () => {
     const a = bot.ask("What should I ask Aziz in an interview?");
     expect(a.intent).toBe("interview");
     expect(a.answer).toContain("ambulance");
     expect(a.limitations.join(" ")).toContain("not claims");
+  });
+});
+
+describe("ALIA: an NDA project, described only as far as my own account goes", () => {
+  it.each([
+    ["What is ALIA?", /practice conversations|avatar/i],
+    ["what did you do at vital laboratories", /fallback|debrief/i],
+    ["what did aziz build in alia", /fallback|debrief/i],
+    ["has alia been tested with real users", /not been evaluated/i],
+    ["tell me about the avatar project", /avatar/i],
+  ])("%j", (q, text) => {
+    const a = bot.ask(q);
+    expect(["supported", "contradicted"], q).toContain(a.outcome);
+    expect(a.passageIds.some((id) => id.startsWith("al-")), q).toBe(true);
+    expect([a.answer, ...a.limitations].join(" "), q).toMatch(text);
+    expect(a.evidence.length, q).toBeGreaterThan(0);
+  });
+  it("states the NDA and the team split, and never invents a score or a result", () => {
+    const all = ["What is ALIA?", "what did aziz build in alia", "how well did alia score", "what accuracy did alia get", "how many users does alia have"].map((q) => bot.ask(q));
+    const text = all.map((a) => [a.answer, ...a.limitations].join(" ")).join(" ");
+    expect(text).toMatch(/NDA/);
+    expect(text).toMatch(/team/i);
+    expect(text).not.toMatch(/\b9\d\b|%|out of 100|users? (love|like)/i);
   });
 });
 

@@ -52,3 +52,7 @@
 - { id: PR-03, projectId: portfolio, status: supported, sources: [live-site-data], limitations: ["My own account; the club and organisation pages are linked where they exist."] }
 - { id: PR-04, projectId: portfolio, status: supported, sources: [live-site-page], limitations: ["Working languages as I state them; no test score or level is claimed."] }
 - { id: PR-05, projectId: portfolio, status: caveated, sources: [live-site-page], limitations: ["Only the country is stated; the city differs between my sources."] }
+# ALIA: my own account, copied from my earlier portfolio. The code is under NDA, so there is no public repository.
+- { id: AL-01, projectId: alia, status: caveated, sources: [live-site-data], limitations: ["Code is under NDA: there is no public repository to inspect.", "My own account, copied from my earlier portfolio."] }
+- { id: AL-02, projectId: alia, status: caveated, sources: [live-site-data], limitations: ["Team prototype; the speech components are not documented in public materials, so they are not described.", "No public artifact shows my part."] }
+- { id: AL-03, projectId: alia, status: supported, sources: [live-site-data], limitations: ["Not evaluated with real trainers or sales representatives."] }

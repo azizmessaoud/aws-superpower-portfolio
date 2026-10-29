@@ -34,7 +34,8 @@
       "id": "q04",
       "question": "What did you personally build in the TraffiX team?",
       "top": [
-        "tr-role"
+        "tr-role",
+        "al-role"
       ],
       "rank": 1,
       "ok": true,
@@ -172,7 +173,8 @@
       "id": "q17",
       "question": "What did Aziz personally build in TraffiX?",
       "top": [
-        "tr-role"
+        "tr-role",
+        "al-role"
       ],
       "rank": 1,
       "ok": true,
@@ -266,12 +268,35 @@
       "rank": null,
       "ok": true,
       "abstain": true
+    },
+    {
+      "id": "q27",
+      "question": "What is ALIA?",
+      "top": [
+        "al-limits",
+        "al-overview",
+        "al-role"
+      ],
+      "rank": 2,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q28",
+      "question": "Has ALIA been tested with real users?",
+      "top": [
+        "al-limits",
+        "hr-accuracy"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
     }
   ],
-  "answerable": 23,
-  "hit1": 0.9565217391304348,
+  "answerable": 25,
+  "hit1": 0.92,
   "hit3": 1,
-  "mrr": 0.9782608695652174,
+  "mrr": 0.96,
   "abstainOk": 3,
   "abstainTotal": 3
 }

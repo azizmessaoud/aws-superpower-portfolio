@@ -33,6 +33,13 @@ const PROJECTS: Record<string, { title: string; summary: string; facts: string[]
     limits: ["One decision date and one outcome week", "Observational, not causal", "Gated warehouse limits public reproduction"],
     evidence: { text: "capstone report", href: `${R}/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L55` },
   },
+  alia: {
+    title: "ALIA — conversational practice avatar (team prototype, under NDA)",
+    summary: "A prototype for sales-representative practice, built for Vital Laboratories Tunisia. My part: the browser avatar fallback (TalkingHead.js and Three.js) and the agent that builds a PowerPoint debrief after a session.",
+    facts: ["The practice conversation, the real-time session (WebSockets) and the Groq-hosted replies were the team's work", "No score is published here"],
+    limits: ["Never tested with real trainers or sales representatives", "Code under NDA: nothing can be inspected or re-run in public", "Speech components are not documented in public materials, so they are not described"],
+    evidence: { text: "my earlier portfolio's ALIA card (source file)", href: "https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts" },
+  },
   hr: {
     title: "HR document checks — prototype",
     summary: "Local pipeline: pre-flight checks → Docling → RapidOCR fallback → validation → anomaly detection → explained flags → a person decides.",
@@ -41,14 +48,14 @@ const PROJECTS: Record<string, { title: string; summary: string; facts: string[]
     evidence: { text: "README", href: `${R}/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L1-L16` },
   },
 };
-const ALIASES: Record<string, string> = { "hr-docs": "hr", hrdocs: "hr", "hr-anomaly-detection": "hr", fly: "flyrank" };
+const ALIASES: Record<string, string> = { "vital": "alia", "avatar": "alia", "hr-docs": "hr", hrdocs: "hr", "hr-anomaly-detection": "hr", fly: "flyrank" };
 
 export const COMMANDS: [string, string][] = [
   ["help", "list commands"],
   ["about", "who I am"],
   ["skills", "tools, by where I used them"],
-  ["projects", "the three projects"],
-  ["project <name>", "traffix · flyrank · hr"],
+  ["projects", "the four projects"],
+  ["project <name>", "traffix · flyrank · hr · alia"],
   ["limits <name>", "what a project does not prove"],
   ["certs [issuer]", "certifications, each with its issuer's page"],
   ["label <name>", "data · judging · failures · review"],
@@ -120,7 +127,7 @@ export function createTerminal(corpus: Corpus, portfolio: Portfolio) {
       case "project":
       case "limits": {
         const key = resolve(arg.toLowerCase());
-        if (!key) return [{ kind: "error", text: `unknown project "${arg}". Try: traffix · flyrank · hr` }];
+        if (!key) return [{ kind: "error", text: `unknown project "${arg}". Try: traffix · flyrank · hr · alia` }];
         const p = PROJECTS[key];
         if (cmd.toLowerCase() === "limits")
           return [{ kind: "heading", text: `Limits — ${p.title}` }, ...p.limits.map((l) => ({ kind: "limit" as const, text: `  – ${l}` })), { kind: "link", text: `  evidence: ${p.evidence.text}`, href: p.evidence.href }];
@@ -142,7 +149,7 @@ export function createTerminal(corpus: Corpus, portfolio: Portfolio) {
         return answerLines(assistant.certs(arg));
       case "label": {
         const key = resolve(arg.toLowerCase()) as LabelKey | null;
-        if (!key) return [{ kind: "error", text: `label needs a project: traffix · flyrank · hr` }];
+        if (!key) return [{ kind: "error", text: `label needs a project: traffix · flyrank · hr · alia` }];
         const l = LABELS[key];
         const block = (title: string, items: string[], kind: "text" | "limit"): Line[] => [{ kind: "heading", text: title }, ...items.map((t) => ({ kind, text: `  – ${t}` }))];
         return [

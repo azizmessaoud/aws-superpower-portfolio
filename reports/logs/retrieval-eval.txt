@@ -6,7 +6,7 @@
 > aws-superpower-portfolio@0.1.0 content
 > tsx scripts/build-corpus.ts
 
-corpus: 22 passages
+corpus: 25 passages
 portfolio: 16 certifications, 4 smaller projects
 ┌─────────┬───────┬──────┬───────┬─────────────────────────────────────────────┬────────────────────────────────────────────────────┐
 │ (index) │ id    │ rank │ ok    │ top                                         │ question                                           │
@@ -14,7 +14,7 @@ portfolio: 16 certifications, 4 smaller projects
 │ 0       │ 'q01' │ 1    │ 'yes' │ 'tr-simulation'                             │ 'Is TraffiX deployed in Tunis?'                    │
 │ 1       │ 'q02' │ 1    │ 'yes' │ 'tr-pedestrian'                             │ 'How do you keep pedestrians safe at crossings?'   │
 │ 2       │ 'q03' │ 1    │ 'yes' │ 'tr-ambulance'                              │ 'Are ambulances faster with TraffiX?'              │
-│ 3       │ 'q04' │ 1    │ 'yes' │ 'tr-role'                                   │ 'What did you personally build in the TraffiX tea' │
+│ 3       │ 'q04' │ 1    │ 'yes' │ 'tr-role, al-role'                          │ 'What did you personally build in the TraffiX tea' │
 │ 4       │ 'q05' │ 1    │ 'yes' │ 'tr-mixed, fr-p50'                          │ 'Are the traffic results statistically significan' │
 │ 5       │ 'q06' │ 1    │ 'yes' │ 'fr-question'                               │ 'How do you decide which pages editors should rev' │
 │ 6       │ 'q07' │ 2    │ 'yes' │ 'fr-question, fr-p50, portfolio-weakest'    │ 'What precision did the ranking model reach?'      │
@@ -27,7 +27,7 @@ portfolio: 16 certifications, 4 smaller projects
 │ 13      │ 'q14' │ '-'  │ 'yes' │ ''                                          │ 'What is your favourite food?'                     │
 │ 14      │ 'q15' │ 1    │ 'yes' │ 'fr-method, fr-question, portfolio-weakest' │ 'How was the ranking model validated on new clien' │
 │ 15      │ 'q16' │ 1    │ 'yes' │ 'portfolio-weakest'                         │ 'Which project performed worst?'                   │
-│ 16      │ 'q17' │ 1    │ 'yes' │ 'tr-role'                                   │ 'What did Aziz personally build in TraffiX?'       │
+│ 16      │ 'q17' │ 1    │ 'yes' │ 'tr-role, al-role'                          │ 'What did Aziz personally build in TraffiX?'       │
 │ 17      │ 'q18' │ '-'  │ 'yes' │ ''                                          │ 'What is your favourite colour?'                   │
 │ 18      │ 'q19' │ 1    │ 'yes' │ 'pr-experience, pr-about, fr-question'      │ 'Where did he do internships?'                     │
 │ 19      │ 'q20' │ 1    │ 'yes' │ 'pr-languages'                              │ 'Which languages does he speak?'                   │
@@ -37,5 +37,7 @@ portfolio: 16 certifications, 4 smaller projects
 │ 23      │ 'q24' │ 1    │ 'yes' │ 'tr-role'                                   │ 'wat did aziz buld in trafix'                      │
 │ 24      │ 'q25' │ 1    │ 'yes' │ 'tr-ambulance'                              │ 'did trafifx make ambulences faster'               │
 │ 25      │ 'q26' │ '-'  │ 'yes' │ ''                                          │ 'Does he have a PhD?'                              │
+│ 26      │ 'q27' │ 2    │ 'yes' │ 'al-limits, al-overview, al-role'           │ 'What is ALIA?'                                    │
+│ 27      │ 'q28' │ 1    │ 'yes' │ 'al-limits, hr-accuracy'                    │ 'Has ALIA been tested with real users?'            │
 └─────────┴───────┴──────┴───────┴─────────────────────────────────────────────┴────────────────────────────────────────────────────┘
-hit@1 0.96 · hit@3 1.00 · MRR 0.978 · answerable 23 · abstentions correct 3/3
+hit@1 0.92 · hit@3 1.00 · MRR 0.960 · answerable 25 · abstentions correct 3/3

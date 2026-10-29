@@ -49,8 +49,12 @@ export function createRetriever(corpus: Corpus) {
   function search(query: string, k = 3): Result[] {
     const hits = score(index, expand(query));
     if (!hits.length || hits[0].score < MIN_SCORE) return [];
-    return hits
-      .filter((h) => h.score >= hits[0].score * RELATIVE_CUTOFF)
+    /* a result found only through typo fixes of short words ("hire" for "here") is a coincidence, not a match */
+    const typoOnly = (h: (typeof hits)[number]) => h.matched.length > 0 && h.matched.every((m) => m.via?.endsWith("a likely typo")) && h.matched.every((m) => (m.via ?? "").split(",")[0].length <= 5);
+    const kept = hits.filter((h) => !typoOnly(h));
+    if (!kept.length || kept[0].score < MIN_SCORE) return [];
+    return kept
+      .filter((h) => h.score >= kept[0].score * RELATIVE_CUTOFF)
       .slice(0, k)
       .map((h) => ({
         passage: byId.get(h.id)!,
