@@ -285,3 +285,47 @@ test("skip link is visible whenever it has focus, even after wrapping from the p
   expect(r!.y).toBeGreaterThanOrEqual(0);
   expect(r!.y + r!.height).toBeLessThanOrEqual(860);
 });
+
+test("terminal explorer: keyboard, suggestions, history, no Tab trap, evidence links", async ({ page }, info) => {
+  await page.goto("/#terminal");
+  const input = page.locator("#term-input");
+  await input.fill("project flyrank");
+  await input.press("Enter");
+  const log = page.getByRole("log", { name: "Terminal output" });
+  await expect(log).toContainText("Precision@50: 0.94");
+  await expect(log).toContainText("Observational, not causal");
+  await input.fill("ask What is the OCR accuracy on real documents?");
+  await input.press("Enter");
+  await expect(log).toContainText("has not been measured");
+  await expect(log.getByRole("link").last()).toHaveAttribute("href", /github\.com\/azizmessaoud\//);
+  await input.press("ArrowUp");
+  await expect(input).toHaveValue(/^ask What is the OCR accuracy/);
+  await input.fill("");
+  await input.press("Tab");                                  /* Tab must leave the input */
+  await expect(input).not.toBeFocused();
+  await page.getByRole("button", { name: "projects", exact: true }).click();
+  await expect(log).toContainText("HR document checks");
+  await page.locator(".terminal-section").screenshot({ path: `reports/screens/${info.project.name}-terminal.png` });
+});
+
+test("tech superpowers: seven cards, every evidenced card links to a repository", async ({ page }, info) => {
+  await page.goto("/#skills");
+  const cards = page.locator(".skill-card");
+  await expect(cards).toHaveCount(7);
+  const links = page.locator(".skill-evidence");
+  await expect(links).toHaveCount(6);
+  for (const href of await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")))) expect(href).toMatch(/^https:\/\/github\.com\/azizmessaoud\//);
+  await page.locator("#skills").screenshot({ path: `reports/screens/${info.project.name}-skills.png` });
+});
+
+test("the neural field fills the whole hero background, not only the sphere", async ({ page }) => {
+  await page.goto("/?seed=7");
+  await page.waitForTimeout(2000);
+  const lit = await page.evaluate(() => {
+    const c = document.querySelector<HTMLCanvasElement>(".brain-canvas")!, k = c.width / innerWidth, ctx = c.getContext("2d")!;
+    const count = (x0: number, x1: number) => { const d = ctx.getImageData(Math.round(x0 * k), 0, Math.round((x1 - x0) * k), Math.round(innerHeight * k)).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 20) n++; return n; };
+    return { left: count(0, innerWidth / 3), right: count((2 * innerWidth) / 3, innerWidth) };
+  });
+  expect(lit.left).toBeGreaterThan(200);                     /* the field reaches the text side too */
+  expect(lit.right).toBeGreaterThan(200);
+});

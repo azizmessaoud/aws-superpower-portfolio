@@ -25,8 +25,8 @@ The hero carries the same idea visually: a point-cloud brain inside a sphere of 
 | Check | Result | Evidence |
 |---|---|---|
 | Retrieval, 15 judged questions | hit@1 0.93 · hit@3 1.00 · MRR 0.964 · 1/1 out-of-scope question correctly refused | `reports/retrieval-keyword.json` |
-| Unit tests (Vitest) | 21 passed | `reports/logs/vitest.txt` |
-| Browser tests (Playwright, 1280 and 390 px) | 35 passed, 3 skipped by design | `reports/logs/playwright.txt` |
+| Unit tests (Vitest) | 28 passed | `reports/logs/vitest.txt` |
+| Browser tests (Playwright, 1280 and 390 px) | 41 passed, 3 skipped by design | `reports/logs/playwright.txt` |
 | Accessibility audit (WCAG 2.1 AA) | 9 issues found, 9 fixed; 0 targets under 44 px; no reflow problems at 320 px or 200 % zoom | `docs/accessibility-audit.md` |
 | axe-core | 0 serious or critical violations (desktop and mobile) | same |
 | Contrast (38 text and focus pairs) | all pass | `reports/logs/contrast.txt` |
@@ -52,4 +52,5 @@ Caveat: I wrote both the judged questions and the passage tags, so the retrieval
 - A strict Content-Security-Policy would have blocked an inline boot script; I moved it to a same-origin file instead of weakening the policy, and test the page under that exact policy.
 - My first "whole page" idea, a floating brain button in the corner, covered text on phones. Docking the brain into the navigation instead fixed it and made the feature's hint visible on every screen.
 - The accessibility audit caught things automated tools don't: a toggle announcing two states, a duplicate link, and focus not landing in the search box after a keyboard jump.
+- I brought back the terminal from my first prototype because it was eye-catching, but wired it to the same verified passages instead of scripted answers, and fixed its keyboard trap (it used to swallow the Tab key).
 - TODO: deployment lessons (Amplify build, headers, live checks).

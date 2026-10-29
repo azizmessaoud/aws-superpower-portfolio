@@ -8,10 +8,14 @@ import { buildEdges, cameraZoom, dockTravel, placeSphere, seedBrain, seedShell, 
 import { mulberry32 } from "./rng";
 
 const SETTINGS = {
-  mobile: { shell: 34, brain: 420, neighbors: 2, fps: 30, labels: false },
-  tablet: { shell: 48, brain: 800, neighbors: 3, fps: 45, labels: false },
-  desktop: { shell: 64, brain: 1400, neighbors: 3, fps: 60, labels: true },
+  mobile: { shell: 34, brain: 420, neighbors: 2, fps: 30, labels: false, field: 20 },
+  tablet: { shell: 48, brain: 800, neighbors: 3, fps: 45, labels: false, field: 32 },
+  desktop: { shell: 64, brain: 1400, neighbors: 3, fps: 60, labels: true, field: 46 },
 } as const;
+/* the intro's full-background neural field (the prototype's drifting network, in token colours) */
+const FIELD_COLORS = ["139,92,246", "6,182,212", "59,130,246", "167,139,250", "34,211,238"];
+const FIELD_LINK = 150;
+interface FieldNode { x: number; y: number; vx: number; vy: number; r: number; c: string; phase: number }
 type Breakpoint = keyof typeof SETTINGS;
 const BANDS = 4, MAX_HOPS = 4, MAX_PULSES = 28;
 const BRAIN_HALF = 0.42; /* approximate half-width of the projected brain, in model units × depth */
@@ -42,6 +46,7 @@ export function createScene(o: SceneOptions) {
   let W = 0, H = 0, stageH = 0, bp: Breakpoint = "desktop";
   let nodes: ShellNode[] = [], proj: Proj[] = [], edges: Edge[] = [], adj: Edge[][] = [];
   let brain = new Float32Array(0), brainXY = new Float32Array(0);
+  let field: FieldNode[] = [];
   let pulses: Pulse[] = [], flash = 0, frame = 0, raf = 0, last = 0;
   let progress = 0, stageTop = 0, text: Box | null = null, fixedOut: Box[] = [], sphere = { cx: 0, cy: 0, R: 0 };
   let dock = { cx: 0, cy: 0, r: 0 }, dockAllowed = true, dockActive = false, docked = false;
@@ -101,8 +106,14 @@ export function createScene(o: SceneOptions) {
       adj = nodes.map(() => []);
       edges.forEach((e) => { adj[e.from].push(e); adj[e.to].push(e); });
       pulses = []; excitation.clear();
+      field = [];
     }
     measure();
+    const fh = Math.max(stageH, 1);
+    if (!field.length) field = Array.from({ length: cfg().field }, (_, i) => ({
+      x: rand() * W, y: rand() * fh, vx: (rand() - 0.5) * 0.22, vy: (rand() - 0.5) * 0.22,
+      r: 1.6 + rand() * 2.4, c: FIELD_COLORS[i % FIELD_COLORS.length], phase: rand() * Math.PI * 2,
+    }));
     readScroll();
   }
 
@@ -143,6 +154,10 @@ export function createScene(o: SceneOptions) {
     excitation.forEach((v, i) => (v * 0.95 < 0.03 ? excitation.delete(i) : excitation.set(i, v * 0.95)));
     flash *= 0.93;
     ctx.clearRect(0, 0, W, H);
+
+    /* full-background neural field behind everything in the hero */
+    const fieldAlpha = heroOn ? (1 - span(travel, 0, 0.5)) * (0.35 + 0.65 * intro) : 0;
+    if (fieldAlpha > 0.01) drawField(fieldAlpha, t);
 
     /* the sphere and its skills: hero only */
     const kHero = (sphere.R * zoom) / (1.15 / 1.7), cyHero = sphere.cy + stageTop;
@@ -224,6 +239,45 @@ export function createScene(o: SceneOptions) {
     }
   }
 
+  function drawField(alpha: number, t: number) {
+    const lim = FIELD_LINK * FIELD_LINK;
+    const dim = (x: number, y: number) => (blocked(x, y + stageTop) ? 0.12 : 1);
+    ctx.lineWidth = 1;
+    for (let i = 0; i < field.length; i++) {
+      const a = field[i];
+      for (let j = i + 1; j < field.length; j++) {
+        const b = field[j], dx = a.x - b.x, dy = a.y - b.y, dd = dx * dx + dy * dy;
+        if (dd >= lim) continue;
+        const k = (1 - dd / lim) * 0.32 * alpha * Math.min(dim(a.x, a.y), dim(b.x, b.y), dim((a.x + b.x) / 2, (a.y + b.y) / 2));
+        if (k < 0.01) continue;
+        ctx.strokeStyle = `rgba(${a.c},${k})`;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y + stageTop); ctx.lineTo(b.x, b.y + stageTop); ctx.stroke();
+      }
+    }
+    for (const n of field) {
+      const y = n.y + stageTop, d = dim(n.x, n.y) * alpha, r = n.r * (1 + 0.2 * Math.sin(t * 0.9 + n.phase));
+      ctx.fillStyle = `rgba(${n.c},${0.12 * d})`;
+      ctx.beginPath(); ctx.arc(n.x, y, r * 3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = `rgba(${n.c},${0.85 * d})`;
+      ctx.beginPath(); ctx.arc(n.x, y, r, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function stepField() {
+    const fh = Math.max(stageH, 1);
+    for (const n of field) {
+      const dx = n.x - pointer.x, dy = n.y + stageTop - pointer.y, dd = dx * dx + dy * dy;
+      if (pointer.active && dd < 160 * 160 && dd > 0) { const d = Math.sqrt(dd), f = (1 - d / 160) * 0.06; n.vx += (dx / d) * f; n.vy += (dy / d) * f; }
+      n.vx *= 0.992; n.vy *= 0.992;
+      const sp = Math.hypot(n.vx, n.vy);
+      if (sp > 0.66) { n.vx *= 0.66 / sp; n.vy *= 0.66 / sp; }
+      if (sp < 0.08) { n.vx += (rand() - 0.5) * 0.02; n.vy += (rand() - 0.5) * 0.02; }
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < -20) n.x = W + 20; else if (n.x > W + 20) n.x = -20;
+      if (n.y < -20) n.y = fh + 20; else if (n.y > fh + 20) n.y = -20;
+    }
+  }
+
   function drawNodes(order: number[], near: boolean) {
     for (const i of order) {
       const p = proj[i], n = nodes[i];
@@ -276,7 +330,7 @@ export function createScene(o: SceneOptions) {
   function loop(now: number) {
     raf = 0;
     if (!shouldRun()) { still(); return; }
-    if (now - last >= 1000 / cfg().fps - 1) { last = now; frame++; draw(now); }
+    if (now - last >= 1000 / cfg().fps - 1) { last = now; frame++; if (!docked) stepField(); draw(now); }
     raf = requestAnimationFrame(loop);
   }
   const still = () => { if (!destroyed && !raf) draw(performance.now()); };

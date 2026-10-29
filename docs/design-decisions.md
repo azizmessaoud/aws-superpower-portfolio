@@ -17,11 +17,11 @@
 |---|---|
 | Violet **text** uses `#a78bfa` (`--violet-light`) | `#8b5cf6` measures 4.19:1 on `--bg` and 3.93:1 on `--surface` (`reports/logs/contrast.txt`); text needs 4.5:1 |
 | Primary button gradient ends at `#2563eb` | White on the prototype's `#3b82f6` end measured 3.68:1; on `#2563eb` it is 5.17:1 |
-| Terminal dropped | The official idea list already suggests "a command line visitors type into"; my spec drops it; it would compete with the signature feature |
+| Terminal dropped (28 Oct) → **restored on Aziz's request (29 Oct)** | Restored as a *second way into the same evidence*: `ask` uses the Ask my brain retriever; `project`/`limits` print verified numbers with their limits and links. No invented output, no `sudo hire`, neutral prompt, Tab never captured. Kept secondary: Ask my brain stays the headline feature and the nav hint |
 | Headline "Ask my brain what I've built." | Names the creative feature in the first viewport, so the hint is the headline itself; the prototype's "that actually ship" is on the deny-list |
 | No stat tiles | Hero-metric templates invite arbitrary numbers; each number now sits inside its project with its definition and limits |
 | Three different project layouts | TraffiX = control hierarchy + results table with the slower ambulance; FlyRank = two 50-cell ranking queues (47 vs 38 hits = 0.94 vs 0.76); HR = pipeline with outcome notes. Content decides the shape |
-| Skills split into "used in the projects below" vs "also in my toolkit" | Ties each tool to evidence instead of levels or percentages |
+| Tech Superpowers in the prototype's card view (29 Oct) | Same glass cards, cyan titles and highlighted chips, but six evidenced domains, each ending in an "Used in …" link, plus a dashed "Also in my toolkit" card. Prototype chips with no source (YOLOv8, DeepSORT, PySpark, Airflow, MLflow…) dropped; team ownership respected (TraffiX React UI and DuckDB/Parquet belonged to other pairs) |
 | Emoji icons replaced by stroke SVGs in the prototype's own style | Emoji render inconsistently and read as decoration |
 
 ## Motion
@@ -30,6 +30,7 @@
 - **Supporting motion only where it explains state:** result cards rise 8 px once; nav underline marks the current section; buttons press to 0.97 for 100 ms.
 - **CSS transitions, no Motion library.** The spec asked to compare: everything here is opacity/transform on known elements, so Motion's ~30 kB buys nothing yet.
 - **Canvas 2D, not WebGL:** ≈1,400 brain points and 64 nodes draw well inside a 60 fps budget, and 2D is simpler to test and pause.
+- **Full intro background (29 Oct):** a drifting neural field (the prototype's nodes and links, token colours) fills the whole hero behind the brain sphere; dimmed to 12 % under the text; fades as the brain travels to the nav; moves only in animation frames.
 - **Whole page (29 Oct):** one fixed canvas. At the end of the pinned scroll (80 svh) the brain shrinks and flies into the nav's "Ask my brain" link, which shows an empty ring until it arrives. Rejected first try: a floating bottom-right dock, because on phones it covered body text.
 - **Controls:** Pause/Play lives in the nav, so it is reachable on every screen (WCAG 2.2.2); remembered across reloads; nothing resumes it except the visitor. The loop runs only while the hero moves or the docked brain is hovered/focused; it stops in hidden tabs. Reduced motion: no pin, no intro, still frames that follow the scroll, no pause button (nothing moves).
 - **Clear text:** the scene measures the headline, lead, buttons and hint every resize and never draws brain dots, nodes or labels inside them, nor behind the pause button.

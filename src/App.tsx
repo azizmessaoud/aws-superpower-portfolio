@@ -7,6 +7,7 @@ import Skills from "./sections/Skills";
 import Projects from "./sections/Projects";
 import AskMyBrain from "./sections/AskMyBrain";
 import Contact from "./sections/Contact";
+import Terminal from "./sections/Terminal";
 
 const NeuralScene = lazy(() => import("./scene/NeuralScene"));
 
@@ -48,6 +49,7 @@ export default function App() {
         <Skills />
         <Projects />
         <AskMyBrain />
+        <Terminal />
         <Contact />
       </main>
       <footer className="footer">
