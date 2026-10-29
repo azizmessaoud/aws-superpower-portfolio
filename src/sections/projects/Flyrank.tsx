@@ -1,4 +1,5 @@
-import { Evidence, Limits } from "./Evidence";
+import { Evidence } from "./Evidence";
+import Label from "./Label";
 
 const C = "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md";
 const NB = "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/notebooks/w05_model.ipynb";
@@ -43,11 +44,7 @@ export default function Flyrank() {
           <li><strong>Error.</strong> R² 0.50 and MAE 2.51 clicks, against R² 0.26 for the calibrated baseline.</li>
         </ul>
       </div>
-      <Limits items={[
-        "One decision date and one outcome week.",
-        "Observational, not causal: it does not show that editing a page increases traffic.",
-        "The internship warehouse is gated, so the result cannot be fully reproduced in public.",
-      ]} />
+      <Label project="flyrank" />
       <Evidence links={[{ label: "Capstone report @ a220b9e", url: `${C}#L55` }, { label: "Notebook w05 (cell output)", url: NB }]} />
     </article>
   );

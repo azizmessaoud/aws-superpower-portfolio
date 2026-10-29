@@ -355,3 +355,27 @@ test("clicking on the hero text still sends a pulse through the network", async 
   expect(await pulses()).toBeLessThanOrEqual(mid);
 });
 
+
+test("the terminal understands a plain question about certifications", async ({ page }, info) => {
+  await page.goto("/#terminal");
+  const input = page.locator("#term-input");
+  const log = page.getByRole("log", { name: "Terminal output" });
+  await input.fill("whats aziz certifs");
+  await input.press("Enter");
+  await expect(log).toContainText("OCI Data Science Professional");
+  await expect(log).not.toContainText("command not found");
+  await expect(log.getByRole("link", { name: /Azure AI Fundamentals/ })).toHaveAttribute("href", /learn\.microsoft\.com/);
+  await input.fill("do you have the AWS cloud practitioner certificate?");
+  await input.press("Enter");
+  await expect(log).toContainText("none is claimed");
+  await page.locator("#terminal").screenshot({ path: `reports/screens/${info.project.name}-terminal-certs.png` });
+});
+
+test("every project ends with the same four-part label", async ({ page }) => {
+  await page.goto("/#projects");
+  const labels = page.locator(".plabel");
+  await expect(labels).toHaveCount(3);
+  for (const l of await labels.all()) {
+    await expect(l.locator("dt")).toHaveText([/Data/, /How it was judged/, /Where it fails/, /Who reviews the output/]);
+  }
+});

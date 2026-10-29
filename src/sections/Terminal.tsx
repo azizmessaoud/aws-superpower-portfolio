@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { ASK_EVENT } from "../ask";
-import type { Corpus } from "../content/schema";
+import type { Corpus, Portfolio } from "../content/schema";
 import corpusJson from "../generated/corpus.json";
+import portfolioJson from "../generated/portfolio.json";
 import { createTerminal, type Line } from "../terminal/commands";
 import Icon from "../ui/Icon";
 
@@ -9,6 +10,8 @@ const PROMPT = "visitor@ask-my-brain:~$";
 const TRY = [
   "help",
   "projects",
+  "what are Aziz's certifications?",
+  "label flyrank",
   "ask What did you personally build in the TraffiX team?",
   "ask Is TraffiX deployed in Tunis?",
   "ask How did you avoid data leakage?",
@@ -19,7 +22,7 @@ type Entry = { id: number; cmd?: string; lines: Line[] };
 /* The Terminal Explorer is "Ask my brain": questions and commands over the same verified passages.
  * Tab is never captured (no keyboard trap); ↑/↓ recall history; output is a polite live log. */
 export default function Terminal() {
-  const term = useMemo(() => createTerminal(corpusJson as Corpus), []);
+  const term = useMemo(() => createTerminal(corpusJson as Corpus, (portfolioJson as Portfolio).certifications), []);
   const [log, setLog] = useState<Entry[]>([{ id: 0, lines: [{ kind: "muted", text: "Type help to see the commands, or try one below." }] }]);
   const [value, setValue] = useState("");
   const [history, setHistory] = useState<string[]>([]);

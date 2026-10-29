@@ -1,3 +1,13 @@
+
+> aws-superpower-portfolio@0.1.0 eval:retrieval
+> npm run content && tsx scripts/eval-retrieval.ts
+
+
+> aws-superpower-portfolio@0.1.0 content
+> tsx scripts/build-corpus.ts
+
+corpus: 16 passages
+portfolio: 16 certifications, 4 smaller projects
 ┌─────────┬───────┬──────┬───────┬────────────────────────────┬────────────────────────────────────────────────────┐
 │ (index) │ id    │ rank │ ok    │ top                        │ question                                           │
 ├─────────┼───────┼──────┼───────┼────────────────────────────┼────────────────────────────────────────────────────┤

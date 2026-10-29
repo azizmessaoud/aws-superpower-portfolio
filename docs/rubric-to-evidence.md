@@ -87,3 +87,5 @@ Judging process (official): Gate 1 "AI and human scoring", top 50 advance; Gate 
 - R-04 was re-checked: the repo is not public.
 - Statuses reworded: nothing is "IN PROGRESS" except the three docs. The chat-only revision 2 marked Communication "IN PROGRESS", but nothing for it exists yet.
 - Caching note for Stage 6, adopted from the other session's review: mark only Vite's hashed `/assets/*` as immutable; serve `/models/` under a versioned folder (`/models/all-MiniLM-L6-v2-<revision>/`).
+
+> **Update 29 Oct 2026:** "Ask my brain" is now the Terminal Explorer (plain questions work, certifications included). The pause button was removed on request, so rows that mention it are out of date. Counts: Vitest 38, Playwright 52 passed / 4 skipped. Live checks and AWS rows are still BLOCKED until Amplify is deployed.

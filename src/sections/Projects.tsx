@@ -13,10 +13,10 @@ export default function Projects() {
     <section id="projects" className="section projects" aria-labelledby="projects-title">
       <div className="inner">
         <p className="sec-label">Projects</p>
-        <h2 id="projects-title" className="sec-h2">Three projects, each with its evidence.</h2>
+        <h2 id="projects-title" className="sec-h2">Three projects, with the evidence next to each.</h2>
         <p className="sec-lead">
-          A team simulation, an internship capstone and a prototype. Each shows what was measured, under which conditions,
-          and what it does not prove.
+          A team simulation, an internship capstone and a prototype. Each ends with the same label: where the data came from,
+          how it was judged, where it fails, and who reviews the output.
         </p>
         <Traffix />
         <Flyrank />

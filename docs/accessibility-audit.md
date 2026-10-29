@@ -1,3 +1,5 @@
+> **Update 29 Oct 2026:** this audit was run on 28 Oct. Since then the separate "Ask my brain" section and the page-wide pause button were removed (the terminal is now the feature, and "Ask my brain" in the nav goes to it), and certifications, a portrait and project labels were added. axe-core still reports 0 serious or critical issues, but the manual keyboard and screen-reader checks below have not been repeated. Without the pause button the site no longer meets WCAG 2.2.2 for visitors who allow motion.
+
 ## Accessibility Audit: Ask my brain portfolio (local build)
 **Standard:** WCAG 2.1 AA (plus 2.2's 2.4.11 and 2.5.8 where noted) | **Date:** 29 Oct 2026
 **Method:** axe-core 4.10 (wcag2a, wcag2aa, wcag21a, wcag21aa, best-practice) at 1280 and 390 px · scripted keyboard pass (44 stops, both widths, scroll allowed to settle) · touch-target measurement · reflow at 320 px and 1280 px @ 200 % zoom · WCAG 1.4.12 text-spacing override · token contrast script · Chromium accessibility tree. **Not done:** real screen readers (VoiceOver, NVDA) and real devices.

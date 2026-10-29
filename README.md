@@ -1,6 +1,6 @@
 # aws-superpower-portfolio
 
-Aziz Messaoud's entry for the AWS Student Builder Challenge. A portfolio whose creative feature, **Ask my brain**, finds verified passages about my projects and shows the evidence behind each one.
+Aziz Messaoud's entry for the AWS Student Builder Challenge. A portfolio whose creative feature, **Ask my brain**, is a terminal: type a plain question and it finds verified passages about my projects, or my certifications, and shows the evidence behind each one.
 
 ```sh
 npm ci

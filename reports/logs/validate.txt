@@ -1,1 +1,5 @@
+
+> aws-superpower-portfolio@0.1.0 validate
+> tsx scripts/validate-content.ts
+
 content validation passed: 16 passages, 20 claims, 15 judged questions

@@ -25,9 +25,9 @@ export default function Skills() {
     <section id="skills" className="section skills" aria-labelledby="skills-title">
       <div className="inner">
         <p className="sec-label">Tech Superpowers</p>
-        <h2 id="skills-title" className="sec-h2">The tools I reach for when it has to work.</h2>
+        <h2 id="skills-title" className="sec-h2">Tools, and where I used each one.</h2>
         <p className="sec-lead">
-          Six capability domains. One through-line: every tool links to the repository where I used it.
+          Each card links to the repository where I used the tool.
         </p>
         <ul className="skills-grid">
           {DOMAINS.map((d) => (

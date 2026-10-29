@@ -1,3 +1,7 @@
+
+> aws-superpower-portfolio@0.1.0 contrast
+> tsx scripts/contrast-check.ts
+
 PASS  fg            on bg                 16.95:1  (needs 4.5:1)
 PASS  fg-muted      on bg                 6.92:1  (needs 4.5:1)
 PASS  violet-light  on bg                 6.52:1  (needs 4.5:1)

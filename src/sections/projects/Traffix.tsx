@@ -1,4 +1,5 @@
-import { Evidence, Limits } from "./Evidence";
+import { Evidence } from "./Evidence";
+import Label from "./Label";
 
 const V = "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md";
 const R = "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md";
@@ -52,12 +53,7 @@ export default function Traffix() {
           <p className="results-note">Ambulances were also slower than fixed-time signals (197.0 s). None of these differences is significant at p &lt; 0.05 with three seeds.</p>
         </div>
       </div>
-      <Limits items={[
-        "Simulation only, with synthetic road demand.",
-        "Three seeds and three scenarios; no result is statistically significant yet.",
-        "18 of 21 junction roads use unverified lane counts.",
-        "The slower ambulance trips are not explained yet.",
-      ]} />
+      <Label project="traffix" />
       <Evidence links={[{ label: "README @ d54b071", url: `${R}#L1-L11` }, { label: "Validation report §5.3–5.5", url: V }]} />
     </article>
   );

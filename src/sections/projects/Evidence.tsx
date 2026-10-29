@@ -9,12 +9,3 @@ export function Evidence({ links }: { links: { label: string; url: string }[] })
     </ul>
   );
 }
-
-export function Limits({ items }: { items: string[] }) {
-  return (
-    <div className="limits">
-      <h4><Icon name="alert" /> Limits</h4>
-      <ul>{items.map((i) => <li key={i}>{i}</li>)}</ul>
-    </div>
-  );
-}
