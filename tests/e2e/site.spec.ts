@@ -349,6 +349,21 @@ test("stopping the scroll mid-way never leaves the brain hanging: it finishes th
   await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
 });
 
+test("pausing mid-flight freezes the brain in place and resumes the same journey", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(900);
+  const run = await runway(page);
+  await scrollPage(page, Math.round(run * 0.92));
+  await page.waitForTimeout(180);
+  const toggle = page.getByRole("button", { name: "Pause motion" });
+  await toggle.click();
+  await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
+  await page.waitForTimeout(450);
+  await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
+  await page.getByRole("button", { name: "Resume motion" }).click();
+  await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/, { timeout: 2000 });
+});
+
 test("rapid scroll reversals and full-page jumps leave the dock synchronized", async ({ page }) => {
   await page.goto("/");
   await page.waitForTimeout(900);
