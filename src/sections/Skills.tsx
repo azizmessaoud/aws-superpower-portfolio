@@ -1,19 +1,20 @@
 import Icon from "../ui/Icon";
 
 /* Tech Superpowers, in the prototype's card view with verified content: each domain names the tools the
- * linked repository shows I used. Team ownership respected: TraffiX's React UI and DuckDB/Parquet layer
+ * linked repository shows I used. Team ownership respected: the RAG assistant is a team project and the card names only my part, from my own account; TraffiX's React UI and DuckDB/Parquet layer
  * belonged to other pairs, so they are not credited to TraffiX here. No levels, bars or percentages. */
 const G = "https://github.com/azizmessaoud";
 const TRAFFIX = `${G}/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a`;
 const FLY = `${G}/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204`;
 const HR = `${G}/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52`;
-const SITE = `${G}/aws-superpower-portfolio/blob/main`;
+/* A college team project owned by a teammate; the card says so. Pinned to the commit read on 29 Oct 2026. */
+const RAG = "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c";
 
 const DOMAINS: { icon: Parameters<typeof Icon>[0]["name"]; title: string; chips: string[]; hi: string[]; where: string; href: string }[] = [
   { icon: "ranking", title: "Machine learning & ranking", chips: ["scikit-learn", "Random Forest", "Grouped holdout", "Precision@50"], hi: ["scikit-learn"], where: "FlyRank capstone", href: `${FLY}/work/capstone_report.md#L38-L44` },
   { icon: "agents", title: "Multi-agent systems", chips: ["SUMO", "TraCI", "Controllers", "Safety rules", "Reason codes"], hi: ["SUMO"], where: "TraffiX (my pair: control)", href: `${TRAFFIX}/README.md#L635-L648` },
   { icon: "document", title: "Document AI", chips: ["Docling", "RapidOCR", "Validation", "Anomaly detection"], hi: ["Docling"], where: "HR prototype", href: `${HR}/README.md#L1-L16` },
-  { icon: "retrieval", title: "Retrieval & evaluation", chips: ["BM25", "Judged questions", "hit@k", "MRR"], hi: ["BM25"], where: "Ask my brain terminal (this site)", href: `${SITE}/src/retrieval/bm25.ts` },
+  { icon: "retrieval", title: "Retrieval & LLM apps", chips: ["Hybrid RAG", "BM25 + RRF", "Qdrant", "Ollama", "Multilingual"], hi: ["Hybrid RAG"], where: "Administrative procedures assistant (team project, my part: RAG)", href: `${RAG}/README.md#architecture-and-stack` },
   { icon: "data", title: "Data engineering", chips: ["DuckDB", "SQL", "Pandas", "Data contracts"], hi: ["DuckDB"], where: "FlyRank capstone notebooks", href: `${FLY}/work/notebooks/w03_data_contract.ipynb` },
   { icon: "api", title: "APIs, apps & tests", chips: ["FastAPI", "Docker", "pytest", "React + TypeScript"], hi: ["FastAPI"], where: "HR prototype · this site", href: `${HR}/README.md#L310-L325` },
 ];

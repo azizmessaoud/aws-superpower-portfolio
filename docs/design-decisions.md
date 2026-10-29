@@ -50,4 +50,4 @@
 - Aziz asked to remove the separate "Ask my brain" form because the Terminal Explorer does the same job. The `ask` command now carries the feature name; the hero button, the hero hint and the nav "Ask my brain" link (where the brain docks) all go to `#terminal`. Same retriever, same 16 passages.
 - Added a Certifications section (5 main credentials + 11 shorter courses) and, from the main portfolio, volunteering/clubs and three smaller projects. Wording and links are copied from https://azizmessaoud.github.io/projectx0/ (read 29 Oct); not yet re-checked at the issuers. FlyRank dates stay withheld (D2) and the CV link stays out (D8).
 - Not carried over: the Vital Laboratories avatar project (NDA, no public evidence to link) and the "How I work" steps.
-
+- Retrieval card replaced (29 Oct): "Retrieval & evaluation / this site" was self-referential, so it now reads "Retrieval & LLM apps" and links to the team RAG assistant (owner: EyaLaourine, pinned to 229191a). Role wording is Aziz's own account ("worked on the RAG component"); the repo lists no contributors. Chips come from that repo's README stack section.

@@ -317,7 +317,7 @@ test("tech superpowers: seven cards, every evidenced card links to a repository"
   await expect(cards).toHaveCount(7);
   const links = page.locator("#skills .skill-evidence");
   await expect(links).toHaveCount(6);
-  for (const href of await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")))) expect(href).toMatch(/^https:\/\/github\.com\/azizmessaoud\//);
+  for (const href of await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")))) expect(href).toMatch(/^https:\/\/github\.com\/(azizmessaoud|EyaLaourine)\//);
   await page.locator("#skills").screenshot({ path: `reports/screens/${info.project.name}-skills.png` });
 });
 
