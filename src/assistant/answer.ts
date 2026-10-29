@@ -78,7 +78,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     const asked = ws.filter((w) => w.length >= 3 && !STOP.has(w) && issuers.some((i) => i.includes(w)));
     const missing = OTHER_ISSUERS.filter((i) => new RegExp(`\\b${i}\\b`).test(q) && !issuers.some((x) => x.includes(i)));
     const shown = asked.length ? certifications.filter((c) => asked.some((w) => c.issuer.toLowerCase().includes(w))) : certifications;
-    const line = (c: (typeof certifications)[number]) => `${c.title} · ${c.issuer} · ${c.year}${c.kind === "learning" ? " (course)" : ""}`;
+    const line = (c: (typeof certifications)[number]) => `${c.title} · ${c.issuer} · ${c.year}${c.kind === "learning" ? ` (${c.detail})` : ""}`;
     const evidence = shown.map((c) => ({ label: line(c), url: c.href }));
     if (missing.length && !asked.length)
       return make({

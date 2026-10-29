@@ -85,3 +85,16 @@ describe("plain-language questions", () => {
   });
 });
 
+describe("small terminal behaviours", () => {
+  it("labels each shorter credential as the course or certificate it is", () => {
+    const out = text(term.run("certs"));
+    expect(out).toContain("Hashgraph Developer · The Hashgraph Association · 2025 (certificate)");
+    expect(out).toContain("Fundamentals of Deep Learning · NVIDIA · 2025 (Course)".replace("Course", "course"));
+  });
+  it("a single topic word answers from evidence, and a mistyped command still says command not found", () => {
+    expect(text(term.run("ambulances"))).toContain("Ambulances are slower");
+    expect(text(term.run("zzz"))).toContain("command not found: zzz");
+    expect(term.lastOutcome).toBeUndefined();
+  });
+});
+

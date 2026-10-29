@@ -162,6 +162,12 @@ export function createTerminal(corpus: Corpus, portfolio: Portfolio) {
       default:
         /* A sentence is a question, not a mistyped command. One unknown word is still reported as a command. */
         if (input.includes(" ") || input.endsWith("?")) return answerLines(assistant.ask(input));
+        {
+          /* one word that is not a command may still be a topic ("traffix", "ocr"): answer it if evidence exists */
+          const topic = assistant.ask(input);
+          if (topic.outcome === "supported" || topic.outcome === "contradicted") return answerLines(topic);
+          last = undefined; /* a mistyped command is not a question the mind should react to */
+        }
         return [{ kind: "error", text: `command not found: ${cmd}` }, { kind: "muted", text: "Type help for the commands, or ask a question in plain words." }];
     }
   }

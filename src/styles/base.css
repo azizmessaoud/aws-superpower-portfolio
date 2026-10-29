@@ -273,8 +273,10 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .cert-note { color: var(--fg-muted); font-size: var(--text-small); margin-top: var(--space-xs); }
 .cert-issuer { font-family: var(--font-m); font-size: 12px; color: var(--violet-light); margin-bottom: var(--space-3xs); }
 .cert-learning { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-xs) var(--space-lg); }
-.cert-learning a { display: flex; flex-direction: column; justify-content: center; min-height: 44px; padding: var(--space-3xs) 0; color: var(--fg); text-underline-offset: 3px; }
-.cert-learning a span { color: var(--fg-muted); font-size: var(--text-small); }
+.cert-learning a { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 44px; padding: var(--space-3xs) 0; color: var(--fg-soft); text-decoration: none; }
+.cert-learning .cert-t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; text-decoration-color: rgba(148, 163, 184, 0.45); transition: color var(--dur-base), text-decoration-color var(--dur-base); }
+.cert-learning .cert-m { color: var(--fg-muted); font-size: 13px; }
+.cert-learning a:hover .cert-t, .cert-learning a:focus-visible .cert-t { color: var(--violet-light); text-decoration-color: var(--violet-light); }
 .volunteer { margin-top: var(--space-3xl); }
 .volunteer h3, .small-projects h3 { font-family: var(--font-h); font-size: var(--text-h3); margin-bottom: var(--space-md); }
 .volunteer a { color: var(--violet-light); text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 44px; }

@@ -35,8 +35,8 @@ export default function Certifications() {
             <ul className="cert-learning">
               {LEARNING.map((l) => (
                 <li key={l.title}>
-                  <a href={l.href}>{l.title} <span>{l.issuer} · {l.detail} · {l.year}</span></a>
-                  {l.extra && <a href={l.extra.href}>{l.extra.label}</a>}
+                  <a href={l.href}><span className="cert-t">{l.title}</span><span className="cert-m">{l.issuer} · {l.detail} · {l.year}</span></a>
+                  {l.extra && <a href={l.extra.href}><span className="cert-t">{l.extra.label}</span></a>}
                 </li>
               ))}
             </ul>

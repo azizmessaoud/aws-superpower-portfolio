@@ -20,7 +20,7 @@ const color = (name: string) => parse(tok[name]);
 const ground = (g: string): RGBA => (g.includes("/") ? over(color(g.split("/")[0]), color(g.split("/")[1])) : color(g));
 const PAIRS: [string, string, number][] = [
   ...["bg", "bg-deep", "surface", "surface-v", "glass5/bg", "glass5/surface", "glass5/surface-v"].flatMap((g) => [
-    ["fg", g, 4.5], ["fg-muted", g, 4.5], ["violet-light", g, 4.5], ["cyan", g, 4.5],
+    ["fg", g, 4.5], ["fg-soft", g, 4.5], ["fg-muted", g, 4.5], ["violet-light", g, 4.5], ["cyan", g, 4.5],
   ] as [string, string, number][]),
   ["fg-lead", "bg", 4.5],
   ["on-primary", "primary", 4.5], ["on-primary", "blue-strong", 4.5],
