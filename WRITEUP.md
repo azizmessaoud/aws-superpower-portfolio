@@ -1,61 +1,77 @@
-# Ask my brain — write-up (draft for the Builder Center "Your project" entry)
+# Ask my brain: a portfolio that shows its work (draft for the Builder Center "Your project" entry)
 
-> Status 29 Oct 2026 (updated): built and tested locally, code public on GitHub; **not deployed**. Every `TODO` must be replaced with what actually happened. Don't list an AWS service that wasn't used.
+> Status 29 Oct 2026: built and tested locally; code public on GitHub; **not deployed on AWS yet**. Every `TODO` must be replaced with what actually happened. Don't list an AWS service that wasn't used.
 
 **Live site:** TODO (no Amplify deployment yet)
 **GitHub:** https://github.com/azizmessaoud/aws-superpower-portfolio
 
-## What it is
+## Problem
 
-A portfolio whose creative feature is **Ask my brain**, a terminal you can type a plain question into ("whats aziz certifs", "are ambulances faster with TraffiX?"). It answers from verified passages, each with its limitations and a link to the exact file and commit it came from, and it lists my certifications with each issuer's own page. If nothing verified answers, or I hold no such credential (an AWS one, for example), it says so instead of guessing. It retrieves evidence; it doesn't write answers or judge anyone.
+Portfolios often make big claims and leave the reader to trust them. An early prototype of this site did, and when I checked it against my repositories, several of its numbers and claims did not hold, so I dropped them. I wanted a portfolio where a reader can check every claim in a few seconds, including the parts that went badly.
 
-Each project also ends with the same four-part label: where the data came from, how it was judged, where it fails, and who reviews the output. The terminal prints the same label with `label <project>`.
+## Idea
 
-The hero carries the same idea visually: a point-cloud brain inside a sphere of my skills (from my existing portfolio). On open the camera pulls back from the brain; scrolling while the hero is pinned dollies back into it.
+**Ask my brain** is a question box in the first screen. You ask about my projects or my AWS context in your own words. It answers only from verified passages, and each answer has three parts: the answer, the evidence (the exact file and commit it came from), and the limitations. It keeps four outcomes apart:
 
-**Visible hint:** the headline is "Ask my brain what I've built", the main button goes to the terminal, and a "Try: Are ambulances faster with TraffiX?" button under the buttons runs that question.
+- **Answer**: the evidence supports it.
+- **The evidence disagrees**: the evidence says the opposite of the question's premise ("Did TraffiX make ambulances faster?" gets 240.0 s against 213.2 s with actuated signals).
+- **Not verified**: nothing here proves it either way ("Does Aziz use Bedrock?").
+- **Could not answer**: the question was empty or too long.
 
-## How it works
+It retrieves; it does not write answers or judge anyone.
 
-- Content lives as data: `content/sources.yaml`, `claims.yaml`, `passages.yaml` (16 passages), `judged.yaml` (15 questions).
-- `scripts/validate-content.ts` fails the build if a passage publishes an unresolved or prohibited claim, a caveated claim has no limitation, or any source file contains a deny-listed phrase (invented metrics, deployment claims before deployment).
-- Retrieval is my own BM25 with field weights, a light English/French stemmer and a small synonym list, running entirely in the browser.
-- Static React + TypeScript + Vite site; no backend, no forms that send data.
+## Why the mind animation reflects the project
 
-## Results I measured (local, 28 Oct 2026)
+The point-cloud brain beside the question box is the interface's state, nothing else: idle, listening while you type, retrieving evidence, answering, uncertain (amber, calmer) or error. It never shows what a model "thinks" and it carries no confidence value. The same state is written as a line of text under the box, so it is readable without the animation and in reduced-motion mode. The brain is a picture of the honest part of the project: when the evidence is missing, it goes quiet instead of looking busy.
 
-| Check | Result | Evidence |
+## Architecture
+
+```
+browser only (static site)
+  content/*.yaml  --npm run build (validate, generate data)-->  src/generated/*.json
+  question --> src/assistant/answer.ts (intent routing + BM25 retriever over 17 passages)
+           --> Answer { outcome, answer, evidence[], limitations[] }
+           --> hero panel and terminal (same engine), mind state --> Canvas scene
+
+hosting (prepared, NOT deployed): GitHub --> AWS Amplify Hosting build (npm ci, npm run build) --> serve dist/
+```
+
+- No backend, no model, no network call while answering. `content/aws-status.yaml` is the one place AWS facts live; the build fails if it claims a deployment without a URL and a build record, or a service without evidence.
+- **AWS services actually used: none yet.** Planned and not built: AWS Amplify Hosting (console deploy), Amazon API Gateway, AWS Lambda, Amazon Bedrock, S3 or Bedrock Knowledge Bases. If a backend is added later, the browser retriever stays as the fallback.
+
+## What worked
+
+- Treating content as data with a validator: it caught a mismatched source anchor and a withheld metric quoted in a comment on its first run, and it now also guards the AWS claims (checked by editing the files to break each rule, then restoring them).
+- Separating "contradicted" from "not verified". My own test showed the difference matters: "Is TraffiX deployed in Tunis?" is a no (it is a simulation), "Does Aziz use Bedrock?" is "not verified".
+- Local checks on 29 Oct 2026, with logs in `reports/logs/`:
+
+| Check | Result | Log |
 |---|---|---|
-| Retrieval, 15 judged questions | hit@1 0.93 · hit@3 1.00 · MRR 0.964 · 1/1 out-of-scope question correctly refused | `reports/retrieval-keyword.json` |
-| Unit tests (Vitest) | 38 passed (29 Oct, after the terminal and certification changes) | `reports/logs/vitest.txt` |
-| Browser tests (Playwright, 1280 and 390 px) | 52 passed, 4 skipped by design (29 Oct) | `reports/logs/playwright.txt` |
-| Accessibility audit (WCAG 2.1 AA) | 9 issues found, 9 fixed on 28 Oct, before the pause button and the separate Ask section were removed; not re-audited by hand since | `docs/accessibility-audit.md` |
-| axe-core | 0 serious or critical violations (desktop and mobile), part of the 29 Oct Playwright run | `reports/logs/playwright.txt` |
-| Contrast (38 text and focus pairs) | all pass (29 Oct) | `reports/logs/contrast.txt` |
-| gitleaks | no leaks found on 28 Oct; NOT RUN since (tool not installed in this session) | `reports/logs/gitleaks-dir.txt` |
+| Vitest (answer engine, mind state, retrieval, terminal) | 60 passed | `vitest.txt` |
+| Playwright at 1280 and 390 px, incl. axe-core and the demo flow | 64 passed, 6 skipped by design | `playwright.txt` |
+| Content validation | passed (17 passages, 20 claims, 18 judged questions) | `validate.txt` |
+| Contrast, text and focus pairs from the tokens | 38 pass | `contrast.txt` |
+| Retrieval on 18 judged questions | hit@1 0.94, hit@3 1.00, MRR 0.969, 2 of 2 no-evidence questions refused | `retrieval-eval.txt` |
+| Production build | passed | `build.txt` |
 
-Caveat: I wrote both the judged questions and the passage tags, so the retrieval score is optimistic. TODO: add questions written by someone who hasn't seen the tags.
+## What failed
 
-## AWS services used
+- "whats aziz certifs" first answered "command not found". Plain questions now work, and a test checks that asking for an AWS credential I don't hold says so.
+- My first question throttle ignored a question asked within 600 ms of page load. A browser test found it.
+- Links like `/#projects` did nothing on load or refresh, because the page is rendered by script. Fixed and tested.
+- The hero panel was taller than the screen. I shrank the headline, hid the intro paragraph while an answer is showing, and added a test that the panel fits at 1280x860, 1280x720, 390x844 and 320x640.
+- I removed the page-wide pause button at my own request. That drops a WCAG 2.2.2 mechanism for motion longer than 5 seconds; reduced-motion visitors still get still frames, and the status text never depends on the animation.
 
-- TODO **AWS Amplify Hosting** — only once the repo is connected in the console and a build succeeds. `amplify.yml` and `customHttp.yml` are prepared.
-- TODO AWS Budgets alert, only if set up during the Day 1 guide.
+## What I learned
 
-## Screenshots
-
-- Portfolio (local build): `reports/screens/` — hero start, middle, end at 1280 and 390 px; Ask my brain results; mobile menu; reduced motion. TODO retake on the live URL.
-- TODO AWS: Amplify app overview, successful build log, domain/URL page.
-
-## What I learned / challenges (true so far)
-
-- My own CVs disagree with my repositories (degree name, city, internship dates, one FlyRank metric, and how autonomous the HR pipeline is). I built the site from the repositories and kept the conflicts off the page until I resolve them.
-- A validator caught my own mistakes on its first run: a passage with a mismatched source anchor, and a withheld metric quoted in a code comment.
-- The first browser review found the hero headline hidden for 1.5 s by an intro timer, and brain dots drawn behind the pause button. Both are fixed and now have tests.
-- A strict Content-Security-Policy would have blocked an inline boot script; I moved it to a same-origin file instead of weakening the policy, and test the page under that exact policy.
-- My first "whole page" idea, a floating brain button in the corner, covered text on phones. Docking the brain into the navigation instead fixed it and made the feature's hint visible on every screen.
-- The accessibility audit caught things automated tools don't: a toggle announcing two states, a duplicate link, and focus not landing in the search box after a keyboard jump.
-- I brought back the terminal from my first prototype because it was eye-catching, but wired it to the same verified passages instead of scripted answers, and fixed its keyboard trap (it used to swallow the Tab key).
-- Visitors don't type commands. My own test, "whats aziz certifs", answered "command not found", so the terminal now treats a sentence as a question, and a test checks that it refuses to claim a credential I don't hold.
-- I removed the page-wide pause button at my own request. That drops a WCAG 2.2.2 mechanism for motion longer than 5 s; reduced-motion users still get still frames.
+- My CVs disagree with my repositories (degree name, city, internship dates, one FlyRank metric, how autonomous the HR pipeline is). I built the site from the repositories and kept the conflicts off the page until I settle them.
+- A relevant-looking link is not evidence. Each answer cites the passage's own source and anchor, and a build file is not a deployment.
 - TODO: my own words on what surprised me and what was hard in each project (not written yet).
-- TODO: deployment lessons (Amplify build, headers, live checks).
+
+## What remains unproven
+
+- **The AWS deployment itself.** No live URL, no Amplify build record, no AWS screenshots yet. Live checks (headers, links, the demo flow in a private window) are NOT RUN until then.
+- The retrieval score is optimistic: I wrote both the judged questions and the passage tags. Nobody else has tested it.
+- Passage text and certification links were copied from my repositories and earlier portfolio on 28-29 Oct 2026 and have not been re-checked at the issuers since.
+- The page-wide motion cannot be stopped by the visitor, and the manual keyboard and screen-reader audit from 28 Oct has not been repeated on the new hero.
+- gitleaks was not run again (the tool is not installed in this session).

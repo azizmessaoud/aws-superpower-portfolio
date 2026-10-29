@@ -66,7 +66,8 @@
       "question": "What precision did the ranking model reach?",
       "top": [
         "fr-question",
-        "fr-p50"
+        "fr-p50",
+        "portfolio-weakest"
       ],
       "rank": 2,
       "ok": true,
@@ -149,17 +150,46 @@
       "question": "How was the ranking model validated on new clients?",
       "top": [
         "fr-method",
-        "fr-question"
+        "fr-question",
+        "portfolio-weakest"
       ],
       "rank": 1,
       "ok": true,
       "abstain": false
+    },
+    {
+      "id": "q16",
+      "question": "Which project performed worst?",
+      "top": [
+        "portfolio-weakest"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q17",
+      "question": "What did Aziz personally build in TraffiX?",
+      "top": [
+        "tr-role"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q18",
+      "question": "What is your favourite colour?",
+      "top": [],
+      "rank": null,
+      "ok": true,
+      "abstain": true
     }
   ],
-  "answerable": 14,
-  "hit1": 0.9285714285714286,
+  "answerable": 16,
+  "hit1": 0.9375,
   "hit3": 1,
-  "mrr": 0.9642857142857143,
-  "abstainOk": 1,
-  "abstainTotal": 1
+  "mrr": 0.96875,
+  "abstainOk": 2,
+  "abstainTotal": 2
 }

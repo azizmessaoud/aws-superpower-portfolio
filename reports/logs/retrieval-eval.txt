@@ -6,25 +6,28 @@
 > aws-superpower-portfolio@0.1.0 content
 > tsx scripts/build-corpus.ts
 
-corpus: 16 passages
+corpus: 17 passages
 portfolio: 16 certifications, 4 smaller projects
-┌─────────┬───────┬──────┬───────┬────────────────────────────┬────────────────────────────────────────────────────┐
-│ (index) │ id    │ rank │ ok    │ top                        │ question                                           │
-├─────────┼───────┼──────┼───────┼────────────────────────────┼────────────────────────────────────────────────────┤
-│ 0       │ 'q01' │ 1    │ 'yes' │ 'tr-simulation'            │ 'Is TraffiX deployed in Tunis?'                    │
-│ 1       │ 'q02' │ 1    │ 'yes' │ 'tr-pedestrian'            │ 'How do you keep pedestrians safe at crossings?'   │
-│ 2       │ 'q03' │ 1    │ 'yes' │ 'tr-ambulance'             │ 'Are ambulances faster with TraffiX?'              │
-│ 3       │ 'q04' │ 1    │ 'yes' │ 'tr-role'                  │ 'What did you personally build in the TraffiX tea' │
-│ 4       │ 'q05' │ 1    │ 'yes' │ 'tr-mixed, fr-p50'         │ 'Are the traffic results statistically significan' │
-│ 5       │ 'q06' │ 1    │ 'yes' │ 'fr-question'              │ 'How do you decide which pages editors should rev' │
-│ 6       │ 'q07' │ 2    │ 'yes' │ 'fr-question, fr-p50'      │ 'What precision did the ranking model reach?'      │
-│ 7       │ 'q08' │ 1    │ 'yes' │ 'fr-leakage'               │ 'How did you avoid data leakage?'                  │
-│ 8       │ 'q09' │ 1    │ 'yes' │ 'fr-question, fr-p50'      │ 'Does refreshing a page cause more traffic?'       │
-│ 9       │ 'q10' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy' │ 'How do you process scanned documents?'            │
-│ 10      │ 'q11' │ 1    │ 'yes' │ 'hr-accuracy, hr-pipeline' │ 'What is the OCR accuracy on real documents?'      │
-│ 11      │ 'q12' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy' │ 'Comment détectez-vous les anomalies dans les doc' │
-│ 12      │ 'q13' │ 1    │ 'yes' │ 'hr-runtime'               │ 'Does the HR system run in production with Postgr' │
-│ 13      │ 'q14' │ '-'  │ 'yes' │ ''                         │ 'What is your favourite food?'                     │
-│ 14      │ 'q15' │ 1    │ 'yes' │ 'fr-method, fr-question'   │ 'How was the ranking model validated on new clien' │
-└─────────┴───────┴──────┴───────┴────────────────────────────┴────────────────────────────────────────────────────┘
-hit@1 0.93 · hit@3 1.00 · MRR 0.964 · answerable 14 · abstentions correct 1/1
+┌─────────┬───────┬──────┬───────┬─────────────────────────────────────────────┬────────────────────────────────────────────────────┐
+│ (index) │ id    │ rank │ ok    │ top                                         │ question                                           │
+├─────────┼───────┼──────┼───────┼─────────────────────────────────────────────┼────────────────────────────────────────────────────┤
+│ 0       │ 'q01' │ 1    │ 'yes' │ 'tr-simulation'                             │ 'Is TraffiX deployed in Tunis?'                    │
+│ 1       │ 'q02' │ 1    │ 'yes' │ 'tr-pedestrian'                             │ 'How do you keep pedestrians safe at crossings?'   │
+│ 2       │ 'q03' │ 1    │ 'yes' │ 'tr-ambulance'                              │ 'Are ambulances faster with TraffiX?'              │
+│ 3       │ 'q04' │ 1    │ 'yes' │ 'tr-role'                                   │ 'What did you personally build in the TraffiX tea' │
+│ 4       │ 'q05' │ 1    │ 'yes' │ 'tr-mixed, fr-p50'                          │ 'Are the traffic results statistically significan' │
+│ 5       │ 'q06' │ 1    │ 'yes' │ 'fr-question'                               │ 'How do you decide which pages editors should rev' │
+│ 6       │ 'q07' │ 2    │ 'yes' │ 'fr-question, fr-p50, portfolio-weakest'    │ 'What precision did the ranking model reach?'      │
+│ 7       │ 'q08' │ 1    │ 'yes' │ 'fr-leakage'                                │ 'How did you avoid data leakage?'                  │
+│ 8       │ 'q09' │ 1    │ 'yes' │ 'fr-question, fr-p50'                       │ 'Does refreshing a page cause more traffic?'       │
+│ 9       │ 'q10' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy'                  │ 'How do you process scanned documents?'            │
+│ 10      │ 'q11' │ 1    │ 'yes' │ 'hr-accuracy, hr-pipeline'                  │ 'What is the OCR accuracy on real documents?'      │
+│ 11      │ 'q12' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy'                  │ 'Comment détectez-vous les anomalies dans les doc' │
+│ 12      │ 'q13' │ 1    │ 'yes' │ 'hr-runtime'                                │ 'Does the HR system run in production with Postgr' │
+│ 13      │ 'q14' │ '-'  │ 'yes' │ ''                                          │ 'What is your favourite food?'                     │
+│ 14      │ 'q15' │ 1    │ 'yes' │ 'fr-method, fr-question, portfolio-weakest' │ 'How was the ranking model validated on new clien' │
+│ 15      │ 'q16' │ 1    │ 'yes' │ 'portfolio-weakest'                         │ 'Which project performed worst?'                   │
+│ 16      │ 'q17' │ 1    │ 'yes' │ 'tr-role'                                   │ 'What did Aziz personally build in TraffiX?'       │
+│ 17      │ 'q18' │ '-'  │ 'yes' │ ''                                          │ 'What is your favourite colour?'                   │
+└─────────┴───────┴──────┴───────┴─────────────────────────────────────────────┴────────────────────────────────────────────────────┘
+hit@1 0.94 · hit@3 1.00 · MRR 0.969 · answerable 16 · abstentions correct 2/2

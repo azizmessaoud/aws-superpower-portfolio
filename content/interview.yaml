@@ -1,0 +1,13 @@
+# Questions a reader could ask me, each tied to the passage that holds the evidence. These are questions, not claims.
+- question: Why were ambulance trips slower with TraffiX (240.0 s against 213.2 s)?
+  passage: tr-ambulance
+- question: None of the TraffiX differences is significant with three seeds. What would you run next?
+  passage: tr-mixed
+- question: Which parts of TraffiX did you build, and which came from traffix3?
+  passage: tr-control
+- question: How did you keep clients apart in FlyRank, and what did the planted leakage test show?
+  passage: fr-leakage
+- question: Precision@50 uses one decision date. How would you check it on another?
+  passage: fr-p50
+- question: How would you measure OCR accuracy on real HR documents, given that you have only synthetic ones?
+  passage: hr-accuracy

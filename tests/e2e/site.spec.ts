@@ -83,11 +83,6 @@ test("ask my brain terminal: evidence with links, honest no-result, suggestions"
   await expect(log).toContainText("leakage", { ignoreCase: true });
 });
 
-test("hero hint hands its question to the terminal", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("button", { name: /Are ambulances faster/ }).click();
-  await expect(page.getByRole("log", { name: "Terminal output" })).toContainText("Ambulances are slower");
-});
 
 test("the about section shows my portrait with a text alternative", async ({ page }) => {
   await page.goto("/#about");
@@ -223,7 +218,7 @@ test("the brain docks into the nav's Ask my brain link; it is a keyboard-reachab
   await page.waitForTimeout(300);
   expect(await running(page)).toBe(true);                /* focus wakes it */
   await page.keyboard.press("Enter");
-  await expect(page.locator("#term-input")).toBeFocused();
+  await expect(page.locator("#hero-ask")).toBeFocused();
 });
 
 test.describe("reduced motion dock", () => {
@@ -379,3 +374,131 @@ test("every project ends with the same four-part label", async ({ page }) => {
     await expect(l.locator("dt")).toHaveText([/Data/, /How it was judged/, /Where it fails/, /Who reviews the output/]);
   }
 });
+
+/* ── the demo flow, on the local preview (the live site is checked separately once it exists) ── */
+const mindState = (page: Page) => page.evaluate(() => (window as unknown as { __scene: { mindState: string } }).__scene.mindState);
+async function ask(page: Page, q: string) {
+  await page.locator("#hero-ask").fill(q);
+  await page.locator("#hero-ask").press("Enter");
+}
+const answerBox = (page: Page) => page.locator(".ask-answer");
+const status = (page: Page) => page.locator(".ask-status");
+
+test("hero: the first screen says what the site is and offers the question box", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("I build systems that can show their work.");
+  await expect(page.locator(".hero-lead")).toContainText("verified portfolio and repository evidence");
+  for (const name of ["About", "Skills", "Projects", "Contact"]) await expect(page.locator("nav[aria-label=Main] a", { hasText: new RegExp(`^${name}$`) })).toBeAttached();
+  await expect(page.locator("#hero-ask")).toBeVisible();
+});
+
+test("demo flow: the mind follows the question lifecycle and every answer shows its evidence", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "state timing is asserted on desktop; mobile layout has its own test");
+  await page.goto("/");
+  await page.waitForTimeout(1200);
+  await page.locator("#hero-ask").focus();
+  await expect(status(page)).toContainText("Listening");
+  expect(await mindState(page)).toBe("listening");
+
+  await ask(page, "What did Aziz personally build in TraffiX?");
+  await expect(status(page)).toContainText("Retrieving evidence");
+  expect(await mindState(page)).toBe("retrieving");
+  const box = answerBox(page);
+  await expect(box).toContainText("Control pair");
+  await expect(box.locator(".ask-evidence a").first()).toHaveAttribute("href", /traffix\/blob\/d54b071[0-9a-f]*\/README\.md#L635-L648/);
+  await expect(box.locator(".ask-limits")).toContainText("did not build it alone");
+  await expect(status(page)).toContainText("Answering from evidence");
+
+  await page.waitForTimeout(700);                                   /* the throttle gap */
+  await ask(page, "Did TraffiX make ambulances faster?");
+  await expect(box).toContainText("The evidence disagrees");
+  await expect(box).toContainText("240.0 s against 213.2 s");
+
+  await page.waitForTimeout(700);
+  await ask(page, "What is the AWS hosting status?");
+  await expect(box).toContainText("Deployment is not verified");
+  await expect(box).toContainText("does not prove a deployment");
+  await expect(box.locator(".ask-evidence a").first()).toHaveAttribute("href", /amplify\.yml$/);
+
+  await page.waitForTimeout(700);
+  await ask(page, "Does Aziz use Bedrock?");
+  await expect(box).toContainText("Not verified");
+  await expect(box).not.toContainText("is recorded as connected");
+  await expect(status(page)).toContainText("Not verified");
+  expect(await mindState(page)).toBe("uncertain");
+
+  await page.waitForTimeout(700);
+  await ask(page, "What is your favourite colour?");
+  await expect(box).toContainText("won't guess");
+  await expect(box.locator(".ask-evidence a")).toHaveCount(0);
+  await page.screenshot({ path: `reports/screens/${info.project.name}-hero-uncertain.png` });
+  await expect(status(page)).toContainText("Idle", { timeout: 6000 });   /* the mind settles back */
+});
+
+test("the question box refuses over-long input and answers each outcome with its own label", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#hero-ask")).toHaveAttribute("maxlength", "200");
+  await ask(page, "Is TraffiX deployed in Tunis?");
+  await expect(answerBox(page).locator(".ask-outcome")).toContainText("the evidence disagrees");
+  await page.waitForTimeout(700);
+  await ask(page, "Do you know Kubernetes?");
+  await expect(answerBox(page).locator(".ask-outcome")).toHaveText("Not verified");
+});
+
+test("hero keeps the whole panel inside the viewport (desktop, laptop and phone)", async ({ page }) => {
+  for (const [w, h] of [[1280, 860], [1280, 720], [390, 844], [320, 640]] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.goto("/");
+    await page.waitForTimeout(600);
+    await ask(page, "What did Aziz personally build in TraffiX?");
+    await expect(answerBox(page)).toBeVisible();
+    const m = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, input: document.querySelector("#hero-ask")!.getBoundingClientRect().bottom, vh: innerHeight, ans: document.querySelector(".ask-answer")!.getBoundingClientRect().bottom }));
+    expect(m.sw, `${w}px overflow`).toBe(m.cw);
+    expect(m.input, `${w}x${h}: input below the fold`).toBeLessThan(m.vh);
+    expect(m.ans, `${w}x${h}: answer clipped`).toBeLessThanOrEqual(m.vh + 2);
+  }
+});
+
+test.describe("reduced motion: the state is still readable as text", () => {
+  test.use({ reducedMotion: "reduce" });
+  test("question, status line and answer work without animation", async ({ page }) => {
+    await page.goto("/");
+    await ask(page, "Does Aziz use Lambda?");
+    await expect(status(page)).toContainText("Retrieving evidence");
+    await expect(answerBox(page)).toContainText("Not verified");
+    await expect(status(page)).toContainText("Not verified");
+  });
+});
+
+test("keyboard: Tab reaches the question box, samples and answer; Enter submits", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "keyboard path checked on desktop");
+  await page.goto("/");
+  await page.locator("#hero-ask").focus();
+  await page.keyboard.type("Does Aziz use Bedrock?");
+  await page.keyboard.press("Enter");
+  await expect(answerBox(page)).toContainText("Not verified");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Ask", exact: true })).toBeFocused();
+  const ring = await page.evaluate(() => getComputedStyle(document.activeElement!).outlineStyle);
+  expect(ring).toBe("solid");
+});
+
+test("refresh and hash links land on the right section", async ({ page }) => {
+  for (const id of ["about", "skills", "projects", "aws", "certifications", "contact"]) {
+    await page.goto(`/#${id}`);
+    await page.reload();
+    await expect(page.locator(`#${id}`)).toBeVisible();
+    expect(await page.evaluate((i) => Math.abs(document.getElementById(i)!.getBoundingClientRect().top) < innerHeight, id), id).toBe(true);
+  }
+});
+
+test("the AWS section says not deployed and lists services as planned only", async ({ page }) => {
+  await page.goto("/#aws");
+  const sec = page.locator("#aws");
+  await expect(sec.locator(".aws-status")).toContainText("Not deployed yet");
+  await expect(sec.getByRole("heading", { name: "Planned, not connected" })).toBeVisible();
+  for (const svc of ["Amazon Bedrock", "AWS Lambda", "Amazon API Gateway"]) await expect(sec).toContainText(svc);
+  await expect(sec.getByRole("heading", { name: "Verified" })).toBeVisible();
+  await expect(sec.locator("a[href$='amplify.yml']")).toHaveCount(1);
+});
+

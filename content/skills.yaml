@@ -1,0 +1,42 @@
+# Skill domains shown in Skills and used by the answer panel. Each links to where the tool was used.
+- icon: ranking
+  title: "Machine learning & ranking"
+  chips: ["scikit-learn", "Random Forest", "Grouped holdout", "Precision@50"]
+  hi: ["scikit-learn"]
+  where: "FlyRank capstone"
+  href: "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L38-L44"
+- icon: agents
+  title: "Multi-agent systems"
+  chips: ["SUMO", "TraCI", "Controllers", "Safety rules", "Reason codes"]
+  hi: ["SUMO"]
+  where: "TraffiX (my pair: control)"
+  href: "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md#L635-L648"
+- icon: document
+  title: "Document AI"
+  chips: ["Docling", "RapidOCR", "Validation", "Anomaly detection"]
+  hi: ["Docling"]
+  where: "HR prototype"
+  href: "https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L1-L16"
+- icon: retrieval
+  title: "Retrieval & LLM apps"
+  chips: ["Hybrid RAG", "BM25 + RRF", "Qdrant", "Ollama", "Multilingual"]
+  hi: ["Hybrid RAG"]
+  where: "Administrative procedures assistant (team project, my part: RAG)"
+  href: "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/README.md#architecture-and-stack"
+- icon: data
+  title: "Data engineering"
+  chips: ["DuckDB", "SQL", "Pandas", "Data contracts"]
+  hi: ["DuckDB"]
+  where: "FlyRank capstone notebooks"
+  href: "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/notebooks/w03_data_contract.ipynb"
+- icon: api
+  title: "APIs, apps & tests"
+  chips: ["FastAPI", "Docker", "pytest", "React + TypeScript"]
+  hi: ["FastAPI"]
+  where: "HR prototype \u00b7 this site"
+  href: "https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L310-L325"
+- icon: toolkit
+  title: "Also in my toolkit"
+  chips: ["PyTorch", "TensorFlow", "R", "LLMs", "NLP", "Git", "Data visualization"]
+  hi: []
+  where: "Listed on my portfolio; not demonstrated on this page."

@@ -1,0 +1,25 @@
+
+> aws-superpower-portfolio@0.1.0 build
+> npm run validate && npm run content && tsc --noEmit && vite build
+
+
+> aws-superpower-portfolio@0.1.0 validate
+> tsx scripts/validate-content.ts
+
+content validation passed: 17 passages, 20 claims, 18 judged questions
+
+> aws-superpower-portfolio@0.1.0 content
+> tsx scripts/build-corpus.ts
+
+corpus: 17 passages
+portfolio: 16 certifications, 4 smaller projects
+vite v5.4.11 building for production...
+transforming...
+✓ 62 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                        1.28 kB │ gzip:  0.69 kB
+dist/assets/index-BHx9ltPw.css        26.52 kB │ gzip:  5.89 kB
+dist/assets/NeuralScene-BCkEWb_2.js   14.51 kB │ gzip:  6.97 kB
+dist/assets/index-BhrRgfV9.js        221.95 kB │ gzip: 71.16 kB
+✓ built in 1.44s

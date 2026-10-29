@@ -1,0 +1,34 @@
+# The only source of AWS facts for the site, the terminal and the answer panel.
+# Rule: never infer a deployment from a config file, or a service from a dependency or a plan.
+checkedOn: "2026-10-29"
+deployed: false
+# When the site is really deployed, set deployed: true and add BOTH of these:
+# liveUrl: "https://main.xxxxxxxx.amplifyapp.com"
+# buildRecord: "Amplify console, app <name>, build #1 succeeded on <date>; screenshot in reports/screens/"
+buildChain:
+  - npm ci
+  - npm run build (validates content, regenerates data, type-checks, builds)
+  - serve dist/ (static files)
+verified:
+  - text: "Amplify Hosting build specification exists (amplify.yml). It is configuration only; it does not prove a deployment."
+    href: "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/amplify.yml"
+  - text: "The site is a static React and TypeScript build with no backend: package.json lists react and react-dom as its only dependencies."
+    href: "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/package.json"
+connected: []
+planned:
+  - name: AWS Amplify Hosting
+    note: Console deployment of branch main. Not done yet.
+  - name: Amazon API Gateway
+    note: Would front a question endpoint with request throttling. Not built.
+  - name: AWS Lambda
+    note: Would run retrieval server-side. Not built.
+  - name: Amazon Bedrock
+    note: Would phrase answers from retrieved passages only. Not built; the browser keyword retriever is the working fallback.
+  - name: Amazon S3 or Bedrock Knowledge Bases
+    note: Would hold the evidence corpus for a backend. Not built.
+costSafety:
+  - Set an AWS Budgets alert (and a billing alarm) before connecting anything that can charge.
+  - Throttle requests at the API layer before any model is behind it.
+  - Cap question length (this site already limits it to 200 characters).
+  - Keep AWS credentials out of the browser and the repository; use IAM roles on the service side, never access keys.
+  - Do not assume Bedrock token usage is free; check current pricing before enabling it.

@@ -184,5 +184,189 @@
    "link": "View code",
    "href": "https://github.com/oumaymasaddouri/InnoTravel-PiDev-Symfony.git"
   }
- ]
+ ],
+ "skills": [
+  {
+   "icon": "ranking",
+   "title": "Machine learning & ranking",
+   "chips": [
+    "scikit-learn",
+    "Random Forest",
+    "Grouped holdout",
+    "Precision@50"
+   ],
+   "hi": [
+    "scikit-learn"
+   ],
+   "where": "FlyRank capstone",
+   "href": "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L38-L44"
+  },
+  {
+   "icon": "agents",
+   "title": "Multi-agent systems",
+   "chips": [
+    "SUMO",
+    "TraCI",
+    "Controllers",
+    "Safety rules",
+    "Reason codes"
+   ],
+   "hi": [
+    "SUMO"
+   ],
+   "where": "TraffiX (my pair: control)",
+   "href": "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md#L635-L648"
+  },
+  {
+   "icon": "document",
+   "title": "Document AI",
+   "chips": [
+    "Docling",
+    "RapidOCR",
+    "Validation",
+    "Anomaly detection"
+   ],
+   "hi": [
+    "Docling"
+   ],
+   "where": "HR prototype",
+   "href": "https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L1-L16"
+  },
+  {
+   "icon": "retrieval",
+   "title": "Retrieval & LLM apps",
+   "chips": [
+    "Hybrid RAG",
+    "BM25 + RRF",
+    "Qdrant",
+    "Ollama",
+    "Multilingual"
+   ],
+   "hi": [
+    "Hybrid RAG"
+   ],
+   "where": "Administrative procedures assistant (team project, my part: RAG)",
+   "href": "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/README.md#architecture-and-stack"
+  },
+  {
+   "icon": "data",
+   "title": "Data engineering",
+   "chips": [
+    "DuckDB",
+    "SQL",
+    "Pandas",
+    "Data contracts"
+   ],
+   "hi": [
+    "DuckDB"
+   ],
+   "where": "FlyRank capstone notebooks",
+   "href": "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/notebooks/w03_data_contract.ipynb"
+  },
+  {
+   "icon": "api",
+   "title": "APIs, apps & tests",
+   "chips": [
+    "FastAPI",
+    "Docker",
+    "pytest",
+    "React + TypeScript"
+   ],
+   "hi": [
+    "FastAPI"
+   ],
+   "where": "HR prototype · this site",
+   "href": "https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L310-L325"
+  },
+  {
+   "icon": "toolkit",
+   "title": "Also in my toolkit",
+   "chips": [
+    "PyTorch",
+    "TensorFlow",
+    "R",
+    "LLMs",
+    "NLP",
+    "Git",
+    "Data visualization"
+   ],
+   "hi": [],
+   "where": "Listed on my portfolio; not demonstrated on this page."
+  }
+ ],
+ "interview": [
+  {
+   "question": "Why were ambulance trips slower with TraffiX (240.0 s against 213.2 s)?",
+   "passage": "tr-ambulance"
+  },
+  {
+   "question": "None of the TraffiX differences is significant with three seeds. What would you run next?",
+   "passage": "tr-mixed"
+  },
+  {
+   "question": "Which parts of TraffiX did you build, and which came from traffix3?",
+   "passage": "tr-control"
+  },
+  {
+   "question": "How did you keep clients apart in FlyRank, and what did the planted leakage test show?",
+   "passage": "fr-leakage"
+  },
+  {
+   "question": "Precision@50 uses one decision date. How would you check it on another?",
+   "passage": "fr-p50"
+  },
+  {
+   "question": "How would you measure OCR accuracy on real HR documents, given that you have only synthetic ones?",
+   "passage": "hr-accuracy"
+  }
+ ],
+ "aws": {
+  "checkedOn": "2026-10-29",
+  "deployed": false,
+  "buildChain": [
+   "npm ci",
+   "npm run build (validates content, regenerates data, type-checks, builds)",
+   "serve dist/ (static files)"
+  ],
+  "verified": [
+   {
+    "text": "Amplify Hosting build specification exists (amplify.yml). It is configuration only; it does not prove a deployment.",
+    "href": "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/amplify.yml"
+   },
+   {
+    "text": "The site is a static React and TypeScript build with no backend: package.json lists react and react-dom as its only dependencies.",
+    "href": "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/package.json"
+   }
+  ],
+  "connected": [],
+  "planned": [
+   {
+    "name": "AWS Amplify Hosting",
+    "note": "Console deployment of branch main. Not done yet."
+   },
+   {
+    "name": "Amazon API Gateway",
+    "note": "Would front a question endpoint with request throttling. Not built."
+   },
+   {
+    "name": "AWS Lambda",
+    "note": "Would run retrieval server-side. Not built."
+   },
+   {
+    "name": "Amazon Bedrock",
+    "note": "Would phrase answers from retrieved passages only. Not built; the browser keyword retriever is the working fallback."
+   },
+   {
+    "name": "Amazon S3 or Bedrock Knowledge Bases",
+    "note": "Would hold the evidence corpus for a backend. Not built."
+   }
+  ],
+  "costSafety": [
+   "Set an AWS Budgets alert (and a billing alarm) before connecting anything that can charge.",
+   "Throttle requests at the API layer before any model is behind it.",
+   "Cap question length (this site already limits it to 200 characters).",
+   "Keep AWS credentials out of the browser and the repository; use IAM roles on the service side, never access keys.",
+   "Do not assume Bedrock token usage is free; check current pricing before enabling it."
+  ]
+ }
 }

@@ -34,3 +34,18 @@
   url: https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts
   ref: projectx0 main@bd6e84d (source of azizmessaoud.github.io/projectx0)
   checkedOn: "2026-10-28"
+- id: site-amplify-yml
+  kind: repo
+  url: https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/amplify.yml
+  ref: 0fa4d70
+  checkedOn: "2026-10-29"
+- id: site-package
+  kind: repo
+  url: https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/package.json
+  ref: "0fa4d70 (react and react-dom are the only dependencies)"
+  checkedOn: "2026-10-29"
+- id: site-aws-status
+  kind: repo
+  url: https://github.com/azizmessaoud/aws-superpower-portfolio/blob/main/content/aws-status.yaml
+  ref: main (the file this site reads its AWS status from)
+  checkedOn: "2026-10-29"

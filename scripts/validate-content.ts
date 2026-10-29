@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { loadContent } from "./content";
 
-const { sources, claims, passages, projects, judged } = loadContent();
+const { sources, claims, passages, projects, judged, interview, awsStatus, skills } = loadContent();
 const errors: string[] = [];
 const sourceIds = new Set(sources.map((s) => s.id));
 const claimById = new Map(claims.map((c) => [c.id, c]));
@@ -27,11 +27,19 @@ for (const p of passages) {
     else if (c.status === "caveated" && !p.limitations.length && !c.limitations.length) errors.push(`passage ${p.id}: caveated claim ${id} shown without limitations`);
   }
 }
+for (const q of interview) passageIds.has(q.passage) || errors.push(`interview question "${q.question.slice(0, 40)}": unknown passage ${q.passage}`);
+/* AWS: a deployment needs a URL and a build record; a connected service needs evidence and must not still be "planned". */
+if (awsStatus.deployed && !(awsStatus.liveUrl && awsStatus.buildRecord)) errors.push("aws-status: deployed: true needs liveUrl and buildRecord");
+if (!awsStatus.deployed && awsStatus.liveUrl) errors.push("aws-status: liveUrl set while deployed is false");
+for (const c of awsStatus.connected) if (awsStatus.planned.some((p) => p.name.toLowerCase() === c.name.toLowerCase())) errors.push(`aws-status: ${c.name} is both connected and planned`);
+for (const s of skills) if (s.icon !== "toolkit" && !s.href) errors.push(`skills: ${s.title} has no evidence link`);
 for (const q of judged) q.relevant.forEach((id) => passageIds.has(id) || errors.push(`judged ${q.id}: unknown passage ${id}`));
 
 /* An "AWS Certified" claim in prose still fails the build. It is allowed only as a certification entry,
  * which the schema forces to carry the issuer's https verification link. */
 const AWS_CLAIM = /aws certified/i;
+/* A service named as connected, in prose anywhere except the status file that must prove it. */
+const SERVICE_CLAIM = /\b(connected to|uses|using|powered by|built on)\s+(amazon bedrock|bedrock|aws lambda|lambda|api gateway)\b/i;
 
 /* Deny-list (register §C): contextual phrases, so honest text like "PostgreSQL is only planned" passes. */
 const DENY: RegExp[] = [
@@ -55,6 +63,7 @@ for (const file of rendered) {
   if (file.endsWith("validate-content.ts")) continue;
   const text = readFileSync(file, "utf8");
   if (AWS_CLAIM.test(text) && !file.endsWith("certifications.yaml")) errors.push(`${file.replace(root, "")}: "AWS Certified" outside certifications.yaml`);
+  if (SERVICE_CLAIM.test(text) && !file.endsWith("aws-status.yaml") && !file.endsWith("answer.ts")) errors.push(`${file.replace(root, "")}: claims an AWS service outside aws-status.yaml`);
   for (const re of DENY) if (re.test(text) && !(file.endsWith("claims.yaml") && /0\.24/.test(re.source))) errors.push(`${file.replace(root, "")}: matches deny-list ${re}`);
 }
 

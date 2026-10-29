@@ -4,7 +4,7 @@ import type { Corpus, Portfolio } from "../../src/content/schema";
 import { COMMANDS, createTerminal } from "../../src/terminal/commands";
 
 const portfolio = JSON.parse(readFileSync("src/generated/portfolio.json", "utf8")) as Portfolio;
-const term = createTerminal(JSON.parse(readFileSync("src/generated/corpus.json", "utf8")) as Corpus, portfolio.certifications);
+const term = createTerminal(JSON.parse(readFileSync("src/generated/corpus.json", "utf8")) as Corpus, portfolio);
 const links = (r: ReturnType<typeof term.run>) => (r === "clear" ? [] : r.filter((l) => l.kind === "link").map((l) => (l as { href: string }).href));
 const text = (r: ReturnType<typeof term.run>) => (r === "clear" ? "clear" : r.map((l) => l.text).join("\n"));
 
@@ -58,10 +58,13 @@ describe("plain-language questions", () => {
     expect(text(term.run("are you google certified?"))).toContain("can't verify");
   });
   it("picks up a credential as soon as it is added to the list", () => {
-    const extended = createTerminal(JSON.parse(readFileSync("src/generated/corpus.json", "utf8")) as Corpus, [
-      ...portfolio.certifications,
-      { kind: "main", issuer: "AWS", title: "Cloud Practitioner", detail: "AWS Certified Cloud Practitioner", year: "2026", href: "https://example.com/verify" },
-    ]);
+    const extended = createTerminal(JSON.parse(readFileSync("src/generated/corpus.json", "utf8")) as Corpus, {
+      ...portfolio,
+      certifications: [
+        ...portfolio.certifications,
+        { kind: "main", issuer: "AWS", title: "Cloud Practitioner", detail: "AWS Certified Cloud Practitioner", year: "2026", href: "https://example.com/verify" },
+      ],
+    });
     const out = extended.run("do you have the AWS cloud practitioner certificate?");
     expect(text(out)).toContain("Cloud Practitioner");
     expect(text(out)).not.toContain("can't verify");

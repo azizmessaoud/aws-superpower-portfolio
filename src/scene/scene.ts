@@ -4,6 +4,7 @@
  * rest of the page; it moves there only while the dock is hovered or focused.
  * Never draws inside the hero text or behind fixed controls. The loop runs only while something visible moves
  * and the visitor has not paused; reduced motion draws still frames that follow the scroll. No preventDefault on touch. */
+import type { MindState } from "../mind/state";
 import { buildEdges, cameraZoom, DOCK_AT, placeSphere, seedBrain, seedShell, travelAt, TRAVEL_MS, type Box, type Edge, type ShellNode } from "./geometry";
 import { mulberry32 } from "./rng";
 
@@ -50,6 +51,11 @@ export function createScene(o: SceneOptions) {
   let pulses: Pulse[] = [], flash = 0, frame = 0, raf = 0, last = 0;
   let progress = 0, stageTop = 0, text: Box | null = null, lines: Box[] = [], fixedOut: Box[] = [], sphere = { cx: 0, cy: 0, R: 0 };
   let dock = { cx: 0, cy: 0, r: 0 }, dockAllowed = true, dockActive = false, docked = false;
+  /* interface state of the question lifecycle (see src/mind/state.ts); it only tints and paces the animation */
+  let mind: MindState = "idle";
+  const tint = { r: 34, g: 211, b: 238 };
+  const TINTS: Record<MindState, [number, number, number]> = { idle: [34, 211, 238], listening: [34, 211, 238], retrieving: [34, 211, 238], answering: [34, 211, 238], uncertain: [254, 188, 46], error: [255, 95, 87] };
+  const mindLive = () => mind !== "idle";
   let heroVisible = true, paused = false, destroyed = false;
   let travelFrom = 0, travelTo = 0, travelStart = 0;
   const introStart = o.intro && !o.reducedMotion ? performance.now() : 0;
@@ -175,7 +181,7 @@ export function createScene(o: SceneOptions) {
     const heroOn = stageTop + stageH > 0 && travel < 1;
     const shell = clamp((1.9 - zoom) / 0.9, 0, 1) * (1 - span(travel, 0, 0.4));
     const tags = span(1 - Math.pow(1 - intro, 3), 0.7, 1) * (1 - span(progress, 0, 0.25));
-    const sway = still || (docked && !dockActive) ? 0 : 1;
+    const sway = still || (docked && !dockActive && !mindLive()) ? 0 : 1;
     const orbit = still ? 0.55 : t * 0.11, tilt = 0.32 + Math.sin(t * 0.07) * 0.05 * sway;
     const yaw = Math.PI / 2 + (still ? 0.35 : Math.sin(t * 0.18) * 0.45 * (docked ? sway : 1));
     view.cosY = Math.cos(orbit); view.sinY = Math.sin(orbit);
@@ -185,6 +191,8 @@ export function createScene(o: SceneOptions) {
     pointer.y += (pointer.ty - pointer.y) * (pointer.active ? 0.18 : 0.08);
     excitation.forEach((v, i) => (v * 0.95 < 0.03 ? excitation.delete(i) : excitation.set(i, v * 0.95)));
     flash *= 0.93;
+    const tt = TINTS[mind];
+    tint.r += (tt[0] - tint.r) * 0.12; tint.g += (tt[1] - tint.g) * 0.12; tint.b += (tt[2] - tint.b) * 0.12;
     ctx.clearRect(0, 0, W, H);
 
     /* full-background neural field behind everything in the hero */
@@ -236,7 +244,8 @@ export function createScene(o: SceneOptions) {
       }
       const live = pointer.active && !still && !docking;
       for (let band = 0; band < BANDS; band++) {
-        ctx.fillStyle = `rgba(34,211,238,${Math.min(1, 0.32 + band * 0.2 + flash * 0.3) * fade})`;
+        const dim = mind === "uncertain" ? 0.7 : 1;
+        ctx.fillStyle = `rgba(${tint.r | 0},${tint.g | 0},${tint.b | 0},${Math.min(1, 0.32 + band * 0.2 + flash * 0.3 + (mind === "listening" ? 0.08 : 0)) * fade * dim})`;
         ctx.beginPath();
         for (let i = 0; i < brainXY.length; i += 3) {
           const s = brainXY[i + 2], x = brainXY[i], y = brainXY[i + 1];
@@ -264,7 +273,8 @@ export function createScene(o: SceneOptions) {
       pulses = pulses.filter((p) => p.progress < 1);
       drawNodes(order, true);
       if (cfg().labels && tags > 0.02 && travel === 0) drawLabels(tags);
-      if (!still && !paused && pulses.length <= 9 && edges.length && rand() <= (bp === "desktop" ? 0.025 : 0.012)) {
+      const rate = mind === "retrieving" ? 0.3 : mind === "listening" ? 0.06 : mind === "uncertain" || mind === "error" ? 0 : bp === "desktop" ? 0.025 : 0.012;
+      if (!still && !paused && pulses.length <= (mind === "retrieving" ? 16 : 9) && edges.length && rand() <= rate) {
         const e = edges[Math.floor(rand() * edges.length)];
         pulses.push({ from: e.from, to: e.to, progress: 0, speed: 0.012, strength: 0.7, hops: 0 });
       }
@@ -359,7 +369,7 @@ export function createScene(o: SceneOptions) {
   }
 
   /* the loop runs only while something visible moves: the hero on screen, or a hovered/focused dock */
-  const shouldRun = () => !paused && !document.hidden && !o.reducedMotion && !destroyed && ((heroVisible && !docked) || travelling(performance.now()) || (docked && dockActive && dockAllowed));
+  const shouldRun = () => !paused && !document.hidden && !o.reducedMotion && !destroyed && ((heroVisible && !docked) || travelling(performance.now()) || (docked && (dockActive || mindLive()) && dockAllowed));
   function loop(now: number) {
     raf = 0;
     if (!shouldRun()) { still(); return; }
@@ -408,6 +418,15 @@ export function createScene(o: SceneOptions) {
     pause() { paused = true; if (travelStart) { travelFrom = travelTo; } sync(); still(); },
     resume() { paused = false; sync(); },
     /** dock hovered or focused: the docked brain may move (if not paused) */
+    /** The question lifecycle changed. Tints and paces the animation; maps to no model internals. */
+    setMindState(next: MindState) {
+      if (next === mind) return;
+      mind = next;
+      if (next === "answering") flash = 1;
+      if (next === "error") flash = 0.8;
+      sync(); still();
+    },
+    get mindState() { return mind; },
     setDockActive(on: boolean) { dockActive = on; if (on && !paused) flash = 0.6; sync(); still(); },
     /** dock hidden (e.g. the visitor is already in Ask my brain): don't draw the docked brain */
     setDockAllowed(on: boolean) { dockAllowed = on; measureFixed(); sync(); still(); },

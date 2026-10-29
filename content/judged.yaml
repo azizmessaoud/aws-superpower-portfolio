@@ -52,3 +52,15 @@
 - id: q15
   question: How was the ranking model validated on new clients?
   relevant: [fr-method]
+- id: q16
+  question: Which project performed worst?
+  relevant: [portfolio-weakest]
+  note: added 29 Oct for the demo flow; cross-project comparison
+- id: q17
+  question: What did Aziz personally build in TraffiX?
+  relevant: [tr-role]
+  note: added 29 Oct; third-person phrasing of q04
+- id: q18
+  question: What is your favourite colour?
+  relevant: []
+  note: added 29 Oct; no evidence, so the honest answer is none

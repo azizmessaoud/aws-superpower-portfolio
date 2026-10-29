@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { ASK_EVENT } from "../ask";
+import { useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { DWELL_MS, stateForOutcome, type MindState } from "../mind/state";
 import type { Corpus, Portfolio } from "../content/schema";
 import corpusJson from "../generated/corpus.json";
 import portfolioJson from "../generated/portfolio.json";
@@ -21,8 +21,8 @@ type Entry = { id: number; cmd?: string; lines: Line[] };
 
 /* The Terminal Explorer is "Ask my brain": questions and commands over the same verified passages.
  * Tab is never captured (no keyboard trap); ↑/↓ recall history; output is a polite live log. */
-export default function Terminal() {
-  const term = useMemo(() => createTerminal(corpusJson as Corpus, (portfolioJson as Portfolio).certifications), []);
+export default function Terminal({ setMind, reduced }: { setMind: (s: MindState) => void; reduced: boolean }) {
+  const term = useMemo(() => createTerminal(corpusJson as Corpus, portfolioJson as Portfolio), []);
   const [log, setLog] = useState<Entry[]>([{ id: 0, lines: [{ kind: "muted", text: "Type help to see the commands, or try one below." }] }]);
   const [value, setValue] = useState("");
   const [history, setHistory] = useState<string[]>([]);
@@ -33,6 +33,13 @@ export default function Terminal() {
 
   function exec(cmd: string) {
     const out = term.run(cmd);
+    const outcome = term.lastOutcome;
+    if (outcome) {
+      /* the same lifecycle the hero panel shows, so the docked brain reacts to terminal questions too */
+      const next = stateForOutcome(outcome);
+      setMind("retrieving");
+      window.setTimeout(() => { setMind(next); window.setTimeout(() => setMind("idle"), reduced ? 1500 : DWELL_MS[next]); }, reduced ? 200 : DWELL_MS.retrieving);
+    }
     if (out === "clear") setLog([]);
     else setLog((l) => [...l.slice(-30), { id: nextId.current++, cmd, lines: out }]);
     if (cmd.trim()) setHistory((h) => [cmd, ...h].slice(0, 30));
@@ -40,11 +47,6 @@ export default function Terminal() {
     setValue("");
     requestAnimationFrame(() => { if (body.current) body.current.scrollTop = body.current.scrollHeight; });
   }
-  useEffect(() => {
-    const on = (e: Event) => exec(`ask ${(e as CustomEvent<string>).detail}`);
-    window.addEventListener(ASK_EVENT, on);
-    return () => window.removeEventListener(ASK_EVENT, on);
-  });
   function onKey(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowUp" && history.length) { e.preventDefault(); const i = Math.min(hIdx + 1, history.length - 1); setHIdx(i); setValue(history[i]); }
     else if (e.key === "ArrowDown" && hIdx >= 0) { e.preventDefault(); const i = hIdx - 1; setHIdx(i); setValue(i >= 0 ? history[i] : ""); }
@@ -53,8 +55,8 @@ export default function Terminal() {
   return (
     <section id="terminal" className="section terminal-section" aria-labelledby="terminal-title">
       <div className="inner">
-        <p className="sec-label">Creative feature</p>
-        <h2 id="terminal-title" className="sec-h2">Ask my brain: the Terminal Explorer</h2>
+        <p className="sec-label">Command line</p>
+        <h2 id="terminal-title" className="sec-h2">The same answers, as commands</h2>
         <p className="sec-lead">
           Ask about my projects with <code>ask</code> and your own words. It searches {corpusJson.passages.length} verified passages
           and shows the evidence behind each match, or says nothing verified answers it. It doesn't write answers and it

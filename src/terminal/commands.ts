@@ -1,9 +1,9 @@
 /* The Terminal Explorer is Ask my brain: verified evidence reached by typing.
  * Pure: takes a command line, returns lines to print. Every fact comes from the corpus or the
  * evidence register; nothing here is invented, and `ask` uses the same retriever. */
-import type { Certification, Corpus } from "../content/schema";
+import type { Corpus, Portfolio } from "../content/schema";
+import { createAssistant, type Answer } from "../assistant/answer";
 import { LABELS, type LabelKey } from "../content/labels";
-import { createRetriever } from "../retrieval/retriever";
 
 export type Line =
   | { kind: "text" | "muted" | "heading" | "error" | "ok" | "limit"; text: string }
@@ -57,54 +57,30 @@ export const COMMANDS: [string, string][] = [
   ["clear", "clear the screen"],
 ];
 
-/* Words that mean "show me credentials". Issuer words map to the issuer names used in content/certifications.yaml. */
-const CERT_WORDS = /certif|credential|badge|diploma|accredit|\bcerts?\b|\bcourses?\b|\blearning\b/i;
-const ISSUER_ALIAS: Record<string, string> = { azure: "microsoft", amazon: "aws", oci: "oracle", gcp: "google" };
-/* Well-known issuers I hold nothing from: asking about them gets a plain "not in my list". */
-const OTHER_ISSUERS = ["aws", "google", "cisco", "comptia", "pmi", "red hat", "salesforce", "tensorflow", "hashicorp", "snowflake"];
-const STOP = new Set(["what", "whats", "what's", "is", "are", "the", "a", "an", "do", "does", "you", "your", "aziz", "azizs", "have", "has", "his", "he", "any", "of", "to", "and", "or", "with", "got", "show", "me", "list", "all", "my", "i", "please", "tell", "about", "certified", "in"]);
+const OUTCOME_LABEL: Record<Answer["outcome"], string> = { supported: "Answer", contradicted: "Answer (the evidence disagrees with the question)", not_verified: "Not verified", error: "Error" };
 
-export function createTerminal(corpus: Corpus, certifications: Certification[] = []) {
-  const retriever = createRetriever(corpus);
+/* One Answer, printed the same way everywhere: answer, then evidence, then limitations. */
+export function answerLines(a: Answer): Line[] {
+  return [
+    { kind: a.outcome === "not_verified" ? "muted" : a.outcome === "error" ? "error" : "heading", text: `${OUTCOME_LABEL[a.outcome]} — ${a.title}` },
+    { kind: a.outcome === "error" ? "error" : "text", text: `  ${a.answer}` },
+    ...a.evidence.map((e) => ({ kind: "link" as const, text: `  evidence: ${e.label}`, href: e.url })),
+    ...a.limitations.map((l) => ({ kind: "limit" as const, text: `  – ${l}` })),
+  ];
+}
+
+export function createTerminal(corpus: Corpus, portfolio: Portfolio) {
+  const real = createAssistant(corpus, portfolio);
+  let last: Answer["outcome"] | undefined;
+  /* remember the outcome of the latest question so the page can drive the mind state */
+  const assistant = {
+    ask: (q: string) => { const a = real.ask(q); last = a.outcome; return a; },
+    certs: (q: string) => { const a = real.certs(q); last = a.outcome; return a; },
+  };
   const resolve = (name: string) => PROJECTS[ALIASES[name] ?? name] ? (ALIASES[name] ?? name) : null;
 
-  function certLines(query: string): Line[] {
-    const words = query.toLowerCase().replace(/'s\b/g, "").replace(/[^a-z0-9+ ]/g, " ").split(" ").filter((w) => w.length >= 3 && !STOP.has(w)).map((w) => ISSUER_ALIAS[w] ?? w);
-    const issuers = [...new Set(certifications.map((c) => c.issuer.toLowerCase()))];
-    const asked = words.filter((w) => issuers.some((i) => i.includes(w)));
-    const missing = OTHER_ISSUERS.filter((i) => words.includes(i) || query.toLowerCase().includes(i));
-    const out: Line[] = [];
-    let shown = certifications;
-    if (asked.length) shown = certifications.filter((c) => asked.some((w) => c.issuer.toLowerCase().includes(w)));
-    if (missing.length && !asked.length)
-      out.push({ kind: "muted", text: `I can't verify a ${missing.map((m) => m.toUpperCase()).join(" / ")} credential: none is in my list, so none is claimed. What I can verify:` });
-    if (!certifications.length) return [{ kind: "error", text: "No certifications loaded." }];
-    out.push({ kind: "heading", text: asked.length ? `Credentials from ${[...new Set(shown.map((c) => c.issuer))].join(", ")}` : "Certifications (each links to the issuer's own page)" });
-    for (const c of shown) out.push({ kind: "link", text: `  ${c.title} · ${c.issuer} · ${c.year}${c.kind === "learning" ? " (course)" : ""}`, href: c.href });
-    return out;
-  }
-
-  function question(input: string): Line[] {
-    const q = input.toLowerCase();
-    if (CERT_WORDS.test(q) || OTHER_ISSUERS.some((i) => new RegExp(`\\b${i}\\b`).test(q)) || /\b(oracle|microsoft|azure|databricks|nvidia|kaggle|ibm)\b/.test(q)) return certLines(input);
-    if (/\b(contact|email|e-mail|reach|linkedin|hire|hiring)\b/.test(q)) return run("contact") as Line[];
-    if (/\b(skills?|tools?|stack|technolog)/.test(q)) return run("skills") as Line[];
-    if (/\b(who are you|who is aziz|about|study|studies|esprit|graduate|school)\b/.test(q)) return run("about") as Line[];
-    const results = retriever.search(input, 2);
-    if (!results.length)
-      return [
-        { kind: "muted", text: "No verified passage answers that, so I won't guess." },
-        { kind: "muted", text: "Ask about TraffiX, FlyRank, the HR prototype or my certifications, or type help for the commands." },
-      ];
-    return results.flatMap((r) => [
-      { kind: "heading" as const, text: `${r.passage.projectTitle} — ${r.passage.title}` },
-      { kind: "text" as const, text: `  ${r.passage.text}` },
-      ...r.passage.limitations.map((l) => ({ kind: "limit" as const, text: `  – ${l}` })),
-      ...r.passage.evidence.map((e) => ({ kind: "link" as const, text: `  evidence: ${e.label}`, href: e.url })),
-    ]);
-  }
-
   function run(raw: string): Line[] | "clear" {
+    last = undefined;
     const input = raw.trim().replace(/\s+/g, " ");
     const [cmd = "", ...rest] = input.split(" ");
     const arg = rest.join(" ");
@@ -156,12 +132,12 @@ export function createTerminal(corpus: Corpus, certifications: Certification[] =
       }
       case "ask": {
         if (!arg) return [{ kind: "error", text: "ask needs a question, e.g. ask Is TraffiX deployed?" }];
-        return question(arg);
+        return answerLines(assistant.ask(arg));
       }
       case "certs":
       case "certifications":
       case "certificates":
-        return certLines(arg);
+        return answerLines(assistant.certs(arg));
       case "label": {
         const key = resolve(arg.toLowerCase()) as LabelKey | null;
         if (!key) return [{ kind: "error", text: `label needs a project: traffix · flyrank · hr` }];
@@ -185,10 +161,10 @@ export function createTerminal(corpus: Corpus, certifications: Certification[] =
       case "clear": return "clear";
       default:
         /* A sentence is a question, not a mistyped command. One unknown word is still reported as a command. */
-        if (input.includes(" ") || input.endsWith("?")) return question(input);
+        if (input.includes(" ") || input.endsWith("?")) return answerLines(assistant.ask(input));
         return [{ kind: "error", text: `command not found: ${cmd}` }, { kind: "muted", text: "Type help for the commands, or ask a question in plain words." }];
     }
   }
 
-  return { run };
+  return { run, get lastOutcome() { return last; } };
 }

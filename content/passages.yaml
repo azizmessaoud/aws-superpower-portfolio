@@ -2,6 +2,7 @@
 # limitations ship on the same screen as the passage. Status follows docs/evidence-register.md.
 - id: tr-simulation
   projectId: traffix
+  challenges: [deployed, deployment, production, live, street, streets]
   claimIds: [TR-01]
   title: A simulation, not a deployment
   text: >-
@@ -37,10 +38,10 @@
     safety and the controllers. Pairs build, test and demo each work item, and roles rotate.
   context: Team of six ESPRIT 4DS students; README section 11.
   limitations:
-    - Roles rotate, so other pairs also touched these areas.
+    - Team project of six students; I did not build it alone, and roles rotate, so other pairs also touched these areas.
   sources: [traffix-readme]
   anchors: ["#L635-L648"]
-  tags: [traffix, role, contribution, team, pair, control, sumo, safety, controllers, built, did]
+  tags: [traffix, role, contribution, team, pair, control, sumo, safety, controllers, built, build, did, personally, ownership, owned]
 - id: tr-pedestrian
   projectId: traffix
   claimIds: [TR-03]
@@ -70,6 +71,7 @@
   tags: [traffix, pedestrian, wait, waiting, morning, peak, time]
 - id: tr-ambulance
   projectId: traffix
+  challenges: [faster, quicker, improve, improved, better, speed]
   claimIds: [TR-05]
   title: Ambulances are slower, and that is not explained yet
   text: >-
@@ -219,3 +221,20 @@
   sources: [live-site-data, hr-system-record]
   anchors: ["#L196-L204", "#L34"]
   tags: [hr, ocr, accuracy, accurate, measured, precision, evaluation, real, documents, test]
+- id: portfolio-weakest
+  projectId: portfolio
+  claimIds: [TR-05, HR-04, FR-02]
+  title: The weakest measured results
+  text: >-
+    No project is ranked worst, because the three are measured in different ways. The weakest measured
+    result is TraffiX in the emergency scenario: ambulance trips took 240.0 s against 213.2 s with actuated
+    signals. The HR prototype has no accuracy figure at all, so nothing can be said about it either way.
+    FlyRank beat its baseline on clients the model never saw (Precision@50 0.94 against 0.76), on one decision date.
+  context: Restates the TraffiX validation report, the HR README and the FlyRank notebook output.
+  limitations:
+    - The three projects use different metrics and conditions, so the numbers are not comparable.
+    - None of the TraffiX differences is significant at p < 0.05 with three seeds.
+  sources: [traffix-validation, hr-readme, flyrank-w05]
+  anchors: ["", "#L1-L16", ""]
+  tags: [worst, weakest, bad, poor, performed, performance, lowest, results, project, projects, compare, compared, failed]
+

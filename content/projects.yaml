@@ -13,3 +13,8 @@
   framing: A local prototype that checks HR documents and explains every flag before a person decides.
   layout: pipeline
   repoUrl: https://github.com/azizmessaoud/hr-anomaly-detection
+- id: portfolio
+  title: Across the three projects
+  framing: Comparisons that need more than one project.
+  layout: none
+  repoUrl: https://github.com/azizmessaoud/aws-superpower-portfolio
