@@ -386,8 +386,8 @@ const status = (page: Page) => page.locator(".ask-status");
 
 test("hero: the first screen says what the site is and offers the question box", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("I build systems that can show their work.");
-  await expect(page.locator(".hero-lead")).toContainText("verified portfolio and repository evidence");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("I build practical AI systems.");
+  await expect(page.locator(".hero-lead")).toContainText("including what didn't work");
   for (const name of ["About", "Skills", "Projects", "Contact"]) await expect(page.locator("nav[aria-label=Main] a", { hasText: new RegExp(`^${name}$`) })).toBeAttached();
   await expect(page.locator("#hero-ask")).toBeVisible();
 });
@@ -500,5 +500,17 @@ test("the AWS section says not deployed and lists services as planned only", asy
   for (const svc of ["Amazon Bedrock", "AWS Lambda", "Amazon API Gateway"]) await expect(sec).toContainText(svc);
   await expect(sec.getByRole("heading", { name: "Verified" })).toBeVisible();
   await expect(sec.locator("a[href$='amplify.yml']")).toHaveCount(1);
+});
+
+test("interacting with the animation never highlights the hero text, but the question box stays selectable", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "mouse interaction");
+  await page.goto("/");
+  await page.waitForTimeout(1200);
+  await page.locator(".hero-h1").dblclick();
+  await page.mouse.move(100, 300); await page.mouse.down(); await page.mouse.move(600, 420, { steps: 8 }); await page.mouse.up();
+  expect(await page.evaluate(() => String(getSelection()))).toBe("");
+  await page.locator("#hero-ask").fill("hello brain");
+  await page.locator("#hero-ask").selectText();
+  expect(await page.evaluate(() => (document.activeElement as HTMLInputElement).selectionEnd! - (document.activeElement as HTMLInputElement).selectionStart!)).toBe(11);
 });
 

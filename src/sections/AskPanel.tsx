@@ -63,7 +63,7 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
   return (
     <div className="ask" id="ask">
       <form className="ask-form" role="search" onSubmit={(e) => { e.preventDefault(); submit(value); }}>
-        <label htmlFor="hero-ask" className="ask-label">Ask my brain</label>
+        <label htmlFor="hero-ask" className="ask-label">Ask my brain · check a claim against the evidence</label>
         <div className="ask-row">
           <input id="hero-ask" className="ask-input" type="search" value={value} maxLength={MAX_QUESTION} autoComplete="off"
             placeholder="e.g. Did TraffiX make ambulances faster?"

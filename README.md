@@ -2,7 +2,7 @@
 
 Aziz Messaoud's entry for the AWS Student Builder Challenge, "Build your tech superpower".
 
-**I build systems that can show their work.** The memorable part is **Ask my brain**: a question box in the first screen, with a neural "mind" beside it. You ask about my projects or my AWS context; it answers only from verified portfolio and repository evidence, and shows **Answer, Evidence, Limitations**. When the evidence is missing it says *Not verified* instead of guessing, and when the evidence contradicts the question (for example "did TraffiX make ambulances faster?") it says so.
+**I build practical AI systems**, and every project links to its repo, report or notebook, including what didn't work. The memorable part is **Ask my brain**: a question box in the first screen, with a neural "mind" beside it, for checking any claim against the evidence. You ask about my projects or my AWS context; it answers only from verified portfolio and repository evidence, and shows **Answer, Evidence, Limitations**. When the evidence is missing it says *Not verified* instead of guessing, and when the evidence contradicts the question (for example "did TraffiX make ambulances faster?") it says so.
 
 The mind animation shows interface state only: idle, listening, retrieving evidence, answering, uncertain, error. It does not show what a model "thinks" and it carries no confidence value. The same state is always written out as text.
 
