@@ -12,7 +12,7 @@
 | R-01 | "A public portfolio website hosted on AWS that loads at a live URL and stays accessible through the judging window." | Live Amplify URL | Fresh-context Playwright smoke test; daily check 9–23 Nov | **BLOCKED** (no deploy) |
 | R-02 | "Three core sections: About Me, Skills or Tech Superpowers, and Projects or Achievements (learning projects count)." | `#about`, `#skills`, `#projects` built from `content/` | Playwright presence and nav tests at 390 and 1280 px | **PASS (local)** — `#about`, `#skills`, `#projects` render; nav + mobile menu tested at 1280/390 (`reports/logs/playwright.txt`). Live: BLOCKED. |
 | R-03 | "One creative feature that works without getting in the way of navigation." Plus, from About: "has to be interactive and it has to work, and visitors need a **visible hint** to find it." | "Ask my brain" with suggested questions as the hint; neural scene linked to verified passages | ≥ 12 judged questions + eval report; Playwright for hint, results, fallback, keyboard; nav still works | **PASS (local)** — 15 judged questions, hit@3 1.00, MRR 0.964; hero hint, results, no-result state, keyboard and suggestions tested. Embedding fallback NOT APPLICABLE (no embeddings). Live: BLOCKED. |
-| R-04 | "A link to your GitHub repository." | Public `azizmessaoud/aws-superpower-portfolio`, linked in the footer | Open the link signed out | **BLOCKED.** Clone of that URL asked for credentials on 28 Oct, so it is absent or private. Not to be created until you ask. |
+| R-04 | "A link to your GitHub repository." | Public `azizmessaoud/aws-superpower-portfolio`, linked in the footer | Open the link signed out | **PASS** — created and pushed on your request (28–29 Oct) |
 | R-05 | A "your project" entry that "describes your creative feature, shows screenshots of your portfolio and AWS setup, documents the AWS services you used, and shares what you learned and the challenges you hit." | `WRITEUP.md`, kept current; genuine screenshots | Every statement cross-checked against this register, test output and the console | **IN PROGRESS** — `WRITEUP.md` draft; AWS parts TODO. |
 | R-06 | "An original portfolio website that hasn't been published before." | New implementation and new copy from `content/`; `projectx0` untouched | Compare against the live site and the prototype | **IN PROGRESS** — new React code and new copy from `content/`; `projectx0` untouched. Note: the prototype exists as a **private** claude.ai artifact. Don't share its link, and don't ship it as the site. |
 | R-07 | Eligibility: "verified students 18 or older with a Builder Center profile. See Rules for country and employee exclusions. Limit one entry per person." Individual challenge. | Your own confirmation | You read the Rules tab while signed in | **BLOCKED on you.** The Rules text did not render for me; your summary says Tunisia isn't excluded. |
@@ -32,18 +32,17 @@ Judging process (official): Gate 1 "AI and human scoring", top 50 advance; Gate 
 
 | Evidence / test | Supports | Status (28 Oct, local) |
 |---|---|---|
-| `docs/source-inventory.md` | All | revision 3 appended (new CV sources) |
-| `docs/evidence-register.md` | Communication; truthful content | revision 3 appended (FR-08 resolved, CV-3 conflicts, D8) |
+| Evidence register and source inventory (kept private, not in this repo) | Communication; truthful content | maintained; public mirror is `content/claims.yaml` + `content/sources.yaml` |
 | `validate-content` | Communication; completeness | **PASS** — `reports/logs/validate.txt`; caught 2 real issues on first run |
 | Vitest (tokenizer, BM25, retriever floor, scene geometry) | Creativity; working feature | **PASS** 28/28 (incl. terminal commands) — `reports/logs/vitest.txt` |
 | Retrieval eval, 15 judged questions | Creativity | **PASS** hit@1 0.93, hit@3 1.00, MRR 0.964 — `reports/retrieval-keyword.json` |
-| Playwright local (hero start/middle/end, brain docking into the nav, overflow, mobile menu, retrieval states, pause never self-resumes, idle/offscreen stop, reduced motion, keyboard focus, skip link, touch scroll, CLS, CSP) | Creativity; usability | **PASS** 41 passed, 3 skipped by design — `reports/logs/playwright.txt`, `reports/screens/` |
+| Playwright local (hero start/middle/end, brain docking into the nav, overflow, mobile menu, retrieval states, pause never self-resumes, idle/offscreen stop, reduced motion, keyboard focus, skip link, touch scroll, CLS, CSP) | Creativity; usability | **PASS** 45 passed, 3 skipped by design — `reports/logs/playwright.txt`, `reports/screens/` |
 | WCAG 2.1 AA audit (`docs/accessibility-audit.md`) | Usability | **PASS (local)** — 9 issues found and fixed; real screen readers NOT RUN |
 | axe-core | Usability | **PASS** 0 serious/critical (1280 and 390) |
 | Contrast script | Usability | **PASS** 38/38 — `reports/logs/contrast.txt` |
 | gitleaks + `.gitignore` | AWS implementation hygiene | **PASS** no leaks (dir scan); `.env*` and Amplify local config ignored (`git check-ignore`). Pre-commit hook and CI NOT SET UP |
 | Labels never cross text (automated bounding-box test) | Usability | **NOT RUN** — checked by eye in screenshots only |
-| Amplify build record + live URL | AWS implementation | **BLOCKED** (Day 3/4 guides; your authorisation; repo not created) |
+| Amplify build record + live URL | AWS implementation | **BLOCKED** (Day 4 guide; your authorisation) |
 | Live Playwright + Lighthouse | AWS implementation; usability | **BLOCKED** |
 | Genuine AWS console screenshots | Communication; AWS implementation | **BLOCKED** |
 

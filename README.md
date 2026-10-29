@@ -12,6 +12,6 @@ npm run contrast       # WCAG pairs from src/styles/tokens.css
 npx playwright test    # browser checks at 1280 and 390 px (needs `npm run build` first)
 ```
 
-- Content and evidence: `content/*.yaml`, mirrored by `docs/evidence-register.md`.
+- Content and evidence: `content/*.yaml`. Each claim names its source file and commit; `npm run build` refuses unverified or prohibited claims. (The working evidence register behind it is kept private.)
 - Hosting: `amplify.yml` and `customHttp.yml` are prepared for AWS Amplify Hosting; not deployed yet.
 - Write-up: `WRITEUP.md`. Rubric mapping: `docs/rubric-to-evidence.md`.

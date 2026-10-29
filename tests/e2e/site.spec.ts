@@ -330,6 +330,28 @@ test("the neural field fills the whole hero background, not only the sphere", as
   expect(lit.right).toBeGreaterThan(200);
 });
 
+test("the network flows behind the hero text instead of stopping at a box around it", async ({ page }) => {
+  await page.goto("/?seed=7");
+  await page.waitForTimeout(2000);
+  /* the brightest canvas pixel inside the text column, over ~1 s of drift */
+  const peak = await page.evaluate(async () => {
+    const c = document.querySelector<HTMLCanvasElement>(".brain-canvas")!, k = c.width / innerWidth, ctx = c.getContext("2d")!;
+    const range = document.createRange(); let l = 1e9, t = 1e9, r = 0, b = 0;
+    for (const el of document.querySelectorAll(".hero-inner > *")) {
+      range.selectNodeContents(el); const q = range.getBoundingClientRect();
+      l = Math.min(l, q.left); t = Math.min(t, q.top); r = Math.max(r, q.right); b = Math.max(b, q.bottom);
+    }
+    let max = 0;
+    for (let f = 0; f < 10; f++) {
+      const d = ctx.getImageData(Math.round(l * k), Math.round(t * k), Math.round((r - l) * k), Math.round((b - t) * k)).data;
+      for (let i = 3; i < d.length; i += 4) max = Math.max(max, d[i]);
+      await new Promise((res) => setTimeout(res, 100));
+    }
+    return max;
+  });
+  expect(peak).toBeGreaterThan(120);                         /* the old box cut-out capped everything in it near 30 */
+});
+
 test("stopping the scroll mid-way never leaves the brain hanging: it finishes the flight", async ({ page }) => {
   await page.goto("/");
   await page.waitForTimeout(800);

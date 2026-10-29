@@ -43,8 +43,8 @@ Precedence: Aziz's messages → `CLAUDE_CODE_PROMPT.md` → `docs/` → everythi
 - Day 2 guide: https://builder.aws.com/content/3LKlKCv8mLiBiKLXVGTq0TKUdLR/how-to-connect-your-coding-agent-to-aws
 - Days 3 and 4: linked from the event page once published (29 and 30 Oct)
 
-## Current state (28 Oct 2026, 22:00 Tunisia)
+## Current state (29 Oct 2026)
 
-- Stage 1 documents: revision 2 written, **awaiting Aziz's approval**.
-- Nothing is scaffolded, tested, committed or deployed.
-- Open questions: D1–D7, Q8, Q9 (register §E). Stage 6 is BLOCKED until the Day 4 guide is published.
+- Site built and tested locally (Vitest, Playwright, axe, contrast; logs in `reports/logs/`); code public on GitHub.
+- **Not deployed.** Stage 6 (Amplify) waits for the Day 4 guide and Aziz's go-ahead.
+- Open decisions: D1 (console only vs CLI), D8 (CV link), result-to-node highlighting.

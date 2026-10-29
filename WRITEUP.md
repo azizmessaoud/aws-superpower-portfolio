@@ -1,9 +1,9 @@
 # Ask my brain — write-up (draft for the Builder Center "Your project" entry)
 
-> Status 28 Oct 2026: built and tested locally; **not deployed**. Every `TODO` must be replaced with what actually happened. Don't list an AWS service that wasn't used.
+> Status 29 Oct 2026: built and tested locally, code public on GitHub; **not deployed**. Every `TODO` must be replaced with what actually happened. Don't list an AWS service that wasn't used.
 
 **Live site:** TODO (no Amplify deployment yet)
-**GitHub:** TODO https://github.com/azizmessaoud/aws-superpower-portfolio (repository not created yet)
+**GitHub:** https://github.com/azizmessaoud/aws-superpower-portfolio
 
 ## What it is
 

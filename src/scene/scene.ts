@@ -48,7 +48,7 @@ export function createScene(o: SceneOptions) {
   let brain = new Float32Array(0), brainXY = new Float32Array(0);
   let field: FieldNode[] = [];
   let pulses: Pulse[] = [], flash = 0, frame = 0, raf = 0, last = 0;
-  let progress = 0, stageTop = 0, text: Box | null = null, fixedOut: Box[] = [], sphere = { cx: 0, cy: 0, R: 0 };
+  let progress = 0, stageTop = 0, text: Box | null = null, lines: Box[] = [], fixedOut: Box[] = [], sphere = { cx: 0, cy: 0, R: 0 };
   let dock = { cx: 0, cy: 0, r: 0 }, dockAllowed = true, dockActive = false, docked = false;
   let heroVisible = true, paused = false, destroyed = false;
   let travelFrom = 0, travelTo = 0, travelStart = 0;
@@ -63,17 +63,35 @@ export function createScene(o: SceneOptions) {
   const inBox = (b: Box, x: number, y: number) => x > b.l && x < b.r && y > b.t && y < b.b;
   /* x, y in viewport coordinates */
   const blocked = (x: number, y: number, heroText = true) =>
-    (heroText && !!text && inBox(text, x, y - stageTop)) || fixedOut.some((b) => inBox(b, x, y));
+    (heroText && veil(x, y) > 0.5) || fixedOut.some((b) => inBox(b, x, y));
+  /* how much hero text covers a viewport point: 1 on a line of text, fading to 0 within FEATHER px.
+     Lines, not the text column: the network flows between and beside the words instead of around a box. */
+  const FEATHER = 28;
+  function veil(x: number, y: number) {
+    const sy = y - stageTop;
+    if (!text || !inBox({ l: text.l - FEATHER, t: text.t - FEATHER, r: text.r + FEATHER, b: text.b + FEATHER }, x, sy)) return 0;
+    let v = 0;
+    for (const b of lines) {
+      const d = Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - sy, 0, sy - b.b));
+      if (d < FEATHER) v = Math.max(v, 1 - d / FEATHER);
+      if (v === 1) break;
+    }
+    return v;
+  }
 
   function measure() {
     const s = o.stage.getBoundingClientRect(), range = document.createRange();
     let box: Box | null = null;
+    lines = [];
     for (const el of o.textBlocks()) {
       range.selectNodeContents(el);
       const r = range.getBoundingClientRect();
       if (!r.width) continue;
       const b = { l: r.left - s.left, t: r.top - s.top, r: r.right - s.left, b: r.bottom - s.top };
       box = box ? { l: Math.min(box.l, b.l), t: Math.min(box.t, b.t), r: Math.max(box.r, b.r), b: Math.max(box.b, b.b) } : b;
+      /* buttons keep their whole surface; text keeps each line it actually draws */
+      const parts = el.querySelector("a, button") ? Array.from(el.querySelectorAll("a, button"), (c) => c.getBoundingClientRect()) : Array.from(range.getClientRects());
+      for (const q of parts) if (q.width > 2) lines.push({ l: q.left - s.left - 6, t: q.top - s.top - 4, r: q.right - s.left + 6, b: q.bottom - s.top + 4 });
     }
     text = box && { l: box.l - 20, t: box.t - 20, r: box.r + 20, b: box.b + 20 };
     stageH = s.height;
@@ -184,7 +202,7 @@ export function createScene(o: SceneOptions) {
         const p = proj[i], inf = live ? Math.max(0, 1 - Math.hypot(out.x - pointer.x, out.y - pointer.y) / (180 * out.s)) : 0;
         p.x = out.x + (pointer.x - out.x) * inf * 0.1; p.y = out.y + (pointer.y - out.y) * inf * 0.1;
         p.z = out.z; p.s = out.s; p.inf = inf; p.ex = excitation.get(i) ?? 0;
-        p.a = shell * (blocked(p.x, p.y) ? 0.15 : 1);
+        p.a = shell * (fixedOut.some((b) => inBox(b, p.x, p.y)) ? 0.15 : 1 - 0.8 * veil(p.x, p.y));
         order.push(i);
       });
       order.sort((a, b) => proj[b].z - proj[a].z);
@@ -255,7 +273,8 @@ export function createScene(o: SceneOptions) {
 
   function drawField(alpha: number, t: number) {
     const lim = FIELD_LINK * FIELD_LINK;
-    const dim = (x: number, y: number) => (blocked(x, y + stageTop) ? 0.12 : 1);
+    /* behind the words the field fades to a third: still one continuous network, never competing with the text */
+    const dim = (x: number, y: number) => (fixedOut.some((b) => inBox(b, x, y + stageTop)) ? 0.12 : 1 - 0.68 * veil(x, y + stageTop));
     ctx.lineWidth = 1;
     for (let i = 0; i < field.length; i++) {
       const a = field[i];
