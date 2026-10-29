@@ -1,3 +1,5 @@
+> **Renamed 29 Oct 2026:** "Ask my brain" is now called the Terminal Explorer. This file keeps the old name because it describes the 28 Oct build.
+
 > **Update 29 Oct 2026:** this audit was run on 28 Oct. Since then the separate "Ask my brain" section and the page-wide pause button were removed (the terminal is now the feature, and "Ask my brain" in the nav goes to it), and certifications, a portrait and project labels were added. axe-core still reports 0 serious or critical issues, but the manual keyboard and screen-reader checks below have not been repeated. Without the pause button the site no longer meets WCAG 2.2.2 for visitors who allow motion.
 
 ## Accessibility Audit: Ask my brain portfolio (local build)

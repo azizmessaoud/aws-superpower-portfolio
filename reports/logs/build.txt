@@ -18,8 +18,8 @@ transforming...
 ✓ 62 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                        1.28 kB │ gzip:  0.69 kB
+dist/index.html                        1.29 kB │ gzip:  0.69 kB
 dist/assets/index-Dj1N6_nI.css        27.05 kB │ gzip:  6.03 kB
-dist/assets/NeuralScene-OJ-Ifn8v.js   14.51 kB │ gzip:  6.97 kB
-dist/assets/index-CJRCmY2f.js        222.20 kB │ gzip: 71.25 kB
-✓ built in 1.37s
+dist/assets/NeuralScene-D1QThn0Y.js   14.51 kB │ gzip:  6.97 kB
+dist/assets/index-D3LeQigo.js        222.20 kB │ gzip: 71.25 kB
+✓ built in 1.52s

@@ -65,7 +65,7 @@ export default function Nav({ scene, docked }: Props) {
         <a className={`nav-cta${docked ? " is-docked" : ""}`} href="#top" aria-current={current === "top" ? "true" : undefined} onClick={() => { setOpen(false); landOn("top"); }}
           onMouseEnter={wake(true)} onMouseLeave={wake(false)} onFocus={wake(true)} onBlur={wake(false)}>
           <span className="dock-brain" aria-hidden="true" />
-          <span className="cta-label">Ask my brain</span>
+          <span className="cta-label">Terminal Explorer</span>
         </a>
         <button ref={toggle} className="nav-toggle" type="button" aria-expanded={open} aria-controls="nav-links"
           aria-label={open ? "Close menu" : "Menu"} onClick={() => setOpen((o) => !o)}>

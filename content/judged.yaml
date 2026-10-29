@@ -1,4 +1,4 @@
-# Judged questions for "Ask my brain". relevant = passages a good answer must show (any order).
+# Judged questions for the Terminal Explorer. relevant = passages a good answer must show (any order).
 # An empty list means the honest answer is "no verified passage".
 - id: q01
   question: Is TraffiX deployed in Tunis?

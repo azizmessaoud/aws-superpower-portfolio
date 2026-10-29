@@ -1,4 +1,4 @@
-/* "Ask my brain": finds verified portfolio passages for a question. It retrieves evidence;
+/* Terminal Explorer retrieval: finds verified portfolio passages for a question. It retrieves evidence;
  * it never generates answers and never scores the person. */
 import type { Corpus, CorpusPassage } from "../content/schema";
 import { buildIndex, score } from "./bm25";

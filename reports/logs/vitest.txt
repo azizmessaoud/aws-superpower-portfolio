@@ -5,16 +5,16 @@
 
  RUN  v2.1.8 /home/user/aws-superpower-portfolio
 
- ✓ tests/unit/assistant.test.ts (17 tests) 28ms
+ ✓ tests/unit/terminal.test.ts (19 tests) 19ms
+ ✓ tests/unit/assistant.test.ts (17 tests) 27ms
  ✓ tests/unit/retriever.test.ts (8 tests) 12ms
- ✓ tests/unit/terminal.test.ts (19 tests) 31ms
+ ✓ tests/unit/mind.test.ts (5 tests) 11ms
  ✓ tests/unit/bm25.test.ts (4 tests) 5ms
- ✓ tests/unit/mind.test.ts (5 tests) 5ms
- ✓ tests/unit/geometry.test.ts (6 tests) 14ms
+ ✓ tests/unit/geometry.test.ts (6 tests) 35ms
  ✓ tests/unit/tokenize.test.ts (3 tests) 5ms
 
  Test Files  7 passed (7)
       Tests  62 passed (62)
-   Start at  03:33:11
-   Duration  1.28s (transform 407ms, setup 0ms, collect 854ms, tests 101ms, environment 2ms, prepare 692ms)
+   Start at  03:37:11
+   Duration  1.30s (transform 439ms, setup 0ms, collect 860ms, tests 115ms, environment 2ms, prepare 708ms)
 

@@ -9,7 +9,7 @@ const corpus = JSON.parse(readFileSync("src/generated/corpus.json", "utf8")) as 
 const judged = parse(readFileSync("content/judged.yaml", "utf8")) as Judged[];
 const retriever = createRetriever(corpus);
 
-describe("ask my brain — keyword baseline", () => {
+describe("terminal explorer — keyword baseline", () => {
   it("meets the agreed floor on the judged set", () => {
     const r = evaluate(retriever, judged);
     expect(judged.length).toBeGreaterThanOrEqual(12);

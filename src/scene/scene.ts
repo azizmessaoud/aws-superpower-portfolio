@@ -1,6 +1,6 @@
 /* One fixed canvas for the whole page. In the hero: a point-cloud brain inside a sphere of skill nodes
  * (soul of projectx0's NeuralField); the camera pulls back on open and dollies in with the pinned scroll.
- * At the end of the pin the brain shrinks and travels into the "Ask my brain" dock, where it stays for the
+ * At the end of the pin the brain shrinks and travels into the "Terminal Explorer" dock, where it stays for the
  * rest of the page; it moves there only while the dock is hovered or focused.
  * Never draws inside the hero text or behind fixed controls. The loop runs only while something visible moves
  * and the visitor has not paused; reduced motion draws still frames that follow the scroll. No preventDefault on touch. */
@@ -428,7 +428,7 @@ export function createScene(o: SceneOptions) {
     },
     get mindState() { return mind; },
     setDockActive(on: boolean) { dockActive = on; if (on && !paused) flash = 0.6; sync(); still(); },
-    /** dock hidden (e.g. the visitor is already in Ask my brain): don't draw the docked brain */
+    /** dock hidden (e.g. the visitor is already at the Terminal Explorer): don't draw the docked brain */
     setDockAllowed(on: boolean) { dockAllowed = on; measureFixed(); sync(); still(); },
     remeasure() { measure(); still(); },
     get paused() { return paused; },

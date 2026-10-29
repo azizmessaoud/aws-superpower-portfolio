@@ -85,7 +85,7 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .hint-label { font-family: var(--font-m); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-muted); }
 .hint-q, .suggest-q { min-height: 44px; padding: var(--space-3xs) var(--space-sm); border-radius: var(--radius-pill); border: 1px dashed var(--cyan-line); background: transparent; color: var(--cyan); cursor: pointer; text-align: left; transition: border-color var(--dur-base), background var(--dur-base); }
 .hint-q:hover, .suggest-q:hover { border-style: solid; background: var(--glass5); }
-/* nav control: the "Ask my brain" link the brain docks into */
+/* nav control: the "Terminal Explorer" link the brain docks into */
 .nav-cta[aria-current="true"] { border-color: var(--violet-hover); background: var(--violet-tint); }
 .dock-brain { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px dashed var(--cyan-line); background: radial-gradient(circle, rgba(6, 15, 26, 0.4), rgba(6, 15, 26, 0.9)); transition: border-color var(--dur-slow); }
 .nav-cta.is-docked .dock-brain { border-style: solid; }

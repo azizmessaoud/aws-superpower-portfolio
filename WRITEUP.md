@@ -1,4 +1,4 @@
-# Ask my brain: a portfolio that shows its work (draft for the Builder Center "Your project" entry)
+# Terminal Explorer: a portfolio that shows its work (draft for the Builder Center "Your project" entry)
 
 > Status 29 Oct 2026: built and tested locally; code public on GitHub; **not deployed on AWS yet**. Every `TODO` must be replaced with what actually happened. Don't list an AWS service that wasn't used.
 
@@ -11,7 +11,7 @@ Portfolios often make big claims and leave the reader to trust them. An early pr
 
 ## Idea
 
-**Ask my brain** is a question box in the first screen. You ask about my projects or my AWS context in your own words. It answers only from verified passages, and each answer has three parts: the answer, the evidence (the exact file and commit it came from), and the limitations. It keeps four outcomes apart:
+The **Terminal Explorer** is a question box in the first screen. You ask about my projects or my AWS context in your own words. It answers only from verified passages, and each answer has three parts: the answer, the evidence (the exact file and commit it came from), and the limitations. It keeps four outcomes apart:
 
 - **Answer**: the evidence supports it.
 - **The evidence disagrees**: the evidence says the opposite of the question's premise ("Did TraffiX make ambulances faster?" gets 240.0 s against 213.2 s with actuated signals).

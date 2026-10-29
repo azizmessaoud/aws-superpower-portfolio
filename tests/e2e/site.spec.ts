@@ -65,7 +65,7 @@ test.describe("reduced motion", () => {
   });
 });
 
-test("ask my brain terminal: evidence with links, honest no-result, suggestions", async ({ page }, info) => {
+test("terminal explorer: evidence with links, honest no-result, suggestions", async ({ page }, info) => {
   await page.goto("/#terminal");
   const input = page.locator("#term-input");
   const log = page.getByRole("log", { name: "Terminal output" });
@@ -198,7 +198,7 @@ test("runs under the production CSP from customHttp.yml without violations", asy
 const scrollPage = (page: Page, y: number) => page.evaluate((v) => window.scrollTo({ top: v, behavior: "instant" }), y);
 const running = (page: Page) => page.evaluate(() => (window as unknown as { __scene?: { running: boolean } }).__scene?.running ?? false);
 
-test("the brain docks into the nav's Ask my brain link; it is a keyboard-reachable hint", async ({ page }, info) => {
+test("the brain docks into the nav's Terminal Explorer link; it is a keyboard-reachable hint", async ({ page }, info) => {
   await page.goto("/");
   await page.waitForTimeout(1200);
   const cta = page.locator(".nav-cta");

@@ -13,7 +13,7 @@ describe("terminal explorer", () => {
     const out = text(term.run("help"));
     COMMANDS.forEach(([c]) => expect(out).toContain(c));
   });
-  it("answers from the same retriever as Ask my brain, with limits and evidence", () => {
+  it("answers from the same retriever as the Terminal Explorer, with limits and evidence", () => {
     const r = term.run("ask Are ambulances faster with TraffiX?");
     expect(text(r)).toContain("Ambulances are slower");
     expect(r !== "clear" && r.some((l) => l.kind === "link" && /github\.com\/azizmessaoud\/traffix/.test(l.href))).toBe(true);

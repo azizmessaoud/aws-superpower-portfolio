@@ -1,4 +1,4 @@
-# Each passage is retrievable by "Ask my brain". Text paraphrases its source closely;
+# Each passage is retrievable by the Terminal Explorer. Text paraphrases its source closely;
 # limitations ship on the same screen as the passage. Status follows docs/evidence-register.md.
 - id: tr-simulation
   projectId: traffix

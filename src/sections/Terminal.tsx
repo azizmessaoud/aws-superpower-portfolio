@@ -6,7 +6,7 @@ import portfolioJson from "../generated/portfolio.json";
 import { createTerminal, type Line } from "../terminal/commands";
 import Icon from "../ui/Icon";
 
-const PROMPT = "visitor@ask-my-brain:~$";
+const PROMPT = "visitor@explorer:~$";
 const TRY = [
   "help",
   "projects",
@@ -19,7 +19,7 @@ const TRY = [
 ];
 type Entry = { id: number; cmd?: string; lines: Line[] };
 
-/* The Terminal Explorer is "Ask my brain": questions and commands over the same verified passages.
+/* The Terminal Explorer: questions and commands over the same verified passages.
  * Tab is never captured (no keyboard trap); ↑/↓ recall history; output is a polite live log. */
 export default function Terminal({ setMind, reduced }: { setMind: (s: MindState) => void; reduced: boolean }) {
   const term = useMemo(() => createTerminal(corpusJson as Corpus, portfolioJson as Portfolio), []);
@@ -55,7 +55,7 @@ export default function Terminal({ setMind, reduced }: { setMind: (s: MindState)
   return (
     <section id="terminal" className="section terminal-section" aria-labelledby="terminal-title">
       <div className="inner">
-        <p className="sec-label">Command line</p>
+        <p className="sec-label">Terminal Explorer</p>
         <h2 id="terminal-title" className="sec-h2">The same answers, as commands</h2>
         <p className="sec-lead">
           Ask about my projects with <code>ask</code> and your own words. It searches {corpusJson.passages.length} verified passages
@@ -65,7 +65,7 @@ export default function Terminal({ setMind, reduced }: { setMind: (s: MindState)
         <div className="term-win" onClick={(e) => { if (!String(getSelection()) && !(e.target as Element).closest("a")) input.current?.focus(); }}>
           <div className="term-bar" aria-hidden="true">
             <span className="dot r" /><span className="dot y" /><span className="dot g" />
-            <span className="term-title">ask-my-brain — terminal</span>
+            <span className="term-title">terminal-explorer</span>
           </div>
           <div className="term-body" ref={body} role="log" aria-live="polite" aria-relevant="additions" aria-label="Terminal output">
             {log.map((entry) => (
