@@ -2,7 +2,7 @@
 # limitations ship on the same screen as the passage. Status follows docs/evidence-register.md.
 - id: tr-simulation
   projectId: traffix
-  challenges: [deployed, deployment, production, live, street, streets]
+  challenges: [deployed, deployment, production, live, street, streets, real, world, reality, practice, reallife]
   claimIds: [TR-01]
   title: A simulation, not a deployment
   text: >-
@@ -96,7 +96,7 @@
     - Three seeds; synthetic demand; 18 of 21 junction roads use unverified lane counts.
   sources: [traffix-validation]
   anchors: [""]
-  tags: [traffix, results, car, wait, significant, significance, statistics, test, better, improve]
+  tags: [traffix, results, car, wait, significant, significance, statistics, test, better, improve, seed, seeds, scenarios, paired]
 - id: tr-limits
   projectId: traffix
   claimIds: [TR-09]
@@ -151,7 +151,7 @@
     - A grouped split tests transfer to new clients, not performance over time.
   sources: [flyrank-capstone]
   anchors: ["#L38-L42"]
-  tags: [flyrank, method, split, groupshufflesplit, clients, holdout, evaluation, validation, random, forest]
+  tags: [flyrank, method, split, groupshufflesplit, clients, client, holdout, held, unseen, evaluation, validation, random, forest, sample, size, rows, test, pages, training, train, baseline]
 - id: fr-leakage
   projectId: flyrank
   claimIds: [FR-08]

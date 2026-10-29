@@ -1,7 +1,7 @@
 # Skill domains shown in Skills and used by the answer panel. Each links to where the tool was used.
 - icon: ranking
   title: "Machine learning & ranking"
-  chips: ["scikit-learn", "Random Forest", "Grouped holdout", "Precision@50"]
+  chips: ["Python", "scikit-learn", "Random Forest", "Grouped holdout", "Precision@50"]
   hi: ["scikit-learn"]
   where: "FlyRank capstone"
   href: "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L38-L44"

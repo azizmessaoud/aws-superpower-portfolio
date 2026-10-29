@@ -59,7 +59,7 @@ describe("the required demo questions", () => {
     const a = bot.ask("What are the limitations of the results?");
     expect(a.intent).toBe("limitations");
     const t = a.limitations.join("\n");
-    ["TraffiX:", "FlyRank:", "HR:"].forEach((x) => expect(t).toContain(x));
+    ["TraffiX:", "FlyRank:", "HR document checks:"].forEach((x) => expect(t).toContain(x));
   });
   it("interview: suggested questions tied to passages, labelled as not claims", () => {
     const a = bot.ask("What should I ask Aziz in an interview?");

@@ -1,0 +1,45 @@
+## heldout2
+
+Cases: 69 · passed 50 (72%)
+In-scope answers routed correctly: 36/52 (69%)
+Refusals, greetings and clarifications handled safely: 15/17 (88%)
+**False support** (a real-looking answer where none was right): 1
+
+| category | cases | passed |
+|---|---:|---:|
+| judge | 9 | 5 |
+| recruiter | 14 | 9 |
+| classmate | 7 | 3 |
+| skeptic | 7 | 5 |
+| abuse | 7 | 7 |
+| lang | 7 | 5 |
+| followup | 5 | 5 |
+| numbers | 5 | 4 |
+| noise | 8 | 7 |
+
+### False support
+
+- `we have an AI internship opening, is he a fit` → retrieval/supported: Who I am and what I am looking for
+
+### All failures
+
+- [judge] `show me the architecture` → clarify/info: Which one do you mean? — class clarify, wanted answer; intent clarify, wanted architecture
+- [judge] `where is the source code` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; intent retrieval, wanted contact
+- [judge] `what failed` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer
+- [judge] `is this project original` → projects/supported: Projects — class answer, wanted not_verified|related
+- [recruiter] `we have an AI internship opening, is he a fit` → retrieval/supported: Who I am and what I am looking for — class answer, wanted not_verified
+- [recruiter] `which universities has he attended` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted pr-about
+- [recruiter] `can he work from tunis` → retrieval/related: Internships so far — class related, wanted answer
+- [recruiter] `send me his cv` → retrieval/related: Internships so far — class related, wanted not_verified
+- [recruiter] `is he on github` → tool/supported: Git and GitHub: used — intent tool, wanted contact
+- [classmate] `yo what did u do in traffix` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted tr-role
+- [classmate] `did ur flyrank model work` → retrieval/related: Internships so far — class related, wanted answer
+- [classmate] `which libs did u use for ocr` → retrieval/related: Every flag is explained, a person decides — class related, wanted answer
+- [classmate] `is it a team project` → projects/supported: Projects — passages [tr-simulation,fr-question,hr-pipeline], wanted tr-role
+- [skeptic] `what are the weaknesses` → clarify/info: Which one do you mean? — class clarify, wanted answer; intent clarify, wanted limitations
+- [skeptic] `what is the sample size for flyrank` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted fr-method
+- [lang] `a-t-il fait des stages` → retrieval/related: Internships so far — class related, wanted answer
+- [lang] `ما هي لغاته` → clarify/info: Tell me a bit more — class clarify, wanted answer; passages [], wanted pr-languages
+- [numbers] `how many pages were in the test set` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted fr-method
+- [noise] `ocr accuracy??` → glossary/supported: OCR: what it means — passages [hr-pipeline], wanted hr-accuracy
+

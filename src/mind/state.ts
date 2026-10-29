@@ -1,7 +1,7 @@
 /* The mind's state mirrors the question lifecycle in the interface. It says what the page is doing,
  * never what a model "thinks", and carries no confidence value. */
 export type MindState = "idle" | "listening" | "retrieving" | "answering" | "uncertain" | "error";
-export type Outcome = "supported" | "contradicted" | "not_verified" | "error";
+export type Outcome = "supported" | "contradicted" | "related" | "not_verified" | "out_of_scope" | "info" | "error";
 
 /** How long each transient state stays visible, so a fast local lookup is still readable. */
 export const DWELL_MS: Record<MindState, number> = { idle: 0, listening: 0, retrieving: 700, answering: 2400, uncertain: 3200, error: 2400 };
@@ -16,9 +16,10 @@ export const STATE_TEXT: Record<MindState, string> = {
   error: "Could not process that question",
 };
 
-/** The state that follows a finished lookup. A contradicted answer is still an answer: the evidence spoke. */
+/** The state that follows a finished lookup. A contradicted answer is still an answer: the evidence spoke.
+ * A loosely related match (closest evidence) and a plain greeting settle as answering; refusals and missing evidence are uncertain. */
 export function stateForOutcome(o: Outcome): MindState {
-  return o === "not_verified" ? "uncertain" : o === "error" ? "error" : "answering";
+  return o === "not_verified" || o === "out_of_scope" ? "uncertain" : o === "error" ? "error" : "answering";
 }
 
 /** Events the interface can raise. */

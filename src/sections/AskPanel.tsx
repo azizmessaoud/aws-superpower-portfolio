@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Corpus, Portfolio } from "../content/schema";
 import corpusJson from "../generated/corpus.json";
 import portfolioJson from "../generated/portfolio.json";
-import { createAssistant, MAX_QUESTION, type Answer } from "../assistant/answer";
+import { createAssistant, MAX_QUESTION, type Answer, type Context } from "../assistant/answer";
 import { DWELL_MS, nextState, STATE_TEXT, stateForOutcome, type MindState } from "../mind/state";
 import Icon from "../ui/Icon";
 
@@ -18,7 +18,10 @@ const SAMPLES = [
 const OUTCOME: Record<Answer["outcome"], string> = {
   supported: "Answer",
   contradicted: "Answer · the evidence disagrees with the question",
+  related: "Closest evidence · may not answer your question",
   not_verified: "Not verified",
+  out_of_scope: "Not a question about my work",
+  info: "Terminal Explorer",
   error: "Could not answer",
 };
 /* One question per interval: the same limit an API Gateway throttle would impose if a backend is added later. */
@@ -34,6 +37,7 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
   const [shown, setShown] = useState<Answer | null>(null);
   const timers = useRef<number[]>([]);
   const lastAt = useRef(-Infinity);
+  const ctx = useRef<Context | undefined>(undefined); /* what a follow-up like "and its limits?" refers to */
   const stateRef = useRef(mind);
   stateRef.current = mind;
 
@@ -51,7 +55,8 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
     clear();
     setShown(null);
     setMind(nextState(stateRef.current, { type: "submit" }));
-    const answer = assistant.ask(text);
+    const answer = assistant.ask(text, ctx.current);
+    ctx.current = answer.next;
     const dwell = reduced ? 200 : DWELL_MS.retrieving;
     later(() => {
       setShown(answer);
@@ -82,22 +87,36 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
       </ul>
       {shown && (
         <section className={`ask-answer is-${shown.outcome}`} aria-label="Answer" tabIndex={0}>
-          <p className="ask-outcome">{OUTCOME[shown.outcome]}</p>
-          <h2 className="ask-title">{shown.title}</h2>
-          <p className="ask-text">{shown.answer}</p>
-          {shown.evidence.length > 0 && (
+          {shown.parts?.length ? (
             <>
-              <h3 className="ask-sub">Evidence</h3>
-              <ul className="ask-evidence">{shown.evidence.map((e) => <li key={e.url + e.label}><a href={e.url}>{e.label} <Icon name="external" /></a></li>)}</ul>
+              <p className="ask-outcome">Answer in {shown.parts.length} parts</p>
+              {shown.parts.map((part) => <AnswerBody key={part.title + part.intent} a={part} nested />)}
             </>
-          )}
-          {shown.limitations.length > 0 && (
-            <>
-              <h3 className="ask-sub ask-sub-limits"><Icon name="alert" /> Limitations</h3>
-              <ul className="ask-limits">{shown.limitations.map((l) => <li key={l}>{l}</li>)}</ul>
-            </>
-          )}
+          ) : <AnswerBody a={shown} />}
         </section>
+      )}
+    </div>
+  );
+}
+
+function AnswerBody({ a, nested = false }: { a: Answer; nested?: boolean }) {
+  const H = nested ? "h3" : "h2";
+  return (
+    <div className={nested ? "ask-part" : undefined}>
+      {!nested && <p className="ask-outcome">{OUTCOME[a.outcome]}</p>}
+      <H className="ask-title">{nested && <span className="ask-part-tag">{OUTCOME[a.outcome]} · </span>}{a.title}</H>
+      <p className="ask-text">{a.answer}</p>
+      {a.evidence.length > 0 && (
+        <>
+          <h3 className="ask-sub">Evidence</h3>
+          <ul className="ask-evidence">{a.evidence.map((e) => <li key={e.url + e.label}><a href={e.url}>{e.label} <Icon name="external" /></a></li>)}</ul>
+        </>
+      )}
+      {a.limitations.length > 0 && (
+        <>
+          <h3 className="ask-sub ask-sub-limits"><Icon name="alert" /> Limitations</h3>
+          <ul className="ask-limits">{a.limitations.map((l) => <li key={l}>{l}</li>)}</ul>
+        </>
       )}
     </div>
   );

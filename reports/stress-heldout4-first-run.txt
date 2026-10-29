@@ -1,0 +1,35 @@
+## heldout4
+
+Cases: 63 · passed 54 (86%)
+In-scope answers routed correctly: 35/43 (81%)
+Refusals, greetings and clarifications handled safely: 17/20 (85%)
+**False support** (a real-looking answer where none was right): 1
+
+| category | cases | passed |
+|---|---:|---:|
+| judge | 7 | 5 |
+| manager | 8 | 5 |
+| student | 8 | 8 |
+| skeptic | 6 | 5 |
+| tester | 17 | 15 |
+| aws2 | 6 | 6 |
+| cert2 | 5 | 5 |
+| fr2 | 4 | 3 |
+| ar2 | 2 | 2 |
+
+### False support
+
+- `what is the meaning of life` → retrieval/supported: Where I am based
+
+### All failures
+
+- [judge] `what is the creative feature of this site` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; intent retrieval, wanted capabilities
+- [judge] `does this use rag` → glossary/supported: RAG: what it means — intent glossary, wanted meta
+- [manager] `what has aziz delivered` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; intent retrieval, wanted projects
+- [manager] `give me the one-minute version` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer|clarify|related
+- [manager] `can he join in march` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted pr-about
+- [skeptic] `has it been deployed anywhere` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer
+- [tester] `ask ask ask traffix` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer
+- [tester] `what is the meaning of life` → retrieval/supported: Where I am based — class answer, wanted not_verified|out_of_scope
+- [fr2] `peut-on voir ses projets` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; intent retrieval, wanted projects
+

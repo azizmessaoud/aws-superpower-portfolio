@@ -13,6 +13,9 @@ describe("mind state follows the question lifecycle", () => {
     expect(stateForOutcome("not_verified")).toBe("uncertain");
     expect(stateForOutcome("contradicted")).toBe("answering");
     expect(stateForOutcome("error")).toBe("error");
+    expect(stateForOutcome("out_of_scope")).toBe("uncertain");
+    expect(stateForOutcome("related")).toBe("answering");
+    expect(stateForOutcome("info")).toBe("answering");
   });
   it("typing or blurring cannot interrupt retrieving", () => {
     expect(nextState("retrieving", { type: "type", empty: false })).toBe("retrieving");

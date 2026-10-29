@@ -47,12 +47,25 @@ hosting (prepared, NOT deployed): GitHub --> AWS Amplify Hosting build (npm ci, 
 
 | Check | Result | Log |
 |---|---|---|
-| Vitest (answer engine, typos and recruiter questions, mind state, retrieval, terminal) | 83 passed | `vitest.txt` |
-| Playwright at 1280 and 390 px, incl. axe-core and the demo flow | 66 passed, 8 skipped by design | `playwright.txt` |
+| Vitest (answer engine, fuzz and property checks, memory, typos, recruiter questions, mind state, retrieval, terminal) | 97 passed | `vitest.txt` |
+| Playwright at 1280 and 390 px, incl. axe-core and the demo flow | 87 passed, 9 skipped by design | `playwright.txt` |
 | Content validation | passed (22 passages, 25 claims, 26 judged questions) | `validate.txt` |
 | Contrast, text and focus pairs from the tokens | 38 pass | `contrast.txt` |
 | Retrieval on 26 judged questions (incl. typos and recruiter questions) | hit@1 0.96, hit@3 1.00, MRR 0.978, 3 of 3 no-evidence questions refused | `retrieval-eval.txt` |
 | Production build | passed | `build.txt` |
+
+## Stress test of the question box (29 Oct 2026)
+
+My first judged questions were written to match the passages, so they proved little. I then threw about 600 messy, real-world inputs at the engine (greetings, one-word asks, slang, typos, French and Arabic/Derja, follow-ups, compound questions, premise traps, injection attempts, personal questions, "are you ChatGPT", random Unicode) and graded the **class** of answer, not its wording. Each of four held-out sets was run **once, before** I fixed anything it exposed; those first-run numbers are saved in `reports/`:
+
+| Set (fresh wording each time) | First run | After the fixes it exposed |
+|---|---|---|
+| 1. 130 cases, original engine | 36% passed, 13 real-looking answers where none was right | 100% |
+| 2. 69 cases | 72%, 1 false answer | 100% |
+| 3. 84 cases | 79%, 1 false answer | 98% |
+| 4. 63 cases | 86%, 1 false answer | 98% |
+
+What changed: a relevance gate (a word match is no longer an answer: it is "closest evidence" or "not verified"), a table of intents (greetings, "what can you do", meta, personal questions, tools, cloud and AWS services, comparisons, glossary), conversation memory for follow-ups, compound questions answered in parts, French and basic Arabic/Derja, and instruction-like questions refused without changing any answer. Honest limits: the sets were written by me, not by visitors; the "after" numbers are on sets I tuned against, so only the first-run column is unbiased and it still shows about 1 miss in 7 on wording I had not seen; two cases still fail (a long rambling question about leakage, and "only 3 seeds? that's not enough" returns related evidence instead of the passage on seeds). No language model is involved, so there is nothing to hallucinate, but there is also no real understanding: it matches words, small typos and a hand-written intent list.
 
 ## What failed
 

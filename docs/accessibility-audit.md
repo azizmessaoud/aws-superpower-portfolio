@@ -1,5 +1,7 @@
 > **Renamed 29 Oct 2026:** "Ask my brain" is now called the Terminal Explorer. This file keeps the old name because it describes the 28 Oct build.
 
+> **Update 29 Oct 2026 (later):** PR #1 restored a small pause/resume control in the nav. Reviewing it found and fixed one regression (the scene drew brain dots behind the button) and added tests for pause-then-scroll, resize while paused, keyboard, 320/390 px layout and reduced motion. All automated; the manual keyboard and screen-reader checks below are still not repeated.
+
 > **Update 29 Oct 2026:** the separate "Ask my brain" section was consolidated into the Terminal Explorer, and certifications, a portrait and project labels were added. This UX pass restores a compact pause/resume control in the fixed navigation for visitors who allow motion. Automated checks are being extended for pause/resume and rapid scroll reversals; the manual keyboard and real screen-reader checks below still need to be repeated against the resulting build.
 
 ## Accessibility Audit: Ask my brain portfolio (local build)

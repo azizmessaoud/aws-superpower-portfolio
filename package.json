@@ -11,6 +11,7 @@
     "preview": "vite preview --port 4173 --strictPort",
     "test": "vitest run",
     "eval:retrieval": "npm run content && tsx scripts/eval-retrieval.ts",
+    "stress": "npm run content && tsx scripts/stress.ts --out reports/stress-report.md",
     "contrast": "tsx scripts/contrast-check.ts",
     "e2e": "playwright test"
   },

@@ -1,0 +1,47 @@
+## heldout3
+
+Cases: 84 · passed 66 (79%)
+In-scope answers routed correctly: 39/52 (75%)
+Refusals, greetings and clarifications handled safely: 30/32 (94%)
+**False support** (a real-looking answer where none was right): 1
+
+| category | cases | passed |
+|---|---:|---:|
+| rambling | 5 | 1 |
+| judge2 | 8 | 7 |
+| hr | 11 | 9 |
+| peer | 8 | 6 |
+| skeptic2 | 6 | 3 |
+| multi | 4 | 3 |
+| lang3 | 8 | 7 |
+| attack | 8 | 8 |
+| personal2 | 5 | 5 |
+| smalltalk2 | 6 | 3 |
+| noise3 | 11 | 10 |
+| fuzz3 | 4 | 4 |
+
+### False support
+
+- `great, thanks for the help` → capabilities/supported: What you can ask
+
+### All failures
+
+- [rambling] `hi there, I'm a recruiter at a startup in paris and I was wondering whether aziz might be interested in an AI internship next summer` → profile/supported: Internships so far — passages [pr-experience], wanted pr-about
+- [rambling] `ok so basically what i want to know is did the traffic thing actually work in the real world or only in simulation` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted tr-simulation
+- [rambling] `my professor told me to ask about leakage in your ranking project, how did you handle it?` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted fr-leakage
+- [rambling] `I read the readme but still don't understand what the hr thing does, can you summarise` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted hr-pipeline
+- [judge2] `is the search semantic or keyword` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; intent retrieval, wanted meta
+- [hr] `has he got any references` → clarify/info: Which one do you mean? — class clarify, wanted not_verified|related
+- [hr] `link to his linkedin please` → clarify/info: Which one do you mean? — class clarify, wanted answer; intent clarify, wanted contact
+- [peer] `did you try deep learning for flyrank` → certifications/supported: Certifications — class answer, wanted not_verified|related
+- [peer] `can i see the notebook` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer
+- [skeptic2] `only 3 seeds? that's not enough` → retrieval/related: Ambulances are slower, and that is not explained yet — class related, wanted answer; passages [tr-ambulance,tr-pedestrian], wanted tr-mixed
+- [skeptic2] `how do i know you didn't make these numbers up` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer
+- [skeptic2] `was there a leakage in the model` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted fr-leakage
+- [multi] `what did he do at sopra and flyrank` → compound/supported: Projects + The FlyRank capstone — passages [tr-simulation,fr-question,hr-pipeline,fr-p50], wanted pr-experience
+- [lang3] `bonjour, pouvez-vous me parler d'aziz` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted pr-about
+- [smalltalk2] `what's up` → retrieval/not_verified: Nothing verified — class not_verified, wanted greet|clarify
+- [smalltalk2] `nice work!` → clarify/info: Tell me a bit more — class clarify, wanted greet
+- [smalltalk2] `great, thanks for the help` → capabilities/supported: What you can ask — class answer, wanted greet
+- [noise3] `limits` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; intent retrieval, wanted limitations
+

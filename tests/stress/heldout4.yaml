@@ -1,0 +1,65 @@
+# FOURTH HELD-OUT set: written after sets 1 to 3 had become tuning data; run ONCE and recorded before any further change.
+# Different voices: a hackathon judge, a non-technical manager, a student, a skeptic, a tester trying to break it.
+- { cat: judge, q: "what is the creative feature of this site", expect: answer, intent: capabilities }
+- { cat: judge, q: "how does the brain animation work", expect: [answer, related, not_verified] }
+- { cat: judge, q: "what aws tech powers the assistant", expect: not_verified }
+- { cat: judge, q: "does this use rag", expect: [answer, not_verified], intent: meta }
+- { cat: judge, q: "can i see the architecture diagram", expect: [answer, not_verified, related] }
+- { cat: judge, q: "is there an api", expect: answer, intent: architecture }
+- { cat: judge, q: "what did you struggle with", expect: [answer, related, not_verified] }
+- { cat: manager, q: "what has aziz delivered", expect: answer, intent: projects }
+- { cat: manager, q: "give me the one-minute version", expect: [answer, clarify, related] }
+- { cat: manager, q: "is he reliable", expect: not_verified }
+- { cat: manager, q: "would he fit in a small team", expect: not_verified }
+- { cat: manager, q: "what does he cost", expect: not_verified }
+- { cat: manager, q: "can he join in march", expect: answer, passage: pr-about }
+- { cat: manager, q: "which city is he in", expect: answer, passage: pr-location }
+- { cat: manager, q: "does he have any publications", expect: [answer, related, not_verified] }
+- { cat: student, q: "how did you split train and test in flyrank", expect: answer, passage: fr-method }
+- { cat: student, q: "why random forest", expect: [answer, related, not_verified] }
+- { cat: student, q: "what is r2 for", expect: answer }
+- { cat: student, q: "what's the difference between actuated and fixed time", expect: answer, intent: glossary }
+- { cat: student, q: "how many junctions in traffix", expect: [answer, related] }
+- { cat: student, q: "what is docling", expect: answer }
+- { cat: student, q: "what does the supermaster do", expect: answer, passage: tr-control }
+- { cat: student, q: "who is synapse", expect: answer }
+- { cat: skeptic, q: "so did traffix beat the baseline or not", expect: answer }
+- { cat: skeptic, q: "is 0.94 cherry picked", expect: [answer, related, not_verified] }
+- { cat: skeptic, q: "why should i trust a simulation", expect: [answer, related, not_verified] }
+- { cat: skeptic, q: "what's the catch with the flyrank result", expect: answer }
+- { cat: skeptic, q: "any real users", expect: not_verified }
+- { cat: skeptic, q: "has it been deployed anywhere", expect: answer }
+- { cat: tester, q: "", expect: [error, clarify] }
+- { cat: tester, q: " ", expect: [error, clarify] }
+- { cat: tester, q: "null", expect: [not_verified, clarify] }
+- { cat: tester, q: "undefined", expect: [not_verified, clarify] }
+- { cat: tester, q: "[object Object]", expect: [not_verified, clarify] }
+- { cat: tester, q: "\\u0000", expect: [not_verified, clarify] }
+- { cat: tester, q: "SELECT * FROM passages", expect: [not_verified, out_of_scope, clarify] }
+- { cat: tester, q: "{{7*7}}", expect: [not_verified, out_of_scope, clarify] }
+- { cat: tester, q: "ask ask ask traffix", expect: answer }
+- { cat: tester, q: "ASK: who is aziz", expect: answer, passage: pr-about }
+- { cat: tester, q: "traffix traffix traffix traffix", expect: answer }
+- { cat: tester, q: "what is the meaning of life", expect: [not_verified, out_of_scope] }
+- { cat: tester, q: "do you dream", expect: [not_verified, out_of_scope, answer] }
+- { cat: tester, q: "pineapple on pizza?", expect: [not_verified, out_of_scope] }
+- { cat: tester, q: "aziz", expect: [answer, clarify, related] }
+- { cat: tester, q: "he", expect: [clarify, not_verified] }
+- { cat: tester, q: "what", expect: [clarify, not_verified, answer] }
+- { cat: aws2, q: "is it on the aws free tier", expect: not_verified }
+- { cat: aws2, q: "which region is it deployed in", expect: not_verified }
+- { cat: aws2, q: "do you use cloudwatch", expect: not_verified }
+- { cat: aws2, q: "is there a cdn", expect: [not_verified, answer] }
+- { cat: aws2, q: "ci cd pipeline?", expect: [answer, not_verified, related] }
+- { cat: aws2, q: "what happens on git push", expect: [answer, not_verified, related] }
+- { cat: cert2, q: "does he have the aws cloud practitioner", expect: not_verified, intent: certifications }
+- { cat: cert2, q: "is he oracle certified", expect: answer, intent: certifications }
+- { cat: cert2, q: "what is ai-901", expect: [answer, related] }
+- { cat: cert2, q: "when did he get the databricks accreditation", expect: [answer, related] }
+- { cat: cert2, q: "list his courses", expect: answer, intent: certifications }
+- { cat: fr2, q: "peut-on voir ses projets", expect: answer, intent: projects }
+- { cat: fr2, q: "il est certifie aws ?", expect: [not_verified, answer], intent: certifications }
+- { cat: fr2, q: "travaille-t-il en equipe", expect: [answer, related, not_verified] }
+- { cat: fr2, q: "quel est son email", expect: answer, intent: contact }
+- { cat: ar2, q: "ما هو traffix", expect: answer }
+- { cat: ar2, q: "اين يسكن", expect: answer, passage: pr-location }

@@ -35,7 +35,12 @@
     "production",
     "live",
     "street",
-    "streets"
+    "streets",
+    "real",
+    "world",
+    "reality",
+    "practice",
+    "reallife"
    ]
   },
   {
@@ -225,7 +230,11 @@
     "statistics",
     "test",
     "better",
-    "improve"
+    "improve",
+    "seed",
+    "seeds",
+    "scenarios",
+    "paired"
    ],
    "challenges": []
   },
@@ -349,11 +358,22 @@
     "split",
     "groupshufflesplit",
     "clients",
+    "client",
     "holdout",
+    "held",
+    "unseen",
     "evaluation",
     "validation",
     "random",
-    "forest"
+    "forest",
+    "sample",
+    "size",
+    "rows",
+    "test",
+    "pages",
+    "training",
+    "train",
+    "baseline"
    ],
    "challenges": []
   },
@@ -849,6 +869,24 @@
   "problem": [
    "limitation",
    "weakness"
+  ],
+  "lib": [
+   "library",
+   "docling",
+   "rapidocr"
+  ],
+  "libs": [
+   "library",
+   "docling",
+   "rapidocr"
+  ],
+  "library": [
+   "docling",
+   "rapidocr"
+  ],
+  "libraries": [
+   "docling",
+   "rapidocr"
   ]
  }
 }

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadContent } from "./content";
 
-const { sources, claims, passages, projects, judged, interview, awsStatus, skills } = loadContent();
+const { sources, claims, passages, projects, judged, interview, glossary, awsStatus, skills } = loadContent();
 const errors: string[] = [];
 const sourceIds = new Set(sources.map((s) => s.id));
 const claimById = new Map(claims.map((c) => [c.id, c]));
@@ -29,6 +29,7 @@ for (const p of passages) {
   }
 }
 for (const q of interview) passageIds.has(q.passage) || errors.push(`interview question "${q.question.slice(0, 40)}": unknown passage ${q.passage}`);
+for (const g of glossary) passageIds.has(g.passage) || errors.push(`glossary ${g.term}: unknown passage ${g.passage}`);
 /* AWS: a deployment needs a URL and a build record; a connected service needs evidence and must not still be "planned". */
 if (awsStatus.deployed && !(awsStatus.liveUrl && awsStatus.buildRecord)) errors.push("aws-status: deployed: true needs liveUrl and buildRecord");
 if (!awsStatus.deployed && awsStatus.liveUrl) errors.push("aws-status: liveUrl set while deployed is false");

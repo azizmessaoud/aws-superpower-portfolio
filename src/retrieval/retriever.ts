@@ -35,7 +35,7 @@ export function createRetriever(corpus: Corpus) {
   }
 
   function expand(query: string) {
-    const typed = tokenize(query);
+    const typed = tokenize(query).filter((t) => !/^\d$/.test(t));
     const terms = typed.map((term) => ({ term, weight: 1, via: undefined as string | undefined }));
     for (const t of typed)
       for (const f of fuzzy(t))
@@ -63,5 +63,20 @@ export function createRetriever(corpus: Corpus) {
       }));
   }
 
-  return { search, mode: "keyword" as const, status: "ready" as const };
+  /** The same search, plus what the question contained: its content terms and which of them the top result matched.
+   * The answer engine uses this to decide whether a match is an answer, only related, or nothing. */
+  function inspect(query: string, k = 3) {
+    const typed = [...new Set(tokenize(query).filter((t) => !/^\d$/.test(t)))];
+    const results = search(query, k);
+    const top = results[0];
+    /* a typed word counts as matched when the result matched it directly, via a synonym of it, or via a typo fix of it */
+    const hit = (t: string) => top!.why.matchedTerms.some((m) => m === t || m.includes(`from “${t}”`) || m.includes(`from “${t}, a likely typo”`));
+    const matched = top ? typed.filter(hit) : [];
+    /* a short word matched only through a typo fix ("life" for "live") is too easy a coincidence to count as a rare anchor */
+    const direct = (t: string) => top!.why.matchedTerms.some((m) => m === t || (m.includes(`from “${t}”`)));
+    const rare = matched.filter((t) => (index.df.get(t) ?? 0) <= 4 && (direct(t) || t.length >= 6));
+    return { typed, results, matched, rare, df: (t: string) => index.df.get(t) ?? 0 };
+  }
+
+  return { search, inspect, mode: "keyword" as const, status: "ready" as const };
 }

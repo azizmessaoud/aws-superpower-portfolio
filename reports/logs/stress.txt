@@ -1,0 +1,140 @@
+
+> aws-superpower-portfolio@0.1.0 stress
+> npm run content && tsx scripts/stress.ts --out reports/stress-report.md
+
+
+> aws-superpower-portfolio@0.1.0 content
+> tsx scripts/build-corpus.ts
+
+corpus: 22 passages
+portfolio: 16 certifications, 4 smaller projects
+## heldout
+
+Cases: 130 · passed 130 (100%)
+In-scope answers routed correctly: 82/82 (100%)
+Refusals, greetings and clarifications handled safely: 48/48 (100%)
+**False support** (a real-looking answer where none was right): 0
+
+| category | cases | passed |
+|---|---:|---:|
+| greeting | 10 | 10 |
+| vague | 7 | 7 |
+| entity | 6 | 6 |
+| tools | 8 | 8 |
+| profile | 13 | 13 |
+| french | 8 | 8 |
+| derja | 4 | 4 |
+| arabic | 3 | 3 |
+| premise | 8 | 8 |
+| numbers | 6 | 6 |
+| glossary | 5 | 5 |
+| compare | 4 | 4 |
+| compound | 3 | 3 |
+| followup | 5 | 5 |
+| injection | 9 | 9 |
+| personal | 6 | 6 |
+| judgement | 2 | 2 |
+| meta | 5 | 5 |
+| aws | 7 | 7 |
+| cert | 3 | 3 |
+| noise | 4 | 4 |
+| fuzz | 4 | 4 |
+
+## heldout2
+
+Cases: 69 · passed 69 (100%)
+In-scope answers routed correctly: 52/52 (100%)
+Refusals, greetings and clarifications handled safely: 17/17 (100%)
+**False support** (a real-looking answer where none was right): 0
+
+| category | cases | passed |
+|---|---:|---:|
+| judge | 9 | 9 |
+| recruiter | 14 | 14 |
+| classmate | 7 | 7 |
+| skeptic | 7 | 7 |
+| abuse | 7 | 7 |
+| lang | 7 | 7 |
+| followup | 5 | 5 |
+| numbers | 5 | 5 |
+| noise | 8 | 8 |
+
+## heldout3
+
+Cases: 84 · passed 82 (98%)
+In-scope answers routed correctly: 50/52 (96%)
+Refusals, greetings and clarifications handled safely: 32/32 (100%)
+**False support** (a real-looking answer where none was right): 0
+
+| category | cases | passed |
+|---|---:|---:|
+| rambling | 5 | 4 |
+| judge2 | 8 | 8 |
+| hr | 11 | 11 |
+| peer | 8 | 8 |
+| skeptic2 | 6 | 5 |
+| multi | 4 | 4 |
+| lang3 | 8 | 8 |
+| attack | 8 | 8 |
+| personal2 | 5 | 5 |
+| smalltalk2 | 6 | 6 |
+| noise3 | 11 | 11 |
+| fuzz3 | 4 | 4 |
+
+### All failures
+
+- [rambling] `my professor told me to ask about leakage in your ranking project, how did you handle it?` → retrieval/not_verified: Nothing verified — class not_verified, wanted answer; passages [], wanted fr-leakage
+- [skeptic2] `only 3 seeds? that's not enough` → retrieval/related: Ambulances are slower, and that is not explained yet — class related, wanted answer; passages [tr-ambulance,tr-pedestrian], wanted tr-mixed
+
+## heldout4
+
+Cases: 63 · passed 62 (98%)
+In-scope answers routed correctly: 42/43 (98%)
+Refusals, greetings and clarifications handled safely: 18/20 (90%)
+**False support** (a real-looking answer where none was right): 0
+
+| category | cases | passed |
+|---|---:|---:|
+| judge | 7 | 7 |
+| manager | 8 | 8 |
+| student | 8 | 8 |
+| skeptic | 6 | 5 |
+| tester | 17 | 17 |
+| aws2 | 6 | 6 |
+| cert2 | 5 | 5 |
+| fr2 | 4 | 4 |
+| ar2 | 2 | 2 |
+
+### All failures
+
+- [skeptic] `has it been deployed anywhere` → compound/not_verified: AWS hosting: deployment not verified + A simulation, not a deployment — class not_verified, wanted answer
+
+## tuning
+
+Cases: 120 · passed 120 (100%)
+In-scope answers routed correctly: 69/69 (100%)
+Refusals, greetings and clarifications handled safely: 50/51 (98%)
+**False support** (a real-looking answer where none was right): 0
+
+| category | cases | passed |
+|---|---:|---:|
+| greeting | 11 | 11 |
+| vague | 8 | 8 |
+| entity | 5 | 5 |
+| tools | 8 | 8 |
+| followup | 8 | 8 |
+| compound | 4 | 4 |
+| french | 6 | 6 |
+| derja | 1 | 1 |
+| arabic | 1 | 1 |
+| premise | 5 | 5 |
+| numbers | 8 | 8 |
+| compare | 5 | 5 |
+| injection | 9 | 9 |
+| personal | 8 | 8 |
+| meta | 8 | 8 |
+| aws | 9 | 9 |
+| career | 7 | 7 |
+| noise | 6 | 6 |
+| fuzz | 3 | 3 |
+

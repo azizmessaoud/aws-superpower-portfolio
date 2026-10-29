@@ -2,7 +2,7 @@
  * Pure: takes a command line, returns lines to print. Every fact comes from the corpus or the
  * evidence register; nothing here is invented, and `ask` uses the same retriever. */
 import type { Corpus, Portfolio } from "../content/schema";
-import { createAssistant, type Answer } from "../assistant/answer";
+import { createAssistant, type Answer, type Context } from "../assistant/answer";
 import { LABELS, type LabelKey } from "../content/labels";
 
 export type Line =
@@ -57,24 +57,26 @@ export const COMMANDS: [string, string][] = [
   ["clear", "clear the screen"],
 ];
 
-const OUTCOME_LABEL: Record<Answer["outcome"], string> = { supported: "Answer", contradicted: "Answer (the evidence disagrees with the question)", not_verified: "Not verified", error: "Error" };
+const OUTCOME_LABEL: Record<Answer["outcome"], string> = { supported: "Answer", contradicted: "Answer (the evidence disagrees with the question)", related: "Closest evidence (may not answer the question)", not_verified: "Not verified", out_of_scope: "Not a question about my work", info: "Terminal Explorer", error: "Error" };
 
 /* One Answer, printed the same way everywhere: answer, then evidence, then limitations. */
 export function answerLines(a: Answer): Line[] {
-  return [
-    { kind: a.outcome === "not_verified" ? "muted" : a.outcome === "error" ? "error" : "heading", text: `${OUTCOME_LABEL[a.outcome]} — ${a.title}` },
-    { kind: a.outcome === "error" ? "error" : "text", text: `  ${a.answer}` },
-    ...a.evidence.map((e) => ({ kind: "link" as const, text: `  evidence: ${e.label}`, href: e.url })),
-    ...a.limitations.map((l) => ({ kind: "limit" as const, text: `  – ${l}` })),
+  const block = (x: Answer, indent = ""): Line[] => [
+    { kind: x.outcome === "not_verified" || x.outcome === "out_of_scope" ? "muted" : x.outcome === "error" ? "error" : "heading", text: `${indent}${OUTCOME_LABEL[x.outcome]} — ${x.title}` },
+    { kind: x.outcome === "error" ? "error" : "text", text: `${indent}  ${x.answer}` },
+    ...x.evidence.map((e) => ({ kind: "link" as const, text: `${indent}  evidence: ${e.label}`, href: e.url })),
+    ...x.limitations.map((l) => ({ kind: "limit" as const, text: `${indent}  – ${l}` })),
   ];
+  return a.parts?.length ? a.parts.flatMap((p) => block(p)) : block(a);
 }
 
 export function createTerminal(corpus: Corpus, portfolio: Portfolio) {
   const real = createAssistant(corpus, portfolio);
   let last: Answer["outcome"] | undefined;
+  let ctx: Context | undefined; /* what the next question can refer to ("and its limits?") */
   /* remember the outcome of the latest question so the page can drive the mind state */
   const assistant = {
-    ask: (q: string) => { const a = real.ask(q); last = a.outcome; return a; },
+    ask: (q: string) => { const a = real.ask(q, ctx); last = a.outcome; ctx = a.next; return a; },
     certs: (q: string) => { const a = real.certs(q); last = a.outcome; return a; },
   };
   const resolve = (name: string) => PROJECTS[ALIASES[name] ?? name] ? (ALIASES[name] ?? name) : null;
@@ -165,7 +167,7 @@ export function createTerminal(corpus: Corpus, portfolio: Portfolio) {
         {
           /* one word that is not a command may still be a topic ("traffix", "ocr"): answer it if evidence exists */
           const topic = assistant.ask(input);
-          if (topic.outcome === "supported" || topic.outcome === "contradicted") return answerLines(topic);
+          if (topic.outcome === "supported" || topic.outcome === "contradicted" || topic.intent === "greeting") return answerLines(topic);
           last = undefined; /* a mistyped command is not a question the mind should react to */
         }
         return [{ kind: "error", text: `command not found: ${cmd}` }, { kind: "muted", text: "Type help for the commands, or ask a question in plain words." }];

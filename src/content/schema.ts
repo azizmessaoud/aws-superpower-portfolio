@@ -108,6 +108,7 @@ export interface Portfolio {
   smallProjects: SmallProject[];
   skills: SkillDomain[];
   interview: InterviewQuestion[];
+  glossary: GlossaryTerm[];
   aws: AwsStatus;
 }
 
@@ -141,6 +142,14 @@ export const SkillDomain = z.object({
   href: https.optional(),
 });
 export type SkillDomain = z.infer<typeof SkillDomain>;
+
+export const GlossaryTerm = z.object({
+  term: z.string(),
+  names: z.array(z.string()).min(1),
+  definition: z.string().min(30),
+  passage: z.string(),
+});
+export type GlossaryTerm = z.infer<typeof GlossaryTerm>;
 
 export const InterviewQuestion = z.object({ question: z.string().min(10), passage: z.string() });
 export type InterviewQuestion = z.infer<typeof InterviewQuestion>;
