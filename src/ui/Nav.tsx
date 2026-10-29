@@ -10,7 +10,7 @@ const LINKS = [
   ["contact", "Contact"],
 ] as const;
 
-interface Props { scene: Scene | null; reduced: boolean; paused: boolean; onTogglePause: () => void; docked: boolean }
+interface Props { scene: Scene | null; docked: boolean }
 
 /* Move keyboard focus to where an in-page link lands, so Tab continues from there. */
 function landOn(id: string) {
@@ -21,7 +21,7 @@ function landOn(id: string) {
   setTimeout(() => el.focus({ preventScroll: true }), 0);
 }
 
-export default function Nav({ scene, reduced, paused, onTogglePause, docked }: Props) {
+export default function Nav({ scene, docked }: Props) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -60,13 +60,6 @@ export default function Nav({ scene, reduced, paused, onTogglePause, docked }: P
         ))}
       </ul>
       <div className="nav-end">
-        {!reduced && (
-          /* the label states the action; no aria-pressed, so assistive tech never hears two conflicting states */
-          <button className={`motion-toggle${paused ? " is-paused" : ""}`} type="button" onClick={onTogglePause}>
-            <Icon name={paused ? "play" : "pause"} />
-            <span className="motion-label">{paused ? "Play motion" : "Pause motion"}</span>
-          </button>
-        )}
         {/* The brain docks here at the end of the hero; the link is the hint to the creative feature on every screen. */}
         <a className={`nav-cta${docked ? " is-docked" : ""}`} href="#terminal" aria-current={current === "terminal" ? "true" : undefined} onClick={() => { setOpen(false); landOn("terminal"); }}
           onMouseEnter={wake(true)} onMouseLeave={wake(false)} onFocus={wake(true)} onBlur={wake(false)}>

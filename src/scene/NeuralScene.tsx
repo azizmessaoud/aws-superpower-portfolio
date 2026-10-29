@@ -19,7 +19,7 @@ export default function NeuralScene({ reduced, onReady, onDocked }: Props) {
       intro: document.documentElement.classList.contains("intro") || scrollY < 10,
       textBlocks: () => Array.from(hero.querySelectorAll(".hero-inner > *")),
       /* everything in the fixed nav except the brain's own slot, plus the scroll hint */
-      fixedAvoid: () => Array.from(document.querySelectorAll(".nav-logo, .nav-links a, .motion-toggle, .cta-label, .nav-toggle, .nav.is-open .nav-links, .scroll-hint"))
+      fixedAvoid: () => Array.from(document.querySelectorAll(".nav-logo, .nav-links a, .cta-label, .nav-toggle, .nav.is-open .nav-links, .scroll-hint"))
         .filter((el) => getComputedStyle(el).visibility !== "hidden"),
       dockSlot: () => document.querySelector(".nav-cta .dock-brain"),
       onDocked,

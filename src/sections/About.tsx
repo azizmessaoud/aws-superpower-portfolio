@@ -18,12 +18,15 @@ export default function About() {
             </p>
             <p className="about-langs">I work in Arabic, French and English.</p>
           </div>
+          <div className="about-side">
+            <img className="portrait" src="/portrait.jpg" width="480" height="480" alt="Portrait of Aziz Messaoud" loading="lazy" decoding="async" />
           <dl className="timeline" aria-label="Internships">
             <div><dt>Sopra HR Software</dt><dd>AI intern · Jul–Sep 2026</dd></div>
             <div><dt>FlyRank AI</dt><dd>Machine-learning intern · remote</dd></div>
             <div><dt>Sopra HR Software</dt><dd>AI intern · Jul–Aug 2025</dd></div>
             <div><dt>Banque de Tunisie</dt><dd>IT support intern · Jun–Jul 2023</dd></div>
           </dl>
+          </div>
         </div>
         <div className="volunteer">
           <h3>Volunteering &amp; clubs</h3>

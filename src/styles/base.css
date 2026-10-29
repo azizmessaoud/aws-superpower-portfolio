@@ -36,8 +36,7 @@ button { font: inherit; color: inherit; }
 @media (max-width: 760px) {
   .nav-toggle { display: inline-flex; }
   /* phones: icon buttons, names stay available to assistive tech */
-  .motion-label, .cta-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .motion-toggle { padding: 0; width: 44px; }
+  .cta-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .nav-cta { padding: 0; width: 44px; justify-content: center; }
   .dock-brain { margin-left: 0; }
   .nav-links {
@@ -56,7 +55,7 @@ button { font: inherit; color: inherit; }
 .btn-primary { background: var(--grad-primary); color: var(--on-primary); border: none; box-shadow: var(--shadow-primary); }
 .btn-ghost { background: var(--glass5); border: 1px solid var(--glass10); color: var(--fg); }
 @media (hover: hover) { .btn-primary:hover { transform: translateY(-1px); opacity: 0.92; } .btn-ghost:hover { background: var(--glass10); } }
-.btn-primary:active, .btn-ghost:active, .nav-cta:active, .copy-btn:active, .motion-toggle:active, .suggest-q:active, .hint-q:active { transform: scale(0.97); transition-duration: var(--dur-press); }
+.btn-primary:active, .btn-ghost:active, .nav-cta:active, .copy-btn:active, .suggest-q:active, .hint-q:active { transform: scale(0.97); transition-duration: var(--dur-press); }
 
 /* ── hero (pinned while scroll drives the camera) ── */
 .hero { position: relative; }
@@ -81,10 +80,7 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .hint-label { font-family: var(--font-m); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-muted); }
 .hint-q, .suggest-q { min-height: 44px; padding: var(--space-3xs) var(--space-sm); border-radius: var(--radius-pill); border: 1px dashed var(--cyan-line); background: transparent; color: var(--cyan); cursor: pointer; text-align: left; transition: border-color var(--dur-base), background var(--dur-base); }
 .hint-q:hover, .suggest-q:hover { border-style: solid; background: var(--glass5); }
-/* nav controls: pause (whole page, WCAG 2.2.2) and the "Ask my brain" link the brain docks into */
-.motion-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 44px; min-width: 44px; padding: 0 var(--space-md); border-radius: var(--radius-pill); background: var(--glass5); border: 1px solid var(--border-strong); color: var(--fg-muted); font: 500 12px var(--font-m); cursor: pointer; transition: background var(--dur-base), color var(--dur-base); }
-.motion-toggle:hover { background: var(--glass10); color: var(--fg); }
-.motion-toggle.is-paused { color: var(--fg); border-color: var(--violet-hover); }
+/* nav control: the "Ask my brain" link the brain docks into */
 .nav-cta[aria-current="true"] { border-color: var(--violet-hover); background: var(--violet-tint); }
 .dock-brain { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px dashed var(--cyan-line); background: radial-gradient(circle, rgba(6, 15, 26, 0.4), rgba(6, 15, 26, 0.9)); transition: border-color var(--dur-slow); }
 .nav-cta.is-docked .dock-brain { border-style: solid; }
@@ -105,6 +101,8 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .about { background: linear-gradient(180deg, var(--bg), var(--surface)); }
 .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-3xl); align-items: start; }
 .about-text p { color: var(--fg-muted); line-height: 1.8; margin-bottom: var(--space-md); max-width: 62ch; }
+.about-side { display: grid; gap: var(--space-xl); }
+.portrait { width: min(15rem, 100%); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-xl); border: 1px solid var(--border-strong); }
 .timeline { border-left: 1px solid var(--violet-line); padding-left: var(--space-xl); display: grid; gap: var(--space-lg); }
 .timeline div { position: relative; }
 .timeline div::before { content: ""; position: absolute; left: calc(-1 * var(--space-xl) - 4px); top: 0.55em; width: 7px; height: 7px; border-radius: 50%; background: var(--violet); }

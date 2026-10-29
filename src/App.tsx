@@ -11,13 +11,8 @@ import Terminal from "./sections/Terminal";
 
 const NeuralScene = lazy(() => import("./scene/NeuralScene"));
 
-function readPaused() {
-  try { return localStorage.getItem("motion") === "paused"; } catch { return false; }
-}
-
 export default function App() {
   const [reduced, setReduced] = useState(() => matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const [paused, setPaused] = useState(readPaused);
   const [scene, setScene] = useState<Scene | null>(null);
   const [docked, setDocked] = useState(false);
 
@@ -27,19 +22,13 @@ export default function App() {
     mq.addEventListener("change", on);
     return () => mq.removeEventListener("change", on);
   }, []);
-  /* Only the visitor's own press changes this; nothing resumes on its own. */
-  useEffect(() => { if (paused) scene?.pause(); else scene?.resume(); }, [scene, paused]);
-  const togglePaused = () => setPaused((p) => {
-    try { localStorage.setItem("motion", p ? "playing" : "paused"); } catch { /* storage blocked: session-only choice */ }
-    return !p;
-  });
   const onReady = useCallback((s: Scene | null) => setScene(s), []);
   const onDocked = useCallback((d: boolean) => setDocked(d), []);
 
   return (
     <>
       <a className="skip" href="#main">Skip to content</a>
-      <Nav scene={scene} reduced={reduced} paused={paused} onTogglePause={togglePaused} docked={docked} />
+      <Nav scene={scene} docked={docked} />
       <Suspense fallback={null}>
         <NeuralScene reduced={reduced} onReady={onReady} onDocked={onDocked} />
       </Suspense>

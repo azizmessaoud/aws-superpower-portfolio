@@ -1,0 +1,101 @@
+# Credentials shown in the Certifications section. Add a new one at the top of its group.
+# kind: main (professional credential) | learning (course or shorter certificate)
+# year is a string. href must be the issuer's own https verification page (the build fails otherwise).
+
+- kind: main
+  issuer: Oracle
+  title: "OCI Data Science Professional"
+  detail: "Oracle Cloud Infrastructure 2025 Certified Data Science Professional"
+  year: "2025"
+  href: "https://catalog-education.oracle.com/ords/certview/sharebadge?id=1FBB758BADED7CB49AE091395139903D4B9D8463109AEBB0C2673FBC880253A9"
+- kind: main
+  issuer: Oracle
+  title: "OCI AI Foundations Associate"
+  detail: "Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate"
+  year: "2025"
+  href: "https://catalog-education.oracle.com/ords/certview/sharebadge?id=7DA2ADAE20E6DA7233E485DD34299A910811A034BC4E981DACF9118671A3544C"
+- kind: main
+  issuer: Microsoft
+  title: "Azure AI Fundamentals (AI-901)"
+  detail: "Microsoft Certified: Azure AI Fundamentals"
+  year: "2026"
+  href: "https://learn.microsoft.com/fr-fr/users/azizmessaoud/credentials/1a2d218bd3b89433"
+- kind: main
+  issuer: Microsoft
+  title: "Azure Data Fundamentals (DP-900)"
+  detail: "Microsoft Certified: Azure Data Fundamentals"
+  year: "2026"
+  href: "https://learn.microsoft.com/fr-fr/users/azizmessaoud/credentials/9170ffe9ad85882"
+- kind: main
+  issuer: Databricks
+  title: "Generative AI Fundamentals"
+  detail: "Databricks Academy Accreditation"
+  year: "2026"
+  href: "https://credentials.databricks.com/ed7432c9-7444-441d-992a-9c19e81acea9#acc.CiyAfHEW"
+- kind: learning
+  issuer: "NVIDIA"
+  title: "Introduction to Transformer-Based NLP"
+  detail: "course"
+  year: "2025"
+  href: "https://learn.nvidia.com/certificates?id=_2SSDT3sQLis1uAoAh2SNA"
+- kind: learning
+  issuer: "NVIDIA"
+  title: "Fundamentals of Deep Learning"
+  detail: "course"
+  year: "2025"
+  href: "https://learn.nvidia.com/certificates?id=ThehODKqTASFT20JoM1-4w"
+- kind: learning
+  issuer: "NVIDIA"
+  title: "Getting Started with Deep Learning"
+  detail: "course"
+  year: "2025"
+  href: "https://learn.nvidia.com/certificates?id=eotempvJT_-jMSt2HqvJwg"
+- kind: learning
+  issuer: "Kaggle"
+  title: "Intermediate Machine Learning"
+  detail: "course"
+  year: "2025"
+  href: "https://www.kaggle.com/learn/certification/azizmessaoud2002/intermediate-machine-learning"
+- kind: learning
+  issuer: "Kaggle"
+  title: "Intro to Machine Learning"
+  detail: "course"
+  year: "2024"
+  href: "https://www.kaggle.com/learn/certification/azizmessaoud2002/intro-to-machine-learning"
+- kind: learning
+  issuer: "Neo4j"
+  title: "Neo4j Fundamentals"
+  detail: "course"
+  year: "2025"
+  href: "https://graphacademy.neo4j.com/c/19de2cc3-211a-4104-b685-80e20558cc4c"
+- kind: learning
+  issuer: "IBM SkillsBuild"
+  title: "AI Fundamentals with Capstone"
+  detail: "certificate"
+  year: "2025"
+  href: "https://www.credly.com/badges/211a4060-9485-4b3a-9fb9-e2d53c08e888/"
+- kind: learning
+  issuer: "MinnaLearn"
+  title: "Elements of AI for Business"
+  detail: "course"
+  year: "2025"
+  href: "https://courses.minnalearn.com/certificate/en/elements-of-ai-for-business/c1bde2fc-3df9-41cc-903b-f90636bb12a8"
+- kind: learning
+  issuer: "The Hashgraph Association"
+  title: "Hashgraph Developer"
+  detail: "certificate"
+  year: "2025"
+  href: "https://badges.parchment.eu/public/assertions/FsCTKOvmS4iU4tCAbMtQmQ?identity__email=aziz.messaoud@esprit.tn"
+- kind: learning
+  issuer: "SCRUMstudy"
+  title: "Scrum Fundamentals Certified"
+  detail: "certificate"
+  year: "2025"
+  href: "https://www.scrumstudy.com/certification/verify?type=SFC&number=1098120"
+- kind: learning
+  issuer: "Aspire Institute"
+  title: "Leadership"
+  detail: "certificate"
+  year: "2026"
+  href: "https://engage.aspireleaders.org/share/certificate/did:rcw:b3551972-403a-4976-be06-bd9c68b2b605"
+  extra: { label: "Letter for Leadership", href: "https://engage.aspireleaders.org/share/certificate/did:rcw:aff306a7-d8da-48a8-9ed4-378da59d2512" }

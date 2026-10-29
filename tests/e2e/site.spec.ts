@@ -41,32 +41,6 @@ test("full page renders without horizontal overflow", async ({ page }, info) => 
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
 });
 
-test("pause stops the scene and nothing resumes it except the visitor", async ({ page }) => {
-  await page.goto("/");
-  await page.waitForTimeout(800);
-  const toggle = page.getByRole("button", { name: /pause motion/i });
-  await toggle.focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: /play motion/i })).toBeVisible();
-  const f1 = await frames(page);
-  /* scrolling, clicking the field and switching tabs must not resume it */
-  await page.mouse.click(1000, 300);
-  await page.evaluate(() => scrollTo({ top: 200, behavior: "instant" }));
-  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-  await page.waitForTimeout(700);
-  expect(await frames(page)).toBe(f1);
-  /* the choice survives a reload */
-  await page.reload();
-  await page.waitForTimeout(700);
-  await expect(page.getByRole("button", { name: /play motion/i })).toBeVisible();
-  const f2 = await frames(page);
-  await page.waitForTimeout(500);
-  expect(await frames(page)).toBe(f2);
-  await page.getByRole("button", { name: /play motion/i }).click();
-  await page.waitForTimeout(500);
-  expect(await frames(page)).toBeGreaterThan(f2);
-});
-
 test("scene stops while the hero is offscreen", async ({ page }) => {
   await page.goto("/");
   await page.waitForTimeout(600);
@@ -83,8 +57,7 @@ test.describe("reduced motion", () => {
     await page.goto("/");
     await page.waitForTimeout(800);
     expect(await runway(page)).toBe(0);
-    await expect(page.getByRole("button", { name: /motion/i })).toHaveCount(0);
-    const f = await frames(page);
+      const f = await frames(page);
     await page.waitForTimeout(600);
     expect(await frames(page)).toBe(f);
     await expect(page.locator(".hero-h1")).toHaveCSS("opacity", "1");
@@ -116,13 +89,26 @@ test("hero hint hands its question to the terminal", async ({ page }) => {
   await expect(page.getByRole("log", { name: "Terminal output" })).toContainText("Ambulances are slower");
 });
 
+test("the about section shows my portrait with a text alternative", async ({ page }) => {
+  await page.goto("/#about");
+  const img = page.getByRole("img", { name: "Portrait of Aziz Messaoud" });
+  await img.scrollIntoViewIfNeeded();
+  await expect(img).toBeVisible();
+  expect(await img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth)).toBeGreaterThan(0);
+});
+
+test("there is no pause button; reduced motion is still honoured by the media query", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: /motion/i })).toHaveCount(0);
+});
+
 test("certifications link out to each issuer", async ({ page }) => {
   await page.goto("/#certifications");
   const sec = page.locator("#certifications");
   await expect(sec.getByRole("link", { name: /Verify with Oracle/ })).toHaveCount(2);
   await expect(sec.getByRole("link", { name: /Verify with Microsoft/ })).toHaveCount(2);
   await expect(sec.getByRole("link", { name: /Verify with Databricks/ })).toHaveCount(1);
-  expect(await sec.locator(".cert-learning a").count()).toBe(11);
+  expect(await sec.locator(".cert-learning > li").count()).toBe(11);
 });
 
 test("keyboard focus is always visible", async ({ page }, info) => {
@@ -238,18 +224,6 @@ test("the brain docks into the nav's Ask my brain link; it is a keyboard-reachab
   expect(await running(page)).toBe(true);                /* focus wakes it */
   await page.keyboard.press("Enter");
   await expect(page.locator("#term-input")).toBeFocused();
-});
-
-test("pausing freezes the docked brain too", async ({ page }) => {
-  await page.goto("/");
-  await page.waitForTimeout(800);
-  await page.getByRole("button", { name: /pause motion/i }).click();
-  await scrollPage(page, (await runway(page)) + 400);
-  await page.waitForTimeout(500);
-  await page.locator(".nav-cta").hover();
-  const f = await frames(page);
-  await page.waitForTimeout(600);
-  expect(await frames(page)).toBe(f);
 });
 
 test.describe("reduced motion dock", () => {
@@ -377,7 +351,7 @@ test("clicking on the hero text still sends a pulse through the network", async 
   expect(await pulses()).toBeGreaterThan(before);
   /* a real control keeps its own click and sends no pulse */
   const mid = await pulses();
-  await page.getByRole("button", { name: "Pause motion" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Skills" }).click();
   expect(await pulses()).toBeLessThanOrEqual(mid);
 });
 

@@ -48,6 +48,28 @@ export const Project = z.object({
   repoUrl: z.string().url(),
 });
 
+const https = z.string().url().refine((u) => u.startsWith("https://"), "must be an https URL");
+
+/** A credential in the Certifications section; href is the issuer's own verification page. */
+export const Certification = z.object({
+  kind: z.enum(["main", "learning"]),
+  issuer: z.string().min(2),
+  title: z.string().min(3),
+  detail: z.string().min(3),
+  year: z.string().regex(/^20\d\d$/),
+  href: https,
+  extra: z.object({ label: z.string(), href: https }).optional(),
+});
+
+/** A card under "Smaller projects". */
+export const SmallProject = z.object({
+  title: z.string().min(3),
+  text: z.string().min(20),
+  tags: z.array(z.string()).min(1),
+  link: z.string().min(3),
+  href: https,
+});
+
 export const Judged = z.object({
   id: z.string(),
   question: z.string(),
@@ -72,6 +94,15 @@ export interface CorpusPassage {
   limitations: string[];
   evidence: { label: string; url: string }[];
   tags: string[];
+}
+
+export type Certification = z.infer<typeof Certification>;
+export type SmallProject = z.infer<typeof SmallProject>;
+
+/** Portfolio lists shipped to the browser beside the corpus. */
+export interface Portfolio {
+  certifications: Certification[];
+  smallProjects: SmallProject[];
 }
 
 export interface Corpus {

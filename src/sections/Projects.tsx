@@ -2,14 +2,11 @@ import Traffix from "./projects/Traffix";
 import Flyrank from "./projects/Flyrank";
 import HrDocs from "./projects/HrDocs";
 import Icon from "../ui/Icon";
+import type { Portfolio } from "../content/schema";
+import portfolio from "../generated/portfolio.json";
 
-/* Wording from the main portfolio's "Supporting projects"; the technical exercise is labelled as such there too. */
-const SMALL = [
-  { title: "Tunisian Administrative Procedures Assistant", text: "College team project: a multilingual assistant that helps users navigate administrative procedures. I worked on the retrieval-augmented generation (RAG) component. Implementation details and my contribution are based on my own account; the README says it is not legal advice or official validation.", tags: ["RAG", "Qdrant", "Ollama", "FastAPI", "Telegram"], link: "View team repository", href: "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/README.md" },
-  { title: "Breast Cancer ML", text: "Preprocessing, PCA, and a comparison of SVM, MLP and tree models with cross-validation, served through a small Flask API. A technical exercise, not a clinical tool.", tags: ["scikit-learn", "PCA", "SVM", "MLP", "Flask", "Docker"], link: "View code", href: "https://github.com/azizmessaoud/breast-cancer-ml" },
-  { title: "ClusterCrew Analytics", text: "Healthcare analytics dashboards for exploring operational data.", tags: ["Power BI", "Data visualization", "Healthcare BI"], link: "Live demo (wakes in about a minute)", href: "https://clustercrew-analytics.onrender.com/overview" },
-  { title: "InnoTravel", text: "Team academic project: a travel-management system covering planning, booking and REST API integration across desktop and web.", tags: ["JavaFX", "Symfony", "MySQL", "REST API"], link: "View code", href: "https://github.com/oumaymasaddouri/InnoTravel-PiDev-Symfony.git" },
-];
+/* Cards come from content/small-projects.yaml (see docs/ADDING-CONTENT.md). */
+const SMALL = (portfolio as Portfolio).smallProjects;
 
 export default function Projects() {
   return (

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { parse } from "yaml";
 import { z } from "zod";
-import { Claim, Judged, Passage, Project, Source } from "../src/content/schema";
+import { Certification, Claim, Judged, Passage, Project, SmallProject, Source } from "../src/content/schema";
 
 const read = <T extends z.ZodTypeAny>(file: string, schema: T): z.infer<T>[] =>
   z.array(schema).parse(parse(readFileSync(new URL(`../content/${file}`, import.meta.url), "utf8")));
@@ -13,6 +13,8 @@ export function loadContent() {
     passages: read("passages.yaml", Passage),
     projects: read("projects.yaml", Project),
     judged: read("judged.yaml", Judged),
+    certifications: read("certifications.yaml", Certification),
+    smallProjects: read("small-projects.yaml", SmallProject),
     synonyms: parse(readFileSync(new URL("../content/synonyms.yaml", import.meta.url), "utf8")) as Record<string, string[]>,
   };
 }
