@@ -1,6 +1,7 @@
 /* Fails the build when content could put an unsupported claim in front of a judge. */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { loadContent } from "./content";
 
 const { sources, claims, passages, projects, judged, interview, awsStatus, skills } = loadContent();
@@ -57,7 +58,8 @@ function walk(dir: string): string[] {
     return statSync(p).isDirectory() ? (f === "generated" ? [] : walk(p)) : /\.(tsx?|ya?ml|html|css)$/.test(f) ? [p] : [];
   });
 }
-const root = new URL("..", import.meta.url).pathname;
+/* fileURLToPath, not .pathname: on Windows the pathname is "/C:/..." and join() turns it into "C:\C:\..." */
+const root = fileURLToPath(new URL("..", import.meta.url));
 const rendered = [...walk(join(root, "src")), ...walk(join(root, "content")), join(root, "index.html")];
 for (const file of rendered) {
   if (file.endsWith("validate-content.ts")) continue;
