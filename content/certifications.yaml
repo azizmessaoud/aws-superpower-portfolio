@@ -1,6 +1,7 @@
 # Credentials shown in the Certifications section. Add a new one at the top of its group.
 # kind: main (professional credential) | learning (course or shorter certificate)
 # year is a string. href must be the issuer's own https verification page (the build fails otherwise).
+# Exception: Samsung Innovation Campus has no public verification page; its href is the certificate image on Google Drive, and detail says so.
 
 - kind: main
   issuer: Oracle
@@ -32,6 +33,12 @@
   detail: "Databricks Academy Accreditation"
   year: "2026"
   href: "https://credentials.databricks.com/ed7432c9-7444-441d-992a-9c19e81acea9#acc.CiyAfHEW"
+- kind: learning
+  issuer: "Samsung Innovation Campus"
+  title: "Artificial Intelligence Course"
+  detail: "certificate of completion, 23 Sep to 29 Nov 2025, Samsung Electronics Tunisia; the link is the certificate image"
+  year: "2025"
+  href: "https://drive.google.com/file/d/1rcTpUBUeNXRHxbURtmK0VnyQHhXJ77L5/view?usp=sharing"
 - kind: learning
   issuer: "NVIDIA"
   title: "Introduction to Transformer-Based NLP"

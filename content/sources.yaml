@@ -54,3 +54,13 @@
   url: https://azizmessaoud.github.io/projectx0/
   ref: "the rendered earlier portfolio (About, Experience, Volunteering sections), read 29 Oct 2026"
   checkedOn: "2026-10-29"
+- id: samsung-certificate
+  kind: official
+  url: https://drive.google.com/file/d/1rcTpUBUeNXRHxbURtmK0VnyQHhXJ77L5/view?usp=sharing
+  ref: "certificate image: Artificial Intelligence Course, 23.09.2025 to 29.11.2025, Samsung Innovation Center; the link is a Google Drive image, not an issuer verification page"
+  checkedOn: "2026-10-29"
+- id: melanovision-readme
+  kind: repo
+  url: https://github.com/MedAmineEzzaouia/melanovision/blob/cf1f893244c4191a851d746af61ed2f6ee5648e1/README.md
+  ref: cf1f893
+  checkedOn: "2026-10-29"

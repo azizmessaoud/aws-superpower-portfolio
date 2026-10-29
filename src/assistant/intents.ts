@@ -57,7 +57,7 @@ export const GENERIC = new Set(("aziz he his him her project projects tell more 
   "many much long use used using did does do built is are was were it its the a an to of in on at for with from and or but if so then also just really very " +
   "good great nice best well new old first last other another one two three any some all each every way ways kind sort type anyone else model models verify check confirm enough not no only really actually sure right mean means basically whether might could would should read still understand summarise summarize summary simple words professor told ask asked asking wondering take took taken long go went come came give gave say said see saw have having need needs find try tried yo bro man dude mate bruh hey hi hello after anywhere ever never still already now today when where which what why how who whom does anyone anything something").split(" "));
 
-export const PROJECT_WORDS = /\b(alia|vital|avatar|talkinghead|traffix|trafix|traffic|flyrank|fly rank|hr|ocr|docling|rapidocr|sumo|traci|synapse|capstone|ambulances?|pedestrians?|precision|leakage|holdout|baseline|seeds?)\b/;
+export const PROJECT_WORDS = /\b(melano\w*|skin cancer|alia|vital|avatar|talkinghead|traffix|trafix|traffic|flyrank|fly rank|hr|ocr|docling|rapidocr|sumo|traci|synapse|capstone|ambulances?|pedestrians?|precision|leakage|holdout|baseline|seeds?)\b/;
 
 export interface Entity { key: string; re: RegExp; passages: string[]; title: string }
 export const ENTITIES: Entity[] = [
@@ -65,6 +65,7 @@ export const ENTITIES: Entity[] = [
   { key: "flyrank", title: "The FlyRank capstone", re: /\b(flyrank|fly rank|capstone|ranking (project|model|thing))\b/, passages: ["fr-question", "fr-p50"] },
   { key: "hr", title: "HR document checks", re: /\b(hr|hrdocs|hr documents?|docling|rapidocr|ocr|document ai)\b/, passages: ["hr-pipeline", "hr-accuracy"] },
   { key: "alia", title: "ALIA", re: /\b(alia|vital laboratories|vital labs?|avatar|talkinghead)\b/, passages: ["al-overview", "al-role"] },
+  { key: "melano", title: "MelanoVision", re: /\b(melano\w*|skin cancer)\b/, passages: ["mv-overview", "mv-role"] },
   { key: "esprit", title: "ESPRIT", re: /\besprit\b/, passages: ["pr-about"] },
   { key: "sumo", title: "TraffiX", re: /\b(sumo|traci|synapse)\b/, passages: ["tr-simulation", "tr-control"] },
 ];

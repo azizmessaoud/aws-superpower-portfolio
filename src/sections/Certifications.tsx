@@ -2,7 +2,7 @@ import type { Portfolio } from "../content/schema";
 import portfolio from "../generated/portfolio.json";
 import Icon from "../ui/Icon";
 
-/* Credentials come from content/certifications.yaml (see docs/ADDING-CONTENT.md); each links to its issuer's page. */
+/* Credentials come from content/certifications.yaml (see docs/ADDING-CONTENT.md); each links to its issuer's page (Samsung: the certificate image). */
 const { certifications } = portfolio as Portfolio;
 const MAIN = certifications.filter((c) => c.kind === "main");
 const LEARNING = certifications.filter((c) => c.kind === "learning");
@@ -17,7 +17,7 @@ export default function Certifications() {
         <h2 id="certs-title" className="sec-h2">Credentials you can check yourself.</h2>
         <p className="sec-lead">
           {MAIN.length} main credential{MAIN.length === 1 ? "" : "s"} and {word(LEARNING.length)} shorter course{LEARNING.length === 1 ? "" : "s"}. Each one links to the
-          issuer's own page, so you don't have to take my word for it.
+          issuer's own page, except the Samsung course, which links to the certificate image.
         </p>
         <ul className="skills-grid">
           {MAIN.map((c) => (

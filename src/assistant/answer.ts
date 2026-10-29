@@ -41,8 +41,8 @@ const REPO = "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/main
 const PROJECT_OF: [string, LabelKey][] = [["tr-", "traffix"], ["fr-", "flyrank"], ["hr-", "hr"], ["al-", "alia"]];
 const projectOf = (ids: string[]): LabelKey | undefined => PROJECT_OF.find(([p]) => ids.some((i) => i.startsWith(p)))?.[1];
 const PROJECT_NAME: Record<LabelKey, string> = { traffix: "TraffiX", flyrank: "FlyRank", hr: "HR document checks", alia: "ALIA" };
-const ISSUER_ALIAS: Record<string, string> = { azure: "microsoft", oci: "oracle" };
-const CERT_WORDS = /certif|credential|badge|diploma|accredit|\bcerts?\b|\bcourses?\b|practitioner/;
+const ISSUER_ALIAS: Record<string, string> = { azure: "microsoft", oci: "oracle", bootcamp: "samsung" };
+const CERT_WORDS = /certif|credential|badge|diploma|accredit|\bcerts?\b|\bcourses?\b|practitioner|bootcamp|innovation campus/;
 const STOP = new Set(["what", "whats", "what's", "is", "are", "the", "a", "an", "do", "does", "you", "your", "aziz", "azizs", "have", "has", "his", "he", "any", "of", "to", "and", "or", "with", "got", "show", "me", "list", "all", "my", "i", "please", "tell", "about", "certified", "in", "certificate", "certification", "certifications", "certifs", "cert", "certs", "credential", "credentials", "cloud", "practitioner", "badges", "badge", "cloud"]);
 const words = (s: string) => s.toLowerCase().replace(/'s\b/g, "").replace(/[^a-z0-9+ ]/g, " ").split(" ").filter(Boolean);
 const near = (q: string, targets: string[]) =>
@@ -140,7 +140,9 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     return make({
       outcome: "supported", intent: "certifications", title: asked.length ? `Credentials from ${[...new Set(shown.map((c) => c.issuer))].join(", ")}` : "Certifications",
       answer: shown.map(line).join("; ") + ".", evidence,
-      limitations: ["Each link is the issuer's own verification page; I have not re-checked them since copying them from my earlier portfolio on 29 Oct 2026."],
+      limitations: [shown.some((c) => c.issuer === "Samsung Innovation Campus")
+        ? "Most links are the issuer's own verification page; the Samsung link is the certificate image on Google Drive, a certificate of completion rather than an exam result. I have not re-checked the others since copying them from my earlier portfolio on 29 Oct 2026."
+        : "Each link is the issuer's own verification page; I have not re-checked them since copying them from my earlier portfolio on 29 Oct 2026."],
     });
   }
 
@@ -419,7 +421,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     if (re.capabilities.test(q)) return capabilities();
     if (re.judgement.test(q)) return judgement();
     const certExplicit = /certif|credential|badge|diploma|accredit/.test(q);
-    if ((CERT_WORDS.test(q) && (certExplicit || !PROJECT_WORDS.test(q))) || near(q, ["certification", "certificate", "credential", "certified"]) || /\b(oracle|microsoft|azure|databricks|nvidia|kaggle|ibm|google|gcp)\b/.test(q)) return certs(original);
+    if ((CERT_WORDS.test(q) && (certExplicit || !PROJECT_WORDS.test(q))) || near(q, ["certification", "certificate", "credential", "certified"]) || /\b(oracle|microsoft|azure|databricks|nvidia|kaggle|ibm|google|gcp|samsung)\b/.test(q)) return certs(original);
     if (re.softInjection.test(q)) return offTopic("instruction");
     if (/\b(deployed|deployment|in production|go live|went live|gone live)\b/.test(q) && !PROJECT_WORDS.test(q) && !re.awsWords.test(q)) return deploymentOverview();
     if (re.interview.test(q) || near(q, ["interview"])) return interviewQs();
@@ -433,6 +435,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     const pr = premise(q);
     if (pr) return pr;
     const key = ENTITIES.find((e) => e.key !== "esprit" && e.re.test(q))?.key;
+    if (key === "melano") return fromPassage(re.roleAsk.test(q) || /\b(train|trained|build|built|made|make)\b/.test(q) ? "mv-role" : re.resultAsk.test(q) || re.limitations.test(q) || /\b(accura\w*|benign|clinical\w*|medical|metrics?)\b/.test(q) ? "mv-limits" : "mv-overview", "entity");
     const pk: LabelKey | undefined = key === "flyrank" ? "flyrank" : key === "hr" ? "hr" : key === "alia" ? "alia" : key ? "traffix" : undefined;
     if (pk && re.weakest.test(q)) return limitations(pk);
     if (pk === "traffix" && re.roleAsk.test(q)) return fromPassage("tr-role", "role");

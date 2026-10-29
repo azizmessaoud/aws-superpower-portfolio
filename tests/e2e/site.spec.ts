@@ -122,7 +122,7 @@ test("certifications link out to each issuer", async ({ page }) => {
   await expect(sec.getByRole("link", { name: /Verify with Oracle/ })).toHaveCount(2);
   await expect(sec.getByRole("link", { name: /Verify with Microsoft/ })).toHaveCount(2);
   await expect(sec.getByRole("link", { name: /Verify with Databricks/ })).toHaveCount(1);
-  expect(await sec.locator(".cert-learning > li").count()).toBe(11);
+  expect(await sec.locator(".cert-learning > li").count()).toBe(12);
 });
 
 test("keyboard focus is always visible", async ({ page }, info) => {

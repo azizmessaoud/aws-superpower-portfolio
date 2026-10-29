@@ -42,6 +42,14 @@
   },
   {
    "kind": "learning",
+   "issuer": "Samsung Innovation Campus",
+   "title": "Artificial Intelligence Course",
+   "detail": "certificate of completion, 23 Sep to 29 Nov 2025, Samsung Electronics Tunisia; the link is the certificate image",
+   "year": "2025",
+   "href": "https://drive.google.com/file/d/1rcTpUBUeNXRHxbURtmK0VnyQHhXJ77L5/view?usp=sharing"
+  },
+  {
+   "kind": "learning",
    "issuer": "NVIDIA",
    "title": "Introduction to Transformer-Based NLP",
    "detail": "course",
@@ -146,6 +154,17 @@
    ],
    "link": "View team repository",
    "href": "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/README.md"
+  },
+  {
+   "title": "MelanoVision (Samsung Innovation Campus)",
+   "text": "Team proof-of-concept from the 10-week Samsung Innovation Campus programme: melanoma detection with deep learning, behind a small web app. My part was dataset integration and analysis, the groundwork for the team's performance modelling, from my own account. A prototype, not a product or a medical device; the repository publishes no evaluation results.",
+   "tags": [
+    "Deep learning",
+    "Dataset integration",
+    "Data analysis"
+   ],
+   "link": "View team repository",
+   "href": "https://github.com/MedAmineEzzaouia/melanovision/blob/cf1f893244c4191a851d746af61ed2f6ee5648e1/README.md"
   },
   {
    "title": "Breast Cancer ML",

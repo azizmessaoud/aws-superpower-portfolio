@@ -154,3 +154,30 @@ describe("AWS claims follow the evidence file, nothing else", () => {
     expect(calls).toBe(0);
   });
 });
+
+describe("Samsung Innovation Campus and MelanoVision", () => {
+  it("the bootcamp questions find the certificate and say what the link is", () => {
+    for (const q of ["Did he do the Samsung bootcamp?", "is aziz samsung certified", "samsung innovation campus"]) {
+      const a = bot.ask(q);
+      expect(a.outcome, q).toBe("supported");
+      expect(all(a), q).toContain("Samsung");
+      expect(all(a), q).toMatch(/certificate image|completion/);
+    }
+  });
+  it("MelanoVision: his part is the data, never the model", () => {
+    for (const q of ["did aziz train the melanoma model?", "what did aziz do in melanovision", "what was his role in the melanoma project"]) {
+      const a = bot.ask(q);
+      expect(a.outcome, q).not.toBe("not_verified");
+      expect(all(a), q).toMatch(/dataset integration and analysis/);
+      expect(all(a), q).toMatch(/did not build the model|not build the model/);
+    }
+  });
+  it("MelanoVision: no accuracy is claimed", () => {
+    const a = bot.ask("How accurate is the melanoma detection?");
+    expect(all(a)).toMatch(/no accuracy|no evaluation results|publishes no/i);
+    expect(all(a)).not.toMatch(/92\.1|saves lives|%/);
+  });
+  it("Django and Next.js stay unclaimed as his tools", () => {
+    expect(bot.ask("does he know Django?").outcome).not.toBe("supported");
+  });
+});

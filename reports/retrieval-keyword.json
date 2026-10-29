@@ -35,6 +35,7 @@
       "question": "What did you personally build in the TraffiX team?",
       "top": [
         "tr-role",
+        "mv-role",
         "al-role"
       ],
       "rank": 1,
@@ -46,7 +47,8 @@
       "question": "Are the traffic results statistically significant?",
       "top": [
         "tr-mixed",
-        "fr-p50"
+        "fr-p50",
+        "tr-simulation"
       ],
       "rank": 1,
       "ok": true,
@@ -123,6 +125,7 @@
       "question": "Comment détectez-vous les anomalies dans les documents RH ?",
       "top": [
         "hr-pipeline",
+        "mv-overview",
         "hr-accuracy"
       ],
       "rank": 1,
@@ -174,6 +177,7 @@
       "question": "What did Aziz personally build in TraffiX?",
       "top": [
         "tr-role",
+        "mv-role",
         "al-role"
       ],
       "rank": 1,
@@ -291,12 +295,47 @@
       "rank": 1,
       "ok": true,
       "abstain": false
+    },
+    {
+      "id": "q29",
+      "question": "Did he do the Samsung bootcamp?",
+      "top": [
+        "pr-bootcamp",
+        "mv-overview"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q30",
+      "question": "What did Aziz do in MelanoVision?",
+      "top": [
+        "mv-limits",
+        "mv-overview",
+        "mv-role"
+      ],
+      "rank": 3,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q31",
+      "question": "How accurate is the melanoma detection?",
+      "top": [
+        "mv-overview",
+        "mv-limits",
+        "hr-accuracy"
+      ],
+      "rank": 2,
+      "ok": true,
+      "abstain": false
     }
   ],
-  "answerable": 25,
-  "hit1": 0.92,
+  "answerable": 28,
+  "hit1": 0.8571428571428571,
   "hit3": 1,
-  "mrr": 0.96,
+  "mrr": 0.9226190476190476,
   "abstainOk": 3,
   "abstainTotal": 3
 }

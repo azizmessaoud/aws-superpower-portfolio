@@ -10,7 +10,7 @@ const sourceIds = new Set(sources.map((s) => s.id));
 const claimById = new Map(claims.map((c) => [c.id, c]));
 const projectIds = new Set(projects.map((p) => p.id));
 const passageIds = new Set(passages.map((p) => p.id));
-const ALLOWED_URL = /^https:\/\/(github\.com\/azizmessaoud\/|azizmessaoud\.github\.io\/projectx0|builder\.aws\.com\/)/;
+const ALLOWED_URL = /^https:\/\/(github\.com\/azizmessaoud\/|github\.com\/MedAmineEzzaouia\/melanovision\/|drive\.google\.com\/file\/d\/1rcTpUBUeNXRHxbURtmK0VnyQHhXJ77L5\/|azizmessaoud\.github\.io\/projectx0|builder\.aws\.com\/)/;
 
 for (const s of sources) if (!ALLOWED_URL.test(s.url)) errors.push(`source ${s.id}: URL outside the allowed evidence hosts`);
 for (const c of claims) {

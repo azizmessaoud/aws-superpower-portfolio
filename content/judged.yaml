@@ -104,3 +104,15 @@
   question: Has ALIA been tested with real users?
   relevant: [al-limits]
   note: added 29 Oct; trap, it has not
+- id: q29
+  question: Did he do the Samsung bootcamp?
+  relevant: [pr-bootcamp]
+  note: added 29 Oct
+- id: q30
+  question: What did Aziz do in MelanoVision?
+  relevant: [mv-role]
+  note: added 29 Oct
+- id: q31
+  question: How accurate is the melanoma detection?
+  relevant: [mv-limits]
+  note: added 29 Oct; trap, no results are published

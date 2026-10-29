@@ -23,3 +23,8 @@
   framing: A team prototype of a conversational avatar for sales-representative practice, built under NDA for Vital Laboratories Tunisia. My part was the browser avatar fallback and the debrief-deck agent.
   layout: none
   repoUrl: https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts
+- id: melanovision
+  title: MelanoVision
+  framing: A team proof-of-concept from the Samsung Innovation Campus AI programme. My part was dataset integration and analysis; I did not build the model, the web app or the chatbots.
+  layout: none
+  repoUrl: https://github.com/MedAmineEzzaouia/melanovision/blob/cf1f893244c4191a851d746af61ed2f6ee5648e1/README.md

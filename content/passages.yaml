@@ -348,4 +348,51 @@
   sources: [live-site-data]
   anchors: [""]
   tags: [alia, limitation, limitations, weakness, evaluation, evaluated, nda]
-
+- id: pr-bootcamp
+  projectId: portfolio
+  claimIds: [PR-06]
+  title: Samsung Innovation Campus, Artificial Intelligence course
+  text: I completed the Artificial Intelligence course of the Samsung Innovation Campus programme in Tunisia, from 23 September to 29 November 2025, and hold the certificate of completion. The programme's team project was MelanoVision.
+  context: From the certificate itself, which names the course, the dates, Samsung Innovation Center and Samsung Electronics Tunisia.
+  limitations:
+    - "A certificate of completion, not an exam result or a grade."
+    - "The link is an image on Google Drive, not an issuer verification page."
+  sources: [samsung-certificate]
+  anchors: [""]
+  tags: [samsung, bootcamp, innovation, campus, ai, artificial, intelligence, course, training, programme, program, certificate, completion, learning, tunisia, "2025"]
+- id: mv-overview
+  projectId: melanovision
+  claimIds: [MV-01]
+  title: MelanoVision, a melanoma-detection prototype
+  text: MelanoVision is the team project from the Samsung Innovation Campus programme, a proof-of-concept for detecting melanoma with deep learning. The repository describes a Next.js web app, a Django backend, a detection module and two assistant chatbots. It is a prototype, not a product.
+  context: Description from the repository README and from my own account of the programme.
+  limitations:
+    - "Team project; the repository belongs to a teammate and lists no roles."
+    - "The repository publishes no evaluation results."
+  sources: [melanovision-readme]
+  anchors: [""]
+  tags: [melanovision, melanoma, skin, cancer, dermatology, detection, deep, learning, samsung, bootcamp, programme, prototype, proof, concept, nextjs, django, chatbot, team, capstone]
+- id: mv-role
+  projectId: melanovision
+  claimIds: [MV-01]
+  title: My part of MelanoVision
+  text: My role was dataset integration and analysis, the groundwork for the team's performance modelling. I did not build the model, the web app or the chatbots; the team built those.
+  context: My own account of the programme; the repository does not list roles.
+  limitations:
+    - "My own account; nothing in the public repository shows who did what."
+    - "I do not claim the model, the app or any results."
+  sources: [melanovision-readme]
+  anchors: [""]
+  tags: [melanovision, melanoma, role, part, contribution, did, personally, built, build, train, trained, model, data, dataset, datasets, integration, analysis, performance, modelling, team, mine]
+- id: mv-limits
+  projectId: melanovision
+  claimIds: [MV-02]
+  title: What MelanoVision does not show
+  text: MelanoVision is a prototype, not a product and not a medical device. It has not been clinically evaluated, and its repository publishes no accuracy or other evaluation results, so none is claimed here. Screenshots of its demo interface are mock-ups, not results.
+  context: Limitations from the repository README and my own account.
+  limitations:
+    - "No evaluation results are published, so there is nothing to verify."
+    - "The repository's privacy and speed statements are not verified here."
+  sources: [melanovision-readme]
+  anchors: [""]
+  tags: [melanovision, melanoma, limitation, limitations, weakness, accuracy, accurate, result, results, evaluation, evaluated, clinical, medical, benign, performance, metrics, score]

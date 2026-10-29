@@ -889,6 +889,163 @@
     "nda"
    ],
    "challenges": []
+  },
+  {
+   "id": "pr-bootcamp",
+   "projectId": "portfolio",
+   "projectTitle": "Across the three projects",
+   "title": "Samsung Innovation Campus, Artificial Intelligence course",
+   "text": "I completed the Artificial Intelligence course of the Samsung Innovation Campus programme in Tunisia, from 23 September to 29 November 2025, and hold the certificate of completion. The programme's team project was MelanoVision.",
+   "context": "From the certificate itself, which names the course, the dates, Samsung Innovation Center and Samsung Electronics Tunisia.",
+   "limitations": [
+    "A certificate of completion, not an exam result or a grade.",
+    "The link is an image on Google Drive, not an issuer verification page."
+   ],
+   "evidence": [
+    {
+     "label": "Official page · view?usp=sharing @ certificate",
+     "url": "https://drive.google.com/file/d/1rcTpUBUeNXRHxbURtmK0VnyQHhXJ77L5/view?usp=sharing"
+    }
+   ],
+   "tags": [
+    "samsung",
+    "bootcamp",
+    "innovation",
+    "campus",
+    "ai",
+    "artificial",
+    "intelligence",
+    "course",
+    "training",
+    "programme",
+    "program",
+    "certificate",
+    "completion",
+    "learning",
+    "tunisia",
+    "2025"
+   ],
+   "challenges": []
+  },
+  {
+   "id": "mv-overview",
+   "projectId": "melanovision",
+   "projectTitle": "MelanoVision",
+   "title": "MelanoVision, a melanoma-detection prototype",
+   "text": "MelanoVision is the team project from the Samsung Innovation Campus programme, a proof-of-concept for detecting melanoma with deep learning. The repository describes a Next.js web app, a Django backend, a detection module and two assistant chatbots. It is a prototype, not a product.",
+   "context": "Description from the repository README and from my own account of the programme.",
+   "limitations": [
+    "Team project; the repository belongs to a teammate and lists no roles.",
+    "The repository publishes no evaluation results."
+   ],
+   "evidence": [
+    {
+     "label": "README · README.md @ cf1f893",
+     "url": "https://github.com/MedAmineEzzaouia/melanovision/blob/cf1f893244c4191a851d746af61ed2f6ee5648e1/README.md"
+    }
+   ],
+   "tags": [
+    "melanovision",
+    "melanoma",
+    "skin",
+    "cancer",
+    "dermatology",
+    "detection",
+    "deep",
+    "learning",
+    "samsung",
+    "bootcamp",
+    "programme",
+    "prototype",
+    "proof",
+    "concept",
+    "nextjs",
+    "django",
+    "chatbot",
+    "team",
+    "capstone"
+   ],
+   "challenges": []
+  },
+  {
+   "id": "mv-role",
+   "projectId": "melanovision",
+   "projectTitle": "MelanoVision",
+   "title": "My part of MelanoVision",
+   "text": "My role was dataset integration and analysis, the groundwork for the team's performance modelling. I did not build the model, the web app or the chatbots; the team built those.",
+   "context": "My own account of the programme; the repository does not list roles.",
+   "limitations": [
+    "My own account; nothing in the public repository shows who did what.",
+    "I do not claim the model, the app or any results."
+   ],
+   "evidence": [
+    {
+     "label": "README · README.md @ cf1f893",
+     "url": "https://github.com/MedAmineEzzaouia/melanovision/blob/cf1f893244c4191a851d746af61ed2f6ee5648e1/README.md"
+    }
+   ],
+   "tags": [
+    "melanovision",
+    "melanoma",
+    "role",
+    "part",
+    "contribution",
+    "did",
+    "personally",
+    "built",
+    "build",
+    "train",
+    "trained",
+    "model",
+    "data",
+    "dataset",
+    "datasets",
+    "integration",
+    "analysis",
+    "performance",
+    "modelling",
+    "team",
+    "mine"
+   ],
+   "challenges": []
+  },
+  {
+   "id": "mv-limits",
+   "projectId": "melanovision",
+   "projectTitle": "MelanoVision",
+   "title": "What MelanoVision does not show",
+   "text": "MelanoVision is a prototype, not a product and not a medical device. It has not been clinically evaluated, and its repository publishes no accuracy or other evaluation results, so none is claimed here. Screenshots of its demo interface are mock-ups, not results.",
+   "context": "Limitations from the repository README and my own account.",
+   "limitations": [
+    "No evaluation results are published, so there is nothing to verify.",
+    "The repository's privacy and speed statements are not verified here."
+   ],
+   "evidence": [
+    {
+     "label": "README · README.md @ cf1f893",
+     "url": "https://github.com/MedAmineEzzaouia/melanovision/blob/cf1f893244c4191a851d746af61ed2f6ee5648e1/README.md"
+    }
+   ],
+   "tags": [
+    "melanovision",
+    "melanoma",
+    "limitation",
+    "limitations",
+    "weakness",
+    "accuracy",
+    "accurate",
+    "result",
+    "results",
+    "evaluation",
+    "evaluated",
+    "clinical",
+    "medical",
+    "benign",
+    "performance",
+    "metrics",
+    "score"
+   ],
+   "challenges": []
   }
  ],
  "synonyms": {

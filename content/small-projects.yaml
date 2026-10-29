@@ -5,6 +5,11 @@
   tags: ["RAG", "Qdrant", "Ollama", "FastAPI", "Telegram"]
   link: "View team repository"
   href: "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/README.md"
+- title: "MelanoVision (Samsung Innovation Campus)"
+  text: "Team proof-of-concept from the 10-week Samsung Innovation Campus programme: melanoma detection with deep learning, behind a small web app. My part was dataset integration and analysis, the groundwork for the team's performance modelling, from my own account. A prototype, not a product or a medical device; the repository publishes no evaluation results."
+  tags: ["Deep learning", "Dataset integration", "Data analysis"]
+  link: "View team repository"
+  href: "https://github.com/MedAmineEzzaouia/melanovision/blob/cf1f893244c4191a851d746af61ed2f6ee5648e1/README.md"
 - title: "Breast Cancer ML"
   text: "Preprocessing, PCA, and a comparison of SVM, MLP and tree models with cross-validation, served through a small Flask API. A technical exercise, not a clinical tool."
   tags: ["scikit-learn", "PCA", "SVM", "MLP", "Flask", "Docker"]
