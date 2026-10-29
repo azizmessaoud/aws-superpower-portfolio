@@ -92,9 +92,22 @@ test("the about section shows my portrait with a text alternative", async ({ pag
   expect(await img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth)).toBeGreaterThan(0);
 });
 
-test("there is no pause button; reduced motion is still honoured by the media query", async ({ page }) => {
+test("motion control pauses and resumes the scene without changing the scroll position", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: /motion/i })).toHaveCount(0);
+  await page.waitForTimeout(900);
+  const y = await page.evaluate(() => scrollY);
+  const toggle = page.getByRole("button", { name: "Pause motion" });
+  await expect(toggle).toBeVisible();
+  await toggle.click();
+  await expect(page.getByRole("button", { name: "Resume motion" })).toBeVisible();
+  const pausedAt = await frames(page);
+  await page.waitForTimeout(350);
+  expect(await frames(page)).toBe(pausedAt);
+  expect(await page.evaluate(() => scrollY)).toBe(y);
+  await page.getByRole("button", { name: "Resume motion" }).click();
+  await expect(page.getByRole("button", { name: "Pause motion" })).toBeVisible();
+  await page.waitForTimeout(350);
+  expect(await frames(page)).toBeGreaterThan(pausedAt);
 });
 
 test("certifications link out to each issuer", async ({ page }) => {
@@ -334,6 +347,24 @@ test("stopping the scroll mid-way never leaves the brain hanging: it finishes th
   expect(await running(page)).toBe(false);               /* landed, loop idle */
   await scrollPage(page, Math.round(run * 0.5));          /* scroll back above it: the brain flies back out */
   await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
+});
+
+test("rapid scroll reversals and full-page jumps leave the dock synchronized", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(900);
+  const run = await runway(page);
+  for (const y of [run * 0.92, run * 0.38, run + 500, run * 0.22, run + 900]) {
+    await scrollPage(page, Math.round(y));
+    await page.waitForTimeout(90);
+  }
+  await page.waitForTimeout(950);
+  await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/);
+  await scrollPage(page, 0);
+  await page.waitForTimeout(950);
+  await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
+  await scrollPage(page, 100000);
+  await page.waitForTimeout(950);
+  await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/);
 });
 
 test("clicking on the hero text still sends a pulse through the network", async ({ page }, info) => {
