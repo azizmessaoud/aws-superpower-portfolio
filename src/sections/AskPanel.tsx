@@ -13,6 +13,7 @@ const SAMPLES = [
   "What is the AWS hosting status?",
   "Does Aziz use Bedrock?",
   "What should I ask Aziz in an interview?",
+  "Where did Aziz do internships?",
 ];
 const OUTCOME: Record<Answer["outcome"], string> = {
   supported: "Answer",

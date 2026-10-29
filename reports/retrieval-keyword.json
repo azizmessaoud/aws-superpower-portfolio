@@ -99,7 +99,8 @@
       "question": "How do you process scanned documents?",
       "top": [
         "hr-pipeline",
-        "hr-accuracy"
+        "hr-accuracy",
+        "pr-experience"
       ],
       "rank": 1,
       "ok": true,
@@ -184,12 +185,93 @@
       "rank": null,
       "ok": true,
       "abstain": true
+    },
+    {
+      "id": "q19",
+      "question": "Where did he do internships?",
+      "top": [
+        "pr-experience",
+        "pr-about",
+        "fr-question"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q20",
+      "question": "Which languages does he speak?",
+      "top": [
+        "pr-languages"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q21",
+      "question": "Where is he based?",
+      "top": [
+        "pr-location"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q22",
+      "question": "Any volunteering or clubs?",
+      "top": [
+        "pr-volunteering"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q23",
+      "question": "Is Aziz available for an internship?",
+      "top": [
+        "pr-about",
+        "pr-experience"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q24",
+      "question": "wat did aziz buld in trafix",
+      "top": [
+        "tr-role"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q25",
+      "question": "did trafifx make ambulences faster",
+      "top": [
+        "tr-ambulance"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q26",
+      "question": "Does he have a PhD?",
+      "top": [],
+      "rank": null,
+      "ok": true,
+      "abstain": true
     }
   ],
-  "answerable": 16,
-  "hit1": 0.9375,
+  "answerable": 23,
+  "hit1": 0.9565217391304348,
   "hit3": 1,
-  "mrr": 0.96875,
-  "abstainOk": 2,
-  "abstainTotal": 2
+  "mrr": 0.9782608695652174,
+  "abstainOk": 3,
+  "abstainTotal": 3
 }

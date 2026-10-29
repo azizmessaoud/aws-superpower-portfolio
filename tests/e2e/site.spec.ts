@@ -514,3 +514,22 @@ test("interacting with the animation never highlights the hero text, but the que
   expect(await page.evaluate(() => (document.activeElement as HTMLInputElement).selectionEnd! - (document.activeElement as HTMLInputElement).selectionStart!)).toBe(11);
 });
 
+test("the question box understands typos and a recruiter's questions", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "answers are the same on mobile; layout has its own test");
+  await page.goto("/");
+  const box = page.locator(".ask-answer");
+  const cases: [string, RegExp, RegExp?][] = [
+    ["whois aziz", /ESPRIT/, /No start or end dates/],
+    ["wat did aziz buld in trafix", /Control pair/],
+    ["Where did he do internships?", /Sopra HR Software/, /FlyRank dates are not shown/],
+    ["Which languages does he speak?", /Arabic, French and English/],
+    ["Why should we hire you?", /cannot prove|not facts/, /yours to form/],
+  ];
+  for (const [q, text, limit] of cases) {
+    await ask(page, q);
+    await expect(box, q).toContainText(text);
+    if (limit) await expect(box, q).toContainText(limit);
+    await page.waitForTimeout(700);
+  }
+});
+

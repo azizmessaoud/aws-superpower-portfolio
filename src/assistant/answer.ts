@@ -4,6 +4,7 @@
  * not_verified (no evidence either way) and error (the question could not be processed). */
 import type { Corpus, Portfolio } from "../content/schema";
 import { LABELS, LABEL_KEYS } from "../content/labels";
+import { isNear } from "../retrieval/fuzzy";
 import { createRetriever } from "../retrieval/retriever";
 
 export type Outcome = "supported" | "contradicted" | "not_verified" | "error";
@@ -18,7 +19,7 @@ export interface Answer {
 }
 
 export const MAX_QUESTION = 200;
-const SUGGEST = "Ask about TraffiX, FlyRank, the HR prototype, AWS hosting status or my certifications, or type help for the commands.";
+const SUGGEST = "Ask about my projects (TraffiX, FlyRank, the HR prototype), internships, languages, certifications or AWS hosting status, or type help for the commands.";
 
 const AWS_SERVICES: { name: string; re: RegExp }[] = [
   { name: "Amazon Bedrock", re: /\bbedrock\b/i },
@@ -30,6 +31,12 @@ const OTHER_ISSUERS = ["aws", "amazon", "google", "gcp", "cisco", "comptia", "pm
 const ISSUER_ALIAS: Record<string, string> = { azure: "microsoft", oci: "oracle" };
 const CERT_WORDS = /certif|credential|badge|diploma|accredit|\bcerts?\b|\bcourses?\b|\blearning\b|practitioner/i;
 const STOP = new Set(["what", "whats", "what's", "is", "are", "the", "a", "an", "do", "does", "you", "your", "aziz", "azizs", "have", "has", "his", "he", "any", "of", "to", "and", "or", "with", "got", "show", "me", "list", "all", "my", "i", "please", "tell", "about", "certified", "in", "certificate", "certification", "certifications", "certifs", "cert", "certs", "credential", "credentials", "cloud", "practitioner"]);
+/* Everyday shorthand and the commonest slips, applied before routing and retrieval. */
+const SHORTHAND: [RegExp, string][] = [[/\bwhois\b/g, "who is"], [/\b(whats|wats)\b/g, "what is"], [/\bwat\b/g, "what"], [/\bur\b/g, "your"], [/\bu\b/g, "you"], [/\bhe's\b/g, "he is"]];
+const normalise = (s: string) => SHORTHAND.reduce((t, [re, to]) => t.replace(re, to), s.toLowerCase());
+/** A word of the question matches one of `targets` exactly, as a prefix of 5+ letters, or within the allowed typos. */
+const near = (q: string, targets: string[]) =>
+  q.split(/[^a-z0-9]+/).some((w) => w.length > 2 && targets.some((t) => w === t || (w.length >= 5 && t.startsWith(w)) || isNear(w, t)));
 const words = (s: string) => s.toLowerCase().replace(/'s\b/g, "").replace(/[^a-z0-9+ ]/g, " ").split(" ").filter(Boolean);
 
 export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
@@ -126,28 +133,54 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     return make({ outcome: "supported", intent, title, answer, evidence });
   }
 
+  function fromPassage(id: string, intent: string): Answer {
+    const p = byPassage.get(id)!;
+    return make({ outcome: "supported", intent, title: p.title, answer: p.text, evidence: p.evidence, limitations: p.limitations });
+  }
+
+  function judgement(): Answer {
+    const ev = ["fr-method", "tr-ambulance", "hr-accuracy"].flatMap((id) => (byPassage.get(id)?.evidence ?? []).slice(0, 1));
+    return make({
+      outcome: "not_verified", intent: "judgement", title: "A judgement or a number this site cannot verify",
+      answer: "Whether to hire me, my strengths and salary expectations are not facts this site can prove, so I do not claim them. What the evidence does show is how I work and where my results fall short: each project lists its data, how it was judged, where it fails and who reviews the output. Salary and start dates are not on this site; email me.",
+      evidence: ev,
+      limitations: ["Opinions about me are yours to form from the evidence, not mine to assert."],
+    });
+  }
+
+  function projectsOverview(): Answer {
+    const ev = ["tr-simulation", "fr-question", "hr-pipeline"].flatMap((id) => (byPassage.get(id)?.evidence ?? []).slice(0, 1));
+    const small = portfolio.smallProjects.map((x) => x.title).join(", ");
+    return make({
+      outcome: "supported", intent: "projects", title: "Projects",
+      answer: `Three case studies: TraffiX (a multi-agent traffic-control simulation, team project), the FlyRank capstone (ranking pages for human review) and HR document checks (a prototype on synthetic documents). Also: ${small}. Ask about any of them for its result and its limits.`,
+      evidence: ev,
+      limitations: ["Each case study ends with where it fails; the team projects name only my part."],
+    });
+  }
+
   function ask(raw: string): Answer {
     const input = raw.trim().replace(/\s+/g, " ").replace(/^ask\s+/i, "");
     if (!input) return make({ outcome: "error", intent: "invalid", title: "No question", answer: "Type a question first." });
     if (input.length > MAX_QUESTION) return make({ outcome: "error", intent: "invalid", title: "Question too long", answer: `Questions are limited to ${MAX_QUESTION} characters; this one has ${input.length}.` });
-    const q = input.toLowerCase();
+    const q = normalise(input);
+    const project = /traffix|flyrank|fly rank|\bhr\b|document|capstone|ambulance|pedestrian|precision|leakage|ocr/.test(q);
 
-    for (const s of AWS_SERVICES) if (s.re.test(q)) return awsService(s.name);
-    if (/\b(aws|amazon)\b/.test(q) && CERT_WORDS.test(q)) return certs(input);
+    for (const sv of AWS_SERVICES) if (sv.re.test(q) || (sv.name.includes("Bedrock") && near(q, ["bedrock"])) || (sv.name.includes("Lambda") && near(q, ["lambda"]))) return awsService(sv.name);
+    if (/\b(aws|amazon)\b/.test(q) && (CERT_WORDS.test(q) || near(q, ["certification", "certificate", "credential"]))) return certs(input);
     if (/\b(aws|amazon|amplify)\b/.test(q) || /(hosting|hosted|site|website|portfolio).*(deploy|live|status|hosted)|(deploy|live).*(site|website|portfolio)/.test(q) && !/traffix|simulation/.test(q)) return awsHosting();
-    if (CERT_WORDS.test(q) || /\b(oracle|microsoft|azure|databricks|nvidia|kaggle|ibm|google|gcp)\b/.test(q)) return certs(input);
-    if (/interview/.test(q)) return interviewQs();
-    const project = /traffix|flyrank|fly rank|\bhr\b|document|capstone/.test(q);
-    if (/\b(limitations?|weakness(es)?|caveats?)\b/.test(q) && !project) return limitations();
-    if (/\b(skills?|tools?|stack|technolog\w*|tech)\b/.test(q) && !project) return tools();
-    if (/\b(contact|email|e-mail|reach|linkedin|hire|hiring)\b/.test(q))
+    if (/\b(why (should|would|do) (we|i) (hire|pick|choose)|hire (you|him|aziz)|strengths?|best at|salary|salaries|pay|paid|expectations?|rate|how much|rating|score)\b/.test(q)) return judgement();
+    if (CERT_WORDS.test(q) || near(q, ["certification", "certificate", "credential", "certified"]) || /\b(oracle|microsoft|azure|databricks|nvidia|kaggle|ibm|google|gcp)\b/.test(q)) return certs(input);
+    if (near(q, ["interview"])) return interviewQs();
+    if (!project && near(q, ["limitation", "limitations", "weakness", "weaknesses", "caveat"])) return limitations();
+    if (!project && (near(q, ["skills", "tools", "stack", "technologies", "technology"]) || /\bskill/.test(q))) return tools();
+    if (near(q, ["contact", "email", "linkedin", "reach", "hiring"]) && !/(email|reach).*(traffix|project)/.test(q))
       return simple("contact", "Contact", "aziz.messaoud@esprit.tn · github.com/azizmessaoud · linkedin.com/in/azizmessaoud", [
         { label: "Email", url: "mailto:aziz.messaoud@esprit.tn" }, { label: "GitHub", url: "https://github.com/azizmessaoud" }, { label: "LinkedIn", url: "https://www.linkedin.com/in/azizmessaoud/" }]);
-    if (/\b(who are you|who is aziz|about you|study|studies|esprit|graduate|school)\b/.test(q))
-      return simple("about", "About", "Data Science Engineering student at ESPRIT, Tunisia, expecting to graduate in 2027; looking for a 2027 PFE internship in AI/ML engineering, applied data science or AI research. Works in Arabic, French and English.",
-        [{ label: "Live portfolio source (projectx0)", url: "https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts" }]);
+    if (!project && /\b(who (is|are)|about (you|aziz|yourself|him)|tell me about|introduce|describe (you|aziz|yourself))\b/.test(q)) return fromPassage("pr-about", "about");
+    if (!project && /\bprojects?\b/.test(q) && !/\b(worst|weakest|best|performed|bad|poor|fail)/.test(q)) return projectsOverview();
 
-    const results = retriever.search(input, 2);
+    const results = retriever.search(q, 2);
     if (!results.length)
       return make({ outcome: "not_verified", intent: "retrieval", title: "Nothing verified", answer: `No verified passage answers that, so I won't guess. ${SUGGEST}`, limitations: ["Missing evidence, not a 'no': the answer may exist outside what this site can show."] });
     const top = results[0].passage;

@@ -49,3 +49,8 @@
   url: https://github.com/azizmessaoud/aws-superpower-portfolio/blob/main/content/aws-status.yaml
   ref: main (the file this site reads its AWS status from)
   checkedOn: "2026-10-29"
+- id: live-site-page
+  kind: site
+  url: https://azizmessaoud.github.io/projectx0/
+  ref: "the rendered earlier portfolio (About, Experience, Volunteering sections), read 29 Oct 2026"
+  checkedOn: "2026-10-29"

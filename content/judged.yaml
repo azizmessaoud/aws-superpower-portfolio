@@ -64,3 +64,35 @@
   question: What is your favourite colour?
   relevant: []
   note: added 29 Oct; no evidence, so the honest answer is none
+- id: q19
+  question: Where did he do internships?
+  relevant: [pr-experience]
+  note: added 29 Oct; recruiter-style
+- id: q20
+  question: Which languages does he speak?
+  relevant: [pr-languages]
+  note: added 29 Oct; recruiter-style
+- id: q21
+  question: Where is he based?
+  relevant: [pr-location]
+  note: added 29 Oct; recruiter-style
+- id: q22
+  question: Any volunteering or clubs?
+  relevant: [pr-volunteering]
+  note: added 29 Oct; recruiter-style
+- id: q23
+  question: Is Aziz available for an internship?
+  relevant: [pr-about]
+  note: added 29 Oct; recruiter-style
+- id: q24
+  question: wat did aziz buld in trafix
+  relevant: [tr-role]
+  note: added 29 Oct; two typos
+- id: q25
+  question: did trafifx make ambulences faster
+  relevant: [tr-ambulance]
+  note: added 29 Oct; two typos, and a trap (they are slower)
+- id: q26
+  question: Does he have a PhD?
+  relevant: []
+  note: added 29 Oct; no evidence

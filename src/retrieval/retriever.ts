@@ -2,6 +2,7 @@
  * it never generates answers and never scores the person. */
 import type { Corpus, CorpusPassage } from "../content/schema";
 import { buildIndex, score } from "./bm25";
+import { allowedTypos, distance, sameStart } from "./fuzzy";
 import { stem, tokenize } from "./tokenize";
 
 export interface Result {
@@ -22,9 +23,23 @@ export function createRetriever(corpus: Corpus) {
   const byId = new Map(corpus.passages.map((p) => [p.id, p]));
   const synonyms = new Map(Object.entries(corpus.synonyms).map(([k, v]) => [stem(k), v.map(stem)]));
 
+  const vocab = [...index.df.keys()];
+
+  /* A typed word the corpus has never seen may be a typo: borrow the closest corpus words (at most the allowed typos away). */
+  function fuzzy(term: string): string[] {
+    if (index.df.has(term)) return [];
+    const k = allowedTypos(term);
+    if (!k) return [];
+    const near = vocab.filter((v) => v.length >= 4 && sameStart(term, v) && distance(term, v, k) <= k);
+    return near.sort((a, b) => distance(term, a, k) - distance(term, b, k)).slice(0, 2);
+  }
+
   function expand(query: string) {
     const typed = tokenize(query);
     const terms = typed.map((term) => ({ term, weight: 1, via: undefined as string | undefined }));
+    for (const t of typed)
+      for (const f of fuzzy(t))
+        if (!terms.some((x) => x.term === f)) terms.push({ term: f, weight: 0.7, via: `${t}, a likely typo` });
     for (const t of typed)
       for (const s of synonyms.get(t) ?? [])
         if (!terms.some((x) => x.term === s)) terms.push({ term: s, weight: 0.6, via: t });

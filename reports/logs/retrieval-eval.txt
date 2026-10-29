@@ -6,7 +6,7 @@
 > aws-superpower-portfolio@0.1.0 content
 > tsx scripts/build-corpus.ts
 
-corpus: 17 passages
+corpus: 22 passages
 portfolio: 16 certifications, 4 smaller projects
 ┌─────────┬───────┬──────┬───────┬─────────────────────────────────────────────┬────────────────────────────────────────────────────┐
 │ (index) │ id    │ rank │ ok    │ top                                         │ question                                           │
@@ -20,7 +20,7 @@ portfolio: 16 certifications, 4 smaller projects
 │ 6       │ 'q07' │ 2    │ 'yes' │ 'fr-question, fr-p50, portfolio-weakest'    │ 'What precision did the ranking model reach?'      │
 │ 7       │ 'q08' │ 1    │ 'yes' │ 'fr-leakage'                                │ 'How did you avoid data leakage?'                  │
 │ 8       │ 'q09' │ 1    │ 'yes' │ 'fr-question, fr-p50'                       │ 'Does refreshing a page cause more traffic?'       │
-│ 9       │ 'q10' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy'                  │ 'How do you process scanned documents?'            │
+│ 9       │ 'q10' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy, pr-experience'   │ 'How do you process scanned documents?'            │
 │ 10      │ 'q11' │ 1    │ 'yes' │ 'hr-accuracy, hr-pipeline'                  │ 'What is the OCR accuracy on real documents?'      │
 │ 11      │ 'q12' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy'                  │ 'Comment détectez-vous les anomalies dans les doc' │
 │ 12      │ 'q13' │ 1    │ 'yes' │ 'hr-runtime'                                │ 'Does the HR system run in production with Postgr' │
@@ -29,5 +29,13 @@ portfolio: 16 certifications, 4 smaller projects
 │ 15      │ 'q16' │ 1    │ 'yes' │ 'portfolio-weakest'                         │ 'Which project performed worst?'                   │
 │ 16      │ 'q17' │ 1    │ 'yes' │ 'tr-role'                                   │ 'What did Aziz personally build in TraffiX?'       │
 │ 17      │ 'q18' │ '-'  │ 'yes' │ ''                                          │ 'What is your favourite colour?'                   │
+│ 18      │ 'q19' │ 1    │ 'yes' │ 'pr-experience, pr-about, fr-question'      │ 'Where did he do internships?'                     │
+│ 19      │ 'q20' │ 1    │ 'yes' │ 'pr-languages'                              │ 'Which languages does he speak?'                   │
+│ 20      │ 'q21' │ 1    │ 'yes' │ 'pr-location'                               │ 'Where is he based?'                               │
+│ 21      │ 'q22' │ 1    │ 'yes' │ 'pr-volunteering'                           │ 'Any volunteering or clubs?'                       │
+│ 22      │ 'q23' │ 1    │ 'yes' │ 'pr-about, pr-experience'                   │ 'Is Aziz available for an internship?'             │
+│ 23      │ 'q24' │ 1    │ 'yes' │ 'tr-role'                                   │ 'wat did aziz buld in trafix'                      │
+│ 24      │ 'q25' │ 1    │ 'yes' │ 'tr-ambulance'                              │ 'did trafifx make ambulences faster'               │
+│ 25      │ 'q26' │ '-'  │ 'yes' │ ''                                          │ 'Does he have a PhD?'                              │
 └─────────┴───────┴──────┴───────┴─────────────────────────────────────────────┴────────────────────────────────────────────────────┘
-hit@1 0.94 · hit@3 1.00 · MRR 0.969 · answerable 16 · abstentions correct 2/2
+hit@1 0.96 · hit@3 1.00 · MRR 0.978 · answerable 23 · abstentions correct 3/3

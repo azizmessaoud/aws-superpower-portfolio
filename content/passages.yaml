@@ -237,4 +237,69 @@
   sources: [traffix-validation, hr-readme, flyrank-w05]
   anchors: ["", "#L1-L16", ""]
   tags: [worst, weakest, bad, poor, performed, performance, lowest, results, project, projects, compare, compared, failed]
+- id: pr-about
+  projectId: portfolio
+  claimIds: [PR-01]
+  title: Who I am and what I am looking for
+  text: >-
+    I am a Data Science Engineering student at ESPRIT in Tunisia, expecting to graduate in 2027. I am seeking a
+    2027 final-year (PFE) internship in AI/ML engineering, applied data science or AI research.
+  context: From my earlier portfolio's profile data.
+  limitations:
+    - No start or end dates for the internship are stated.
+  sources: [live-site-data]
+  anchors: [""]
+  tags: [who, about, yourself, introduce, introduction, student, esprit, education, study, studies, degree, graduate, graduation, intern, internship, pfe, looking, seeking, goal, goals, availability, available, role, target, opening, position, job]
+- id: pr-experience
+  projectId: portfolio
+  claimIds: [PR-02]
+  title: Internships so far
+  text: >-
+    AI intern at Sopra HR Software in Tunis (July to September 2026), where I built the HR document-check
+    prototype; machine-learning intern at FlyRank AI, remote, which ended in the ranking research paper; AI intern
+    at Sopra HR Software in Tunis (July to August 2025), a first HR document-processing pipeline with Python,
+    spaCy and pdfplumber; IT support intern at Banque de Tunisie (June to July 2023).
+  context: From my earlier portfolio's experience data; the FlyRank dates are left out on purpose.
+  limitations:
+    - FlyRank dates are not shown until I settle which of my sources is right.
+    - Titles and dates are my own account, copied from my earlier portfolio.
+  sources: [live-site-data]
+  anchors: [""]
+  tags: [experience, internship, internships, intern, work, working, job, jobs, company, companies, employer, sopra, flyrank, bank, banque, tunisie, background, history, career, professional, resume, cv]
+- id: pr-volunteering
+  projectId: portfolio
+  claimIds: [PR-03]
+  title: Volunteering and clubs
+  text: >-
+    Researcher for Tunis in the 2026 Happy City Index; member of DeepFlow since October 2025 (workshops on RAG,
+    vector search and LLM applications); member of the Learning Department of ATIA Club ESB since December 2024;
+    member of IEEE chapters (PES, IAS, Computer Society) from October 2022 to December 2023.
+  context: From my earlier portfolio's volunteering data.
+  limitations:
+    - My own account; the club and organisation pages are linked where they exist.
+  sources: [live-site-data]
+  anchors: [""]
+  tags: [volunteer, volunteering, club, clubs, community, activities, extracurricular, association, deepflow, ieee, atia, happy, city, index, workshops, leadership, teamwork]
+- id: pr-languages
+  projectId: portfolio
+  claimIds: [PR-04]
+  title: Languages I work in
+  text: I work in Arabic, French and English. This portfolio and its answers are written in English.
+  context: From the About section of my earlier portfolio.
+  limitations:
+    - Working languages as I state them; no test score or level is claimed.
+  sources: [live-site-page]
+  anchors: [""]
+  tags: [language, languages, speak, speaks, spoken, arabic, french, english, bilingual, multilingual, communicate, communication, fluent, fluency, tunisian]
+- id: pr-location
+  projectId: portfolio
+  claimIds: [PR-05]
+  title: Where I am based
+  text: I am based in Tunisia and open to hybrid or remote work.
+  context: From the contact section of my earlier portfolio.
+  limitations:
+    - Only the country is stated; the city differs between my sources.
+  sources: [live-site-page]
+  anchors: [""]
+  tags: [location, located, where, based, live, lives, living, country, city, from, tunisia, tunis, relocate, relocation, remote, hybrid, onsite, abroad, timezone]
 

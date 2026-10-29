@@ -29,7 +29,7 @@ The point-cloud brain beside the question box is the interface's state, nothing 
 ```
 browser only (static site)
   content/*.yaml  --npm run build (validate, generate data)-->  src/generated/*.json
-  question --> src/assistant/answer.ts (intent routing + BM25 retriever over 17 passages)
+  question --> src/assistant/answer.ts (intent routing + BM25 retriever over 22 passages, with typo tolerance)
            --> Answer { outcome, answer, evidence[], limitations[] }
            --> hero panel and terminal (same engine), mind state --> Canvas scene
 
@@ -47,14 +47,16 @@ hosting (prepared, NOT deployed): GitHub --> AWS Amplify Hosting build (npm ci, 
 
 | Check | Result | Log |
 |---|---|---|
-| Vitest (answer engine, mind state, retrieval, terminal) | 60 passed | `vitest.txt` |
-| Playwright at 1280 and 390 px, incl. axe-core and the demo flow | 64 passed, 6 skipped by design | `playwright.txt` |
-| Content validation | passed (17 passages, 20 claims, 18 judged questions) | `validate.txt` |
+| Vitest (answer engine, typos and recruiter questions, mind state, retrieval, terminal) | 79 passed | `vitest.txt` |
+| Playwright at 1280 and 390 px, incl. axe-core and the demo flow | 66 passed, 8 skipped by design | `playwright.txt` |
+| Content validation | passed (22 passages, 25 claims, 26 judged questions) | `validate.txt` |
 | Contrast, text and focus pairs from the tokens | 38 pass | `contrast.txt` |
-| Retrieval on 18 judged questions | hit@1 0.94, hit@3 1.00, MRR 0.969, 2 of 2 no-evidence questions refused | `retrieval-eval.txt` |
+| Retrieval on 26 judged questions (incl. typos and recruiter questions) | hit@1 0.96, hit@3 1.00, MRR 0.978, 3 of 3 no-evidence questions refused | `retrieval-eval.txt` |
 | Production build | passed | `build.txt` |
 
 ## What failed
+
+- "whois aziz" first found nothing. The question box now fixes everyday shorthand and tolerates small typos, and answers recruiter-style questions (who is he, internships, languages, where based) from profile passages. It still refuses judgements and money ("why should we hire you", salary).
 
 - "whats aziz certifs" first answered "command not found". Plain questions now work, and a test checks that asking for an AWS credential I don't hold says so.
 - My first question throttle ignored a question asked within 600 ms of page load. A browser test found it.
