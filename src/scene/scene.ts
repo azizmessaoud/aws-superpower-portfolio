@@ -46,7 +46,7 @@ export function createScene(o: SceneOptions) {
   const rand = mulberry32(o.seed ?? 7);
   let W = 0, H = 0, stageH = 0, bp: Breakpoint = "desktop";
   let nodes: ShellNode[] = [], proj: Proj[] = [], edges: Edge[] = [], adj: Edge[][] = [];
-  let brain = new Float32Array(0), brainXY = new Float32Array(0);
+  let brain = new Float32Array(0), brainXY = new Float32Array(0), fadeStep = new Int8Array(0);
   let field: FieldNode[] = [];
   let pulses: Pulse[] = [], flash = 0, frame = 0, raf = 0, last = 0;
   let progress = 0, stageTop = 0, text: Box | null = null, lines: Box[] = [], fixedOut: Box[] = [], sphere = { cx: 0, cy: 0, R: 0 };
@@ -243,19 +243,32 @@ export function createScene(o: SceneOptions) {
         brainXY[i] = out.x; brainXY[i + 1] = out.y; brainXY[i + 2] = out.s;
       }
       const live = pointer.active && !still && !docking;
+      /* Dots thin out near words instead of vanishing at a hard edge: each dot's clearance (1 clear, 0 on a line of text)
+         picks one of three strengths, so the cloud fades into the text and stays one continuous shape. */
+      const FADE = [1, 0.55, 0.22];
+      if (fadeStep.length !== brain.length / 3) fadeStep = new Int8Array(brain.length / 3);
+      for (let i = 0; i < brainXY.length; i += 3) {
+        const x = brainXY[i], y = brainXY[i + 1];
+        if (x < -4 || x > W + 4 || y < -4 || y > H + 4 || fixedOut.some((b) => inBox(b, x, y))) { fadeStep[i / 3] = -1; continue; }
+        const c = heroText ? 1 - veil(x, y) : 1;
+        fadeStep[i / 3] = c > 0.75 ? 0 : c > 0.4 ? 1 : c > 0.1 ? 2 : -1;
+      }
       for (let band = 0; band < BANDS; band++) {
         const dim = mind === "uncertain" ? 0.7 : 1;
-        ctx.fillStyle = `rgba(${tint.r | 0},${tint.g | 0},${tint.b | 0},${Math.min(1, 0.32 + band * 0.2 + flash * 0.3 + (mind === "listening" ? 0.08 : 0)) * fade * dim})`;
-        ctx.beginPath();
-        for (let i = 0; i < brainXY.length; i += 3) {
-          const s = brainXY[i + 2], x = brainXY[i], y = brainXY[i + 1];
-          if (clamp(Math.floor((s - 0.52) * 14), 0, BANDS - 1) !== band) continue;
-          if (x < -4 || x > W + 4 || y < -4 || y > H + 4 || blocked(x, y, heroText)) continue;
-          let size = (1 + s * 1.7) * grow;
-          if (live && Math.abs(x - pointer.x) < 90 && Math.abs(y - pointer.y) < 90) size += 0.6;
-          ctx.rect(x - size / 2, y - size / 2, size, size);
+        const base = Math.min(1, 0.32 + band * 0.2 + flash * 0.3 + (mind === "listening" ? 0.08 : 0)) * fade * dim;
+        for (let step = 0; step < FADE.length; step++) {
+          ctx.fillStyle = `rgba(${tint.r | 0},${tint.g | 0},${tint.b | 0},${base * FADE[step]})`;
+          ctx.beginPath();
+          for (let i = 0; i < brainXY.length; i += 3) {
+            const s = brainXY[i + 2], x = brainXY[i], y = brainXY[i + 1];
+            if (clamp(Math.floor((s - 0.52) * 14), 0, BANDS - 1) !== band) continue;
+            if (fadeStep[i / 3] !== step) continue;
+            let size = (1 + s * 1.7) * grow * (step === 0 ? 1 : 0.8);
+            if (live && Math.abs(x - pointer.x) < 90 && Math.abs(y - pointer.y) < 90) size += 0.6;
+            ctx.rect(x - size / 2, y - size / 2, size, size);
+          }
+          ctx.fill();
         }
-        ctx.fill();
       }
     }
 
