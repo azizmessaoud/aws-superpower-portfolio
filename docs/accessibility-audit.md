@@ -1,6 +1,6 @@
 > **Renamed 29 Oct 2026:** "Ask my brain" is now called the Terminal Explorer. This file keeps the old name because it describes the 28 Oct build.
 
-> **Update 29 Oct 2026:** this audit was run on 28 Oct. Since then the separate "Ask my brain" section and the page-wide pause button were removed (the terminal is now the feature, and "Ask my brain" in the nav goes to it), and certifications, a portrait and project labels were added. axe-core still reports 0 serious or critical issues, but the manual keyboard and screen-reader checks below have not been repeated. Without the pause button the site no longer meets WCAG 2.2.2 for visitors who allow motion.
+> **Update 29 Oct 2026:** the separate "Ask my brain" section was consolidated into the Terminal Explorer, and certifications, a portrait and project labels were added. This UX pass restores a compact pause/resume control in the fixed navigation for visitors who allow motion. Automated checks are being extended for pause/resume and rapid scroll reversals; the manual keyboard and real screen-reader checks below still need to be repeated against the resulting build.
 
 ## Accessibility Audit: Ask my brain portfolio (local build)
 **Standard:** WCAG 2.1 AA (plus 2.2's 2.4.11 and 2.5.8 where noted) | **Date:** 29 Oct 2026
@@ -76,3 +76,5 @@ All 44 stops at 1280 and 390 px land fully in view, with a 2 px violet ring, not
 ### Still to do
 - Test with VoiceOver (iOS/macOS) and NVDA (Windows) on a real device.
 - Long focus jumps animate slowly on phones because of `scroll-behavior: smooth` (≈1 s for a 5,000 px jump); consider instant scrolling for focus-driven jumps.
+- Re-run the complete browser and accessibility suites after the motion-control change. The committed logs describe an earlier build, not this change.
+- Manually verify pause/resume, scroll reversal, and navigation focus with NVDA and VoiceOver on real devices.
