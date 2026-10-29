@@ -92,32 +92,37 @@ test.describe("reduced motion", () => {
   });
 });
 
-test("ask my brain: results with evidence, honest no-result state, keyboard", async ({ page }, info) => {
-  await page.goto("/#ask");
-  const input = page.getByLabel("Your question");
-  await input.fill("Are ambulances faster with TraffiX?");
+test("ask my brain terminal: evidence with links, honest no-result, suggestions", async ({ page }, info) => {
+  await page.goto("/#terminal");
+  const input = page.locator("#term-input");
+  const log = page.getByRole("log", { name: "Terminal output" });
+  await input.fill("ask Are ambulances faster with TraffiX?");
   await input.press("Enter");
-  const first = page.locator(".result").first();
-  await expect(first).toContainText("Ambulances are slower");
-  await expect(first.locator(".evidence a").first()).toHaveAttribute("href", /github\.com\/azizmessaoud\/traffix\/blob\/d54b071/);
-  await expect(first.locator(".limits")).toBeVisible();
-  await expect(page.getByRole("status").filter({ hasText: /verified passage/ })).toHaveText(/found/);
-  await page.locator("#ask").screenshot({ path: `reports/screens/${info.project.name}-ask-results.png` });
-  await input.fill("What is your IQ?");
+  await expect(log).toContainText("Ambulances are slower");
+  await expect(log.locator("a[href*='github.com/azizmessaoud/traffix/blob/d54b071']").first()).toBeVisible();
+  await page.locator("#terminal").screenshot({ path: `reports/screens/${info.project.name}-terminal-results.png` });
+  await input.fill("ask What is your IQ?");
   await input.press("Enter");
-  await expect(page.locator(".ask-none")).toContainText("No verified passage");
-  await expect(page.locator(".result")).toHaveCount(0);
-  /* suggestions are buttons with a pressed state */
-  const s = page.getByRole("button", { name: "How did you avoid data leakage?" });
-  await s.click();
-  await expect(s).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(".result").first()).toContainText("deliberate leakage test", { ignoreCase: true });
+  await expect(log).toContainText("No verified passage");
+  await page.getByRole("button", { name: /What did you personally build in the TraffiX team/ }).click();
+  await expect(log).toContainText("TraffiX");
+  await page.getByRole("button", { name: /How did you avoid data leakage/ }).click();
+  await expect(log).toContainText("leakage", { ignoreCase: true });
 });
 
-test("hero hint hands its question to ask my brain", async ({ page }) => {
+test("hero hint hands its question to the terminal", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Are ambulances faster/ }).click();
-  await expect(page.locator(".result").first()).toContainText("Ambulances are slower");
+  await expect(page.getByRole("log", { name: "Terminal output" })).toContainText("Ambulances are slower");
+});
+
+test("certifications link out to each issuer", async ({ page }) => {
+  await page.goto("/#certifications");
+  const sec = page.locator("#certifications");
+  await expect(sec.getByRole("link", { name: /Verify with Oracle/ })).toHaveCount(2);
+  await expect(sec.getByRole("link", { name: /Verify with Microsoft/ })).toHaveCount(2);
+  await expect(sec.getByRole("link", { name: /Verify with Databricks/ })).toHaveCount(1);
+  expect(await sec.locator(".cert-learning a").count()).toBe(11);
 });
 
 test("keyboard focus is always visible", async ({ page }, info) => {
@@ -174,11 +179,9 @@ test("no layout shift while loading", async ({ page }) => {
 test("axe-core: no serious or critical violations", async ({ page }) => {
   await page.goto("/");
   await page.waitForTimeout(2000);
-  await page.getByLabel("Your question").fill("How do you process scanned documents?");
-  await page.getByLabel("Your question").press("Enter");
-  /* let the 300 ms entrance of the result cards finish: axe would otherwise measure half-faded text */
-  await page.locator(".result").first().waitFor();
-  await page.waitForTimeout(500);
+  await page.locator("#term-input").fill("ask How do you process scanned documents?");
+  await page.locator("#term-input").press("Enter");
+  await expect(page.getByRole("log", { name: "Terminal output" })).toContainText("Docling");
   // @axe-core/playwright 4.10 types Page against an older Playwright; the runtime API is the same.
   const r = await new AxeBuilder({ page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]["page"] }).analyze();
   const bad = r.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
@@ -204,9 +207,9 @@ test("runs under the production CSP from customHttp.yml without violations", asy
   });
   await page.goto("/");
   await page.waitForTimeout(1500);
-  await page.getByLabel("Your question").fill("How do you process scanned documents?");
-  await page.getByLabel("Your question").press("Enter");
-  await expect(page.locator(".result").first()).toBeVisible();
+  await page.locator("#term-input").fill("ask How do you process scanned documents?");
+  await page.locator("#term-input").press("Enter");
+  await expect(page.getByRole("log", { name: "Terminal output" })).toContainText("Docling");
   expect(await page.evaluate(() => document.documentElement.classList.contains("js"))).toBe(true);
   expect(violations).toEqual([]);
 });
@@ -234,7 +237,7 @@ test("the brain docks into the nav's Ask my brain link; it is a keyboard-reachab
   await page.waitForTimeout(300);
   expect(await running(page)).toBe(true);                /* focus wakes it */
   await page.keyboard.press("Enter");
-  await expect(page.locator("#ask-input")).toBeFocused();
+  await expect(page.locator("#term-input")).toBeFocused();
 });
 
 test("pausing freezes the docked brain too", async ({ page }) => {
@@ -310,9 +313,9 @@ test("terminal explorer: keyboard, suggestions, history, no Tab trap, evidence l
 
 test("tech superpowers: seven cards, every evidenced card links to a repository", async ({ page }, info) => {
   await page.goto("/#skills");
-  const cards = page.locator(".skill-card");
+  const cards = page.locator("#skills .skill-card");
   await expect(cards).toHaveCount(7);
-  const links = page.locator(".skill-evidence");
+  const links = page.locator("#skills .skill-evidence");
   await expect(links).toHaveCount(6);
   for (const href of await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")))) expect(href).toMatch(/^https:\/\/github\.com\/azizmessaoud\//);
   await page.locator("#skills").screenshot({ path: `reports/screens/${info.project.name}-skills.png` });

@@ -13,7 +13,7 @@ const DOMAINS: { icon: Parameters<typeof Icon>[0]["name"]; title: string; chips:
   { icon: "ranking", title: "Machine learning & ranking", chips: ["scikit-learn", "Random Forest", "Grouped holdout", "Precision@50"], hi: ["scikit-learn"], where: "FlyRank capstone", href: `${FLY}/work/capstone_report.md#L38-L44` },
   { icon: "agents", title: "Multi-agent systems", chips: ["SUMO", "TraCI", "Controllers", "Safety rules", "Reason codes"], hi: ["SUMO"], where: "TraffiX (my pair: control)", href: `${TRAFFIX}/README.md#L635-L648` },
   { icon: "document", title: "Document AI", chips: ["Docling", "RapidOCR", "Validation", "Anomaly detection"], hi: ["Docling"], where: "HR prototype", href: `${HR}/README.md#L1-L16` },
-  { icon: "retrieval", title: "Retrieval & evaluation", chips: ["BM25", "Judged questions", "hit@k", "MRR"], hi: ["BM25"], where: "Ask my brain (this site)", href: `${SITE}/src/retrieval/bm25.ts` },
+  { icon: "retrieval", title: "Retrieval & evaluation", chips: ["BM25", "Judged questions", "hit@k", "MRR"], hi: ["BM25"], where: "Ask my brain terminal (this site)", href: `${SITE}/src/retrieval/bm25.ts` },
   { icon: "data", title: "Data engineering", chips: ["DuckDB", "SQL", "Pandas", "Data contracts"], hi: ["DuckDB"], where: "FlyRank capstone notebooks", href: `${FLY}/work/notebooks/w03_data_contract.ipynb` },
   { icon: "api", title: "APIs, apps & tests", chips: ["FastAPI", "Docker", "pytest", "React + TypeScript"], hi: ["FastAPI"], where: "HR prototype · this site", href: `${HR}/README.md#L310-L325` },
 ];

@@ -25,6 +25,15 @@ export default function About() {
             <div><dt>Banque de Tunisie</dt><dd>IT support intern · Jun–Jul 2023</dd></div>
           </dl>
         </div>
+        <div className="volunteer">
+          <h3>Volunteering &amp; clubs</h3>
+          <dl className="timeline" aria-label="Volunteering and clubs">
+            <div><dt>Happy City Index · Researcher (Tunis)</dt><dd>2026 · gathered and checked Tunis data before submission · <a href="https://happy-city-index.com/OurTeam">Our Team page</a></dd></div>
+            <div><dt>DeepFlow · Member</dt><dd>Oct 2025 – present · workshops on RAG, vector search and LLM applications · <a href="https://www.linkedin.com/company/deepflowesprit/">LinkedIn</a></dd></div>
+            <div><dt>ATIA Club ESB · Learning Department</dt><dd>Dec 2024 – present · AI workshops and study sessions</dd></div>
+            <div><dt>IEEE Chapters (PES, IAS, Computer Society) · Member</dt><dd>Oct 2022 – Dec 2023 · workshops and student engineering events</dd></div>
+          </dl>
+        </div>
       </div>
     </section>
   );

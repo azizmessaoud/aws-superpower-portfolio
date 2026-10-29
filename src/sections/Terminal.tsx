@@ -1,14 +1,22 @@
-import { useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { ASK_EVENT } from "../ask";
 import type { Corpus } from "../content/schema";
 import corpusJson from "../generated/corpus.json";
 import { createTerminal, type Line } from "../terminal/commands";
 import Icon from "../ui/Icon";
 
 const PROMPT = "visitor@ask-my-brain:~$";
-const TRY = ["help", "projects", "project flyrank", "ask Is TraffiX deployed in Tunis?"];
+const TRY = [
+  "help",
+  "projects",
+  "ask What did you personally build in the TraffiX team?",
+  "ask Is TraffiX deployed in Tunis?",
+  "ask How did you avoid data leakage?",
+  "ask What is the OCR accuracy on real documents?",
+];
 type Entry = { id: number; cmd?: string; lines: Line[] };
 
-/* The Terminal Explorer: the same verified evidence as Ask my brain, for visitors who prefer typing.
+/* The Terminal Explorer is "Ask my brain": questions and commands over the same verified passages.
  * Tab is never captured (no keyboard trap); ↑/↓ recall history; output is a polite live log. */
 export default function Terminal() {
   const term = useMemo(() => createTerminal(corpusJson as Corpus), []);
@@ -29,6 +37,11 @@ export default function Terminal() {
     setValue("");
     requestAnimationFrame(() => { if (body.current) body.current.scrollTop = body.current.scrollHeight; });
   }
+  useEffect(() => {
+    const on = (e: Event) => exec(`ask ${(e as CustomEvent<string>).detail}`);
+    window.addEventListener(ASK_EVENT, on);
+    return () => window.removeEventListener(ASK_EVENT, on);
+  });
   function onKey(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowUp" && history.length) { e.preventDefault(); const i = Math.min(hIdx + 1, history.length - 1); setHIdx(i); setValue(history[i]); }
     else if (e.key === "ArrowDown" && hIdx >= 0) { e.preventDefault(); const i = hIdx - 1; setHIdx(i); setValue(i >= 0 ? history[i] : ""); }
@@ -37,10 +50,12 @@ export default function Terminal() {
   return (
     <section id="terminal" className="section terminal-section" aria-labelledby="terminal-title">
       <div className="inner">
-        <p className="sec-label">Second way in</p>
-        <h2 id="terminal-title" className="sec-h2">The Terminal Explorer</h2>
+        <p className="sec-label">Creative feature</p>
+        <h2 id="terminal-title" className="sec-h2">Ask my brain: the Terminal Explorer</h2>
         <p className="sec-lead">
-          Prefer typing? The same verified evidence as Ask my brain, as commands. Type <code>help</code> to start.
+          Ask about my projects with <code>ask</code> and your own words. It searches {corpusJson.passages.length} verified passages
+          and shows the evidence behind each match, or says nothing verified answers it. It doesn't write answers and it
+          doesn't judge anyone. Type <code>help</code> to see the other commands.
         </p>
         <div className="term-win" onClick={(e) => { if (!String(getSelection()) && !(e.target as Element).closest("a")) input.current?.focus(); }}>
           <div className="term-bar" aria-hidden="true">

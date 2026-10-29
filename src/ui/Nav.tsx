@@ -6,7 +6,7 @@ const LINKS = [
   ["about", "About"],
   ["skills", "Skills"],
   ["projects", "Projects"],
-  ["terminal", "Terminal"],
+  ["certifications", "Certifications"],
   ["contact", "Contact"],
 ] as const;
 
@@ -14,9 +14,9 @@ interface Props { scene: Scene | null; reduced: boolean; paused: boolean; onTogg
 
 /* Move keyboard focus to where an in-page link lands, so Tab continues from there. */
 function landOn(id: string) {
-  const el = id === "ask" ? document.getElementById("ask-input") : document.getElementById(id);
+  const el = id === "terminal" ? document.getElementById("term-input") : document.getElementById(id);
   if (!el) return;
-  if (id !== "ask" && !el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+  if (id !== "terminal" && !el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
   /* after the browser has followed the #fragment, which would otherwise reset focus */
   setTimeout(() => el.focus({ preventScroll: true }), 0);
 }
@@ -37,7 +37,7 @@ export default function Nav({ scene, reduced, paused, onTogglePause, docked }: P
       (entries) => entries.forEach((e) => e.isIntersecting && setCurrent(e.target.id)),
       { rootMargin: "-45% 0px -50% 0px" },
     );
-    [...LINKS.map(([id]) => id), "ask"].forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+    [...LINKS.map(([id]) => id), "terminal"].forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen((o) => { if (o) toggle.current?.focus(); return false; }); };
     const onDoc = (e: MouseEvent) => { if (nav.current && !nav.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("keydown", onKey);
@@ -68,7 +68,7 @@ export default function Nav({ scene, reduced, paused, onTogglePause, docked }: P
           </button>
         )}
         {/* The brain docks here at the end of the hero; the link is the hint to the creative feature on every screen. */}
-        <a className={`nav-cta${docked ? " is-docked" : ""}`} href="#ask" aria-current={current === "ask" ? "true" : undefined} onClick={() => { setOpen(false); landOn("ask"); }}
+        <a className={`nav-cta${docked ? " is-docked" : ""}`} href="#terminal" aria-current={current === "terminal" ? "true" : undefined} onClick={() => { setOpen(false); landOn("terminal"); }}
           onMouseEnter={wake(true)} onMouseLeave={wake(false)} onFocus={wake(true)} onBlur={wake(false)}>
           <span className="dock-brain" aria-hidden="true" />
           <span className="cta-label">Ask my brain</span>

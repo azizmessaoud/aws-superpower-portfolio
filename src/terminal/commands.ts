@@ -1,4 +1,4 @@
-/* The Terminal Explorer: a second way into the same verified evidence as Ask my brain.
+/* The Terminal Explorer is Ask my brain: verified evidence reached by typing.
  * Pure: takes a command line, returns lines to print. Every fact comes from the corpus or the
  * evidence register; nothing here is invented, and `ask` uses the same retriever. */
 import type { Corpus } from "../content/schema";

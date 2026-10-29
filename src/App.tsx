@@ -5,7 +5,7 @@ import Hero from "./sections/Hero";
 import About from "./sections/About";
 import Skills from "./sections/Skills";
 import Projects from "./sections/Projects";
-import AskMyBrain from "./sections/AskMyBrain";
+import Certifications from "./sections/Certifications";
 import Contact from "./sections/Contact";
 import Terminal from "./sections/Terminal";
 
@@ -48,8 +48,8 @@ export default function App() {
         <About />
         <Skills />
         <Projects />
-        <AskMyBrain />
         <Terminal />
+        <Certifications />
         <Contact />
       </main>
       <footer className="footer">

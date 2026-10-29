@@ -22,7 +22,7 @@ export default function Hero() {
             Every answer here links to the repository, report or notebook it came from, including what didn't work.
           </p>
           <div className="ctas">
-            <a className="btn-primary" href="#ask">Ask my brain <Icon name="arrow" /></a>
+            <a className="btn-primary" href="#terminal">Ask my brain <Icon name="arrow" /></a>
             <a className="btn-ghost" href="#projects">See the projects</a>
           </div>
           <p className="hint">
