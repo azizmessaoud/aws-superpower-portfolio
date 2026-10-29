@@ -92,22 +92,28 @@ test("the about section shows my portrait with a text alternative", async ({ pag
   expect(await img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth)).toBeGreaterThan(0);
 });
 
-test("motion control pauses and resumes the scene without changing the scroll position", async ({ page }) => {
+test("motion control pauses and resumes the scene, and remembers the visitor preference", async ({ page }) => {
   await page.goto("/");
   await page.waitForTimeout(900);
   const y = await page.evaluate(() => scrollY);
-  const toggle = page.getByRole("button", { name: "Pause motion" });
-  await expect(toggle).toBeVisible();
-  await toggle.click();
+  await page.getByRole("button", { name: "Pause motion" }).click();
   await expect(page.getByRole("button", { name: "Resume motion" })).toBeVisible();
   const pausedAt = await frames(page);
   await page.waitForTimeout(350);
   expect(await frames(page)).toBe(pausedAt);
   expect(await page.evaluate(() => scrollY)).toBe(y);
+
+  await page.reload();
+  await page.waitForTimeout(700);
+  await expect(page.getByRole("button", { name: "Resume motion" })).toBeVisible();
+  const afterReload = await frames(page);
+  await page.waitForTimeout(350);
+  expect(await frames(page)).toBe(afterReload);
+
   await page.getByRole("button", { name: "Resume motion" }).click();
   await expect(page.getByRole("button", { name: "Pause motion" })).toBeVisible();
   await page.waitForTimeout(350);
-  expect(await frames(page)).toBeGreaterThan(pausedAt);
+  expect(await frames(page)).toBeGreaterThan(afterReload);
 });
 
 test("certifications link out to each issuer", async ({ page }) => {
