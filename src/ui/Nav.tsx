@@ -26,7 +26,10 @@ export default function Nav({ scene, docked, reduced }: Props) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const [motionPaused, setMotionPaused] = useState(false);
+  const [motionPaused, setMotionPaused] = useState(() => {
+    try { return localStorage.getItem("portfolio-motion-paused") === "true"; }
+    catch { return false; }
+  });
   const toggle = useRef<HTMLButtonElement>(null);
   const nav = useRef<HTMLElement>(null);
 
@@ -46,6 +49,11 @@ export default function Nav({ scene, docked, reduced }: Props) {
     document.addEventListener("click", onDoc);
     return () => { window.removeEventListener("scroll", onScroll); io.disconnect(); document.removeEventListener("keydown", onKey); document.removeEventListener("click", onDoc); };
   }, []);
+  useEffect(() => {
+    try { localStorage.setItem("portfolio-motion-paused", String(motionPaused)); }
+    catch { /* Motion control still works for this visit if storage is unavailable. */ }
+  }, [motionPaused]);
+
   /* Keep the control and scene in sync, including when the scene is recreated after a preference change. */
   useEffect(() => {
     if (!scene) return;
