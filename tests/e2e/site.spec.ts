@@ -366,3 +366,18 @@ test("stopping the scroll mid-way never leaves the brain hanging: it finishes th
   await scrollPage(page, Math.round(run * 0.5));          /* scroll back above it: the brain flies back out */
   await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
 });
+
+test("clicking on the hero text still sends a pulse through the network", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "hover/click journey is for pointer devices");
+  await page.goto("/");
+  await page.waitForTimeout(1500);
+  const pulses = () => page.evaluate(() => (window as unknown as { __scene: { pulseCount: number } }).__scene.pulseCount);
+  const before = await pulses();
+  await page.locator(".hero-lead").click({ position: { x: 40, y: 20 } });
+  expect(await pulses()).toBeGreaterThan(before);
+  /* a real control keeps its own click and sends no pulse */
+  const mid = await pulses();
+  await page.getByRole("button", { name: "Pause motion" }).click();
+  expect(await pulses()).toBeLessThanOrEqual(mid);
+});
+

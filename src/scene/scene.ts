@@ -379,7 +379,8 @@ export function createScene(o: SceneOptions) {
   };
   const onLeave = () => { pointer.active = false; pointer.tx = pointer.ty = -999; };
   const onClick = (e: MouseEvent) => {
-    if (paused || o.reducedMotion || (e.target as Element).closest("a, button, input, h1, p, li, dd, dt, label")) return;
+    /* Only real controls and a text selection in progress keep their click; plain text no longer blocks the pulse. */
+    if (paused || o.reducedMotion || (e.target as Element).closest("a, button, input, label") || String(getSelection())) return;
     let best = -1, bd = Infinity;
     proj.forEach((p, i) => { const d = Math.hypot(p.x - e.clientX, p.y - e.clientY); if (p.a > 0.1 && d < bd) { bd = d; best = i; } });
     if (best < 0) return;
@@ -413,6 +414,7 @@ export function createScene(o: SceneOptions) {
     remeasure() { measure(); still(); },
     get paused() { return paused; },
     get frames() { return frame; },
+    get pulseCount() { return pulses.length; },
     get running() { return raf !== 0; },
     destroy() {
       destroyed = true; if (raf) cancelAnimationFrame(raf); raf = 0;
