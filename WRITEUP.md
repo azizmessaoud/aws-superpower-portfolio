@@ -56,7 +56,7 @@ hosting (prepared, NOT deployed): GitHub --> AWS Amplify Hosting build (npm ci, 
 
 ## Stress test of the question box (29 Oct 2026)
 
-My first judged questions were written to match the passages, so they proved little. I then threw about 600 messy, real-world inputs at the engine (greetings, one-word asks, slang, typos, French and Arabic/Derja, follow-ups, compound questions, premise traps, injection attempts, personal questions, "are you ChatGPT", random Unicode) and graded the **class** of answer, not its wording. Each of four held-out sets was run **once, before** I fixed anything it exposed; those first-run numbers are saved in `reports/`:
+My first judged questions were written to match the passages, so they proved little. I then threw about 470 hand-written messy inputs, plus 600 random strings, at the engine (greetings, one-word asks, slang, typos, French and Arabic/Derja, follow-ups, compound questions, premise traps, injection attempts, personal questions, "are you ChatGPT", random Unicode) and graded the **class** of answer, not its wording. Each of four held-out sets was run **once, before** I fixed anything it exposed; those first-run numbers are saved in `reports/`:
 
 | Set (fresh wording each time) | First run | After the fixes it exposed |
 |---|---|---|

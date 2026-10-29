@@ -39,7 +39,7 @@ npm run build          # validate content → build data → type-check → buil
 npm test               # Vitest: answer engine, mind state, retrieval, terminal, geometry
 npm run validate       # content rules (claims, sources, AWS status, deny-list)
 npm run eval:retrieval # judged questions → reports/retrieval-keyword.json
-npm run stress         # ~600 messy questions graded by answer class → reports/stress-report.md
+npm run stress         # ~470 messy questions graded by answer class → reports/stress-report.md
 npm run contrast       # WCAG pairs from src/styles/tokens.css
 npx playwright test    # browser checks at 1280 and 390 px (needs `npm run build` first)
 ```
