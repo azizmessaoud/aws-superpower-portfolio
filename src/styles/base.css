@@ -62,7 +62,7 @@ button { font: inherit; color: inherit; }
 .hero { position: relative; }
 .hero-stage { position: sticky; top: 0; min-height: 100vh; min-height: 100svh; display: flex; align-items: center; overflow: hidden; }
 .hero-runway { height: 0; }
-@media (prefers-reduced-motion: no-preference) { html.js .hero-runway { height: 80vh; height: 80svh; } }
+@media (prefers-reduced-motion: no-preference) { html.js .hero-runway { height: 70vh; height: 70svh; } }
 /* one decorative canvas for the whole page, above everything so the brain can dock into the nav; it never
  * draws over text or controls (the scene keeps out of them) and never takes pointer events */
 .brain-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100lvh; display: block; z-index: 210; pointer-events: none; }

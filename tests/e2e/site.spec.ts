@@ -221,8 +221,8 @@ test("the brain docks into the nav's Ask my brain link; it is a keyboard-reachab
   await expect(cta).toBeVisible();                       /* the hint is in the nav from the first screen */
   await expect(cta).not.toHaveClass(/is-docked/);
   const run = await runway(page);
-  await scrollPage(page, Math.round(run * 0.8));
-  await page.waitForTimeout(500);
+  await scrollPage(page, Math.round(run * 0.9));
+  await page.waitForTimeout(330);                         /* mid-flight */
   await page.screenshot({ path: `reports/screens/${info.project.name}-docking.png` });
   await scrollPage(page, run + 400);
   await page.waitForTimeout(600);
@@ -267,7 +267,7 @@ test("the docked brain is actually drawn inside its socket", async ({ page }) =>
   await page.goto("/");
   await page.waitForTimeout(800);
   await scrollPage(page, (await runway(page)) + 400);
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(1000);
   const lit = await page.evaluate(() => {
     const c = document.querySelector<HTMLCanvasElement>(".brain-canvas")!, r = document.querySelector(".nav-cta .dock-brain")!.getBoundingClientRect();
     const k = c.width / innerWidth, d = c.getContext("2d")!.getImageData(Math.round(r.left * k), Math.round(r.top * k), Math.round(r.width * k), Math.round(r.height * k)).data;
@@ -328,4 +328,16 @@ test("the neural field fills the whole hero background, not only the sphere", as
   });
   expect(lit.left).toBeGreaterThan(200);                     /* the field reaches the text side too */
   expect(lit.right).toBeGreaterThan(200);
+});
+
+test("stopping the scroll mid-way never leaves the brain hanging: it finishes the flight", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(800);
+  const run = await runway(page);
+  await scrollPage(page, Math.round(run * 0.87));         /* just past the threshold, then stop */
+  await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/, { timeout: 2000 });
+  await page.waitForTimeout(150);
+  expect(await running(page)).toBe(false);               /* landed, loop idle */
+  await scrollPage(page, Math.round(run * 0.5));          /* scroll back above it: the brain flies back out */
+  await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
 });

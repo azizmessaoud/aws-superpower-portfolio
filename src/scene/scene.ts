@@ -4,7 +4,7 @@
  * rest of the page; it moves there only while the dock is hovered or focused.
  * Never draws inside the hero text or behind fixed controls. The loop runs only while something visible moves
  * and the visitor has not paused; reduced motion draws still frames that follow the scroll. No preventDefault on touch. */
-import { buildEdges, cameraZoom, dockTravel, placeSphere, seedBrain, seedShell, type Box, type Edge, type ShellNode } from "./geometry";
+import { buildEdges, cameraZoom, DOCK_AT, placeSphere, seedBrain, seedShell, travelAt, TRAVEL_MS, type Box, type Edge, type ShellNode } from "./geometry";
 import { mulberry32 } from "./rng";
 
 const SETTINGS = {
@@ -51,6 +51,7 @@ export function createScene(o: SceneOptions) {
   let progress = 0, stageTop = 0, text: Box | null = null, fixedOut: Box[] = [], sphere = { cx: 0, cy: 0, R: 0 };
   let dock = { cx: 0, cy: 0, r: 0 }, dockAllowed = true, dockActive = false, docked = false;
   let heroVisible = true, paused = false, destroyed = false;
+  let travelFrom = 0, travelTo = 0, travelStart = 0;
   const introStart = o.intro && !o.reducedMotion ? performance.now() : 0;
   const excitation = new Map<number, number>();
   const pointer = { tx: -999, ty: -999, x: -999, y: -999, active: false };
@@ -122,10 +123,22 @@ export function createScene(o: SceneOptions) {
     stageTop = o.stage.getBoundingClientRect().top;
     if (run) progress = clamp(-o.hero.getBoundingClientRect().top / run, 0, 1);
     else progress = 0;
-    /* docked: the brain has arrived (motion), or the hero has mostly left the screen (reduced motion) */
-    const now = run ? progress >= 0.999 : stageTop + stageH < H * 0.35;
-    if (now !== docked) { docked = now; o.onDocked?.(docked); sync(); }
+    if (run) {
+      /* past DOCK_AT the brain flies to the nav by itself and always lands; above it, it flies back */
+      const to = progress >= DOCK_AT ? 1 : 0;
+      if (to !== travelTo) {
+        const t = performance.now();
+        /* paused, or the visitor jumped past the hero (e.g. a nav link): land instantly, nothing to watch */
+        travelFrom = paused || stageTop + stageH <= 0 ? to : travelNow(t);
+        travelTo = to; travelStart = t;
+        if (to === 0) setDocked(false);
+        sync();
+      }
+    } else setDocked(stageTop + stageH < H * 0.35); /* reduced motion: docked once the hero has mostly left */
   }
+  const travelNow = (t: number) => (travelStart ? travelAt(travelFrom, travelTo, t - travelStart) : travelTo);
+  const travelling = (t: number) => travelStart !== 0 && t - travelStart < TRAVEL_MS && travelFrom !== travelTo;
+  function setDocked(d: boolean) { if (d !== docked) { docked = d; o.onDocked?.(docked); sync(); } }
 
   /* project a model point; (cx, cy, k) place and scale it on screen */
   function project(x: number, y: number, z: number, cx: number, cy: number, k: number, cosY: number, sinY: number) {
@@ -139,7 +152,8 @@ export function createScene(o: SceneOptions) {
     const still = o.reducedMotion, t = frame * 0.016;
     const intro = introStart ? clamp((now - introStart) / 1800, 0, 1) : 1;
     const zoom = cameraZoom(intro, progress);
-    const travel = o.reducedMotion ? 0 : dockTravel(progress);
+    const travel = o.reducedMotion ? 0 : travelNow(now);
+    if (!o.reducedMotion && travelTo === 1 && travel >= 1) setDocked(true);
     const heroOn = stageTop + stageH > 0 && travel < 1;
     const shell = clamp((1.9 - zoom) / 0.9, 0, 1) * (1 - span(travel, 0, 0.4));
     const tags = span(1 - Math.pow(1 - intro, 3), 0.7, 1) * (1 - span(progress, 0, 0.25));
@@ -326,7 +340,7 @@ export function createScene(o: SceneOptions) {
   }
 
   /* the loop runs only while something visible moves: the hero on screen, or a hovered/focused dock */
-  const shouldRun = () => !paused && !document.hidden && !o.reducedMotion && !destroyed && ((heroVisible && !docked) || (docked && dockActive && dockAllowed));
+  const shouldRun = () => !paused && !document.hidden && !o.reducedMotion && !destroyed && ((heroVisible && !docked) || travelling(performance.now()) || (docked && dockActive && dockAllowed));
   function loop(now: number) {
     raf = 0;
     if (!shouldRun()) { still(); return; }
@@ -371,7 +385,7 @@ export function createScene(o: SceneOptions) {
   draw(performance.now());
 
   return {
-    pause() { paused = true; sync(); still(); },
+    pause() { paused = true; if (travelStart) { travelFrom = travelTo; } sync(); still(); },
     resume() { paused = false; sync(); },
     /** dock hovered or focused: the docked brain may move (if not paused) */
     setDockActive(on: boolean) { dockActive = on; if (on && !paused) flash = 0.6; sync(); still(); },

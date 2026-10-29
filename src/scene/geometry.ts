@@ -61,16 +61,19 @@ export function buildEdges(nodes: ShellNode[], neighbors: number): Edge[] {
 /** Camera zoom: pull back on open (intro 0→1), then dolly into the brain over the first part of the scroll. */
 export const ZOOM_OPEN = 2.6;
 export const ZOOM_DEEP = 2.4;
-export const DOLLY_END = 0.55;
+export const DOLLY_END = 0.75;
+/** Past this point of the pinned scroll the brain flies to the nav on its own (and back when scrolled above it). */
+export const DOCK_AT = 0.85;
+export const TRAVEL_MS = 750;
 const ease3 = (p: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, p)), 3);
 export function cameraZoom(intro: number, scroll: number) {
   return ZOOM_OPEN + (1 - ZOOM_OPEN) * ease3(intro) + (ZOOM_DEEP - 1) * ease3((scroll - 0.05) / (DOLLY_END - 0.05));
 }
 
-/** How far the brain has travelled from the hero to the dock (0 = in the hero, 1 = docked). */
-export function dockTravel(scroll: number) {
-  const t = Math.min(1, Math.max(0, (scroll - DOLLY_END) / (1 - DOLLY_END)));
-  return t * t * (3 - 2 * t);
+/** Time-based flight between hero and dock: from → to over TRAVEL_MS, smoothstep-eased; always completes. */
+export function travelAt(from: number, to: number, elapsedMs: number) {
+  const t = Math.min(1, Math.max(0, elapsedMs / TRAVEL_MS));
+  return from + (to - from) * t * t * (3 - 2 * t);
 }
 
 export interface Box { l: number; t: number; r: number; b: number }

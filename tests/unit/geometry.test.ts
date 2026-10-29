@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildEdges, cameraZoom, dockTravel, placeSphere, seedBrain, seedShell, ZOOM_DEEP, ZOOM_OPEN } from "../../src/scene/geometry";
+import { buildEdges, cameraZoom, placeSphere, seedBrain, seedShell, travelAt, TRAVEL_MS, ZOOM_DEEP, ZOOM_OPEN } from "../../src/scene/geometry";
 
 describe("scene geometry", () => {
   it("seeds the same brain every time", () => {
@@ -22,10 +22,12 @@ describe("scene geometry", () => {
     expect(cameraZoom(1, 0)).toBeCloseTo(1);
     expect(cameraZoom(1, 1)).toBeCloseTo(ZOOM_DEEP);
   });
-  it("travels to the dock only after the dolly, and arrives exactly at the end", () => {
-    expect(dockTravel(0.5)).toBe(0);
-    expect(dockTravel(0.8)).toBeGreaterThan(0);
-    expect(dockTravel(1)).toBe(1);
+  it("the flight to the nav is time-based and always lands exactly", () => {
+    expect(travelAt(0, 1, 0)).toBe(0);
+    expect(travelAt(0, 1, TRAVEL_MS / 2)).toBeCloseTo(0.5);
+    expect(travelAt(0, 1, TRAVEL_MS * 3)).toBe(1);
+    expect(travelAt(1, 0, TRAVEL_MS)).toBe(0);          /* and back out */
+    expect(travelAt(0.4, 1, TRAVEL_MS)).toBe(1);        /* reversing mid-flight still lands */
   });
   it("keeps the sphere clear of the text box", () => {
     const text = { l: 60, t: 200, r: 760, b: 640 };
