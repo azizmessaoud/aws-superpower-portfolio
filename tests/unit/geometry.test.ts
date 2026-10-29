@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildEdges, cameraZoom, placeSphere, seedBrain, seedShell, ZOOM_DEEP, ZOOM_OPEN } from "../../src/scene/geometry";
+import { buildEdges, cameraZoom, dockTravel, placeSphere, seedBrain, seedShell, ZOOM_DEEP, ZOOM_OPEN } from "../../src/scene/geometry";
 
 describe("scene geometry", () => {
   it("seeds the same brain every time", () => {
@@ -21,6 +21,11 @@ describe("scene geometry", () => {
     expect(cameraZoom(0, 0)).toBeCloseTo(ZOOM_OPEN);
     expect(cameraZoom(1, 0)).toBeCloseTo(1);
     expect(cameraZoom(1, 1)).toBeCloseTo(ZOOM_DEEP);
+  });
+  it("travels to the dock only after the dolly, and arrives exactly at the end", () => {
+    expect(dockTravel(0.5)).toBe(0);
+    expect(dockTravel(0.8)).toBeGreaterThan(0);
+    expect(dockTravel(1)).toBe(1);
   });
   it("keeps the sphere clear of the text box", () => {
     const text = { l: 60, t: 200, r: 760, b: 640 };

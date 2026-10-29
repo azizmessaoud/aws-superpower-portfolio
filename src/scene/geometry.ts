@@ -58,12 +58,19 @@ export function buildEdges(nodes: ShellNode[], neighbors: number): Edge[] {
   return edges;
 }
 
-/** Camera zoom for a moment of the sequence: pull back on open (intro 0→1), dolly in with scroll (0→1). */
+/** Camera zoom: pull back on open (intro 0→1), then dolly into the brain over the first part of the scroll. */
 export const ZOOM_OPEN = 2.6;
-export const ZOOM_DEEP = 3.4;
+export const ZOOM_DEEP = 2.4;
+export const DOLLY_END = 0.55;
+const ease3 = (p: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, p)), 3);
 export function cameraZoom(intro: number, scroll: number) {
-  const e = (p: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, p)), 3);
-  return ZOOM_OPEN + (1 - ZOOM_OPEN) * e(intro) + (ZOOM_DEEP - 1) * e((scroll - 0.05) / 0.95);
+  return ZOOM_OPEN + (1 - ZOOM_OPEN) * ease3(intro) + (ZOOM_DEEP - 1) * ease3((scroll - 0.05) / (DOLLY_END - 0.05));
+}
+
+/** How far the brain has travelled from the hero to the dock (0 = in the hero, 1 = docked). */
+export function dockTravel(scroll: number) {
+  const t = Math.min(1, Math.max(0, (scroll - DOLLY_END) / (1 - DOLLY_END)));
+  return t * t * (3 - 2 * t);
 }
 
 export interface Box { l: number; t: number; r: number; b: number }

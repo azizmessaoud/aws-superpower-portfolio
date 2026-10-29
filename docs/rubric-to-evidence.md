@@ -35,9 +35,10 @@ Judging process (official): Gate 1 "AI and human scoring", top 50 advance; Gate 
 | `docs/source-inventory.md` | All | revision 3 appended (new CV sources) |
 | `docs/evidence-register.md` | Communication; truthful content | revision 3 appended (FR-08 resolved, CV-3 conflicts, D8) |
 | `validate-content` | Communication; completeness | **PASS** — `reports/logs/validate.txt`; caught 2 real issues on first run |
-| Vitest (tokenizer, BM25, retriever floor, scene geometry) | Creativity; working feature | **PASS** 20/20 — `reports/logs/vitest.txt` |
+| Vitest (tokenizer, BM25, retriever floor, scene geometry) | Creativity; working feature | **PASS** 21/21 — `reports/logs/vitest.txt` |
 | Retrieval eval, 15 judged questions | Creativity | **PASS** hit@1 0.93, hit@3 1.00, MRR 0.964 — `reports/retrieval-keyword.json` |
-| Playwright local (hero start/middle/end, overflow, mobile menu, retrieval states, pause never self-resumes, offscreen stop, reduced motion, keyboard focus, touch scroll, CLS, CSP) | Creativity; usability | **PASS** 25 passed, 3 skipped by design — `reports/logs/playwright.txt`, `reports/screens/` |
+| Playwright local (hero start/middle/end, brain docking into the nav, overflow, mobile menu, retrieval states, pause never self-resumes, idle/offscreen stop, reduced motion, keyboard focus, skip link, touch scroll, CLS, CSP) | Creativity; usability | **PASS** 35 passed, 3 skipped by design — `reports/logs/playwright.txt`, `reports/screens/` |
+| WCAG 2.1 AA audit (`docs/accessibility-audit.md`) | Usability | **PASS (local)** — 9 issues found and fixed; real screen readers NOT RUN |
 | axe-core | Usability | **PASS** 0 serious/critical (1280 and 390) |
 | Contrast script | Usability | **PASS** 38/38 — `reports/logs/contrast.txt` |
 | gitleaks + `.gitignore` | AWS implementation hygiene | **PASS** no leaks (dir scan); `.env*` and Amplify local config ignored (`git check-ignore`). Pre-commit hook and CI NOT SET UP |

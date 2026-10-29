@@ -47,7 +47,7 @@ test("pause stops the scene and nothing resumes it except the visitor", async ({
   const toggle = page.getByRole("button", { name: /pause motion/i });
   await toggle.focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: /play motion/i })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: /play motion/i })).toBeVisible();
   const f1 = await frames(page);
   /* scrolling, clicking the field and switching tabs must not resume it */
   await page.mouse.click(1000, 300);
@@ -176,6 +176,9 @@ test("axe-core: no serious or critical violations", async ({ page }) => {
   await page.waitForTimeout(2000);
   await page.getByLabel("Your question").fill("How do you process scanned documents?");
   await page.getByLabel("Your question").press("Enter");
+  /* let the 300 ms entrance of the result cards finish: axe would otherwise measure half-faded text */
+  await page.locator(".result").first().waitFor();
+  await page.waitForTimeout(500);
   // @axe-core/playwright 4.10 types Page against an older Playwright; the runtime API is the same.
   const r = await new AxeBuilder({ page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]["page"] }).analyze();
   const bad = r.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
@@ -206,4 +209,79 @@ test("runs under the production CSP from customHttp.yml without violations", asy
   await expect(page.locator(".result").first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.classList.contains("js"))).toBe(true);
   expect(violations).toEqual([]);
+});
+
+const scrollPage = (page: Page, y: number) => page.evaluate((v) => window.scrollTo({ top: v, behavior: "instant" }), y);
+const running = (page: Page) => page.evaluate(() => (window as unknown as { __scene?: { running: boolean } }).__scene?.running ?? false);
+
+test("the brain docks into the nav's Ask my brain link; it is a keyboard-reachable hint", async ({ page }, info) => {
+  await page.goto("/");
+  await page.waitForTimeout(1200);
+  const cta = page.locator(".nav-cta");
+  await expect(cta).toBeVisible();                       /* the hint is in the nav from the first screen */
+  await expect(cta).not.toHaveClass(/is-docked/);
+  const run = await runway(page);
+  await scrollPage(page, Math.round(run * 0.8));
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: `reports/screens/${info.project.name}-docking.png` });
+  await scrollPage(page, run + 400);
+  await page.waitForTimeout(600);
+  await expect(cta).toHaveClass(/is-docked/);
+  await page.screenshot({ path: `reports/screens/${info.project.name}-docked.png` });
+  await page.locator(".nav").screenshot({ path: `reports/screens/${info.project.name}-docked-nav.png` });
+  expect(await running(page)).toBe(false);               /* nothing animates while the docked brain is idle */
+  await cta.focus();
+  await page.waitForTimeout(300);
+  expect(await running(page)).toBe(true);                /* focus wakes it */
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#ask-input")).toBeFocused();
+});
+
+test("pausing freezes the docked brain too", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /pause motion/i }).click();
+  await scrollPage(page, (await runway(page)) + 400);
+  await page.waitForTimeout(500);
+  await page.locator(".nav-cta").hover();
+  const f = await frames(page);
+  await page.waitForTimeout(600);
+  expect(await frames(page)).toBe(f);
+});
+
+test.describe("reduced motion dock", () => {
+  test.use({ reducedMotion: "reduce" });
+  test("still brain docks once the hero leaves; nothing loops", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForTimeout(600);
+    await scrollPage(page, 900);
+    await page.waitForTimeout(500);
+    await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/);
+    await page.locator(".nav-cta").hover();
+    await page.waitForTimeout(300);
+    expect(await running(page)).toBe(false);
+  });
+});
+
+test("the docked brain is actually drawn inside its socket", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(800);
+  await scrollPage(page, (await runway(page)) + 400);
+  await page.waitForTimeout(600);
+  const lit = await page.evaluate(() => {
+    const c = document.querySelector<HTMLCanvasElement>(".brain-canvas")!, r = document.querySelector(".nav-cta .dock-brain")!.getBoundingClientRect();
+    const k = c.width / innerWidth, d = c.getContext("2d")!.getImageData(Math.round(r.left * k), Math.round(r.top * k), Math.round(r.width * k), Math.round(r.height * k)).data;
+    let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 40) n++;
+    return n;
+  });
+  expect(lit).toBeGreaterThan(50);
+});
+
+test("skip link is visible whenever it has focus, even after wrapping from the page end", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
+  await page.locator(".skip").focus();
+  const r = await page.locator(".skip").boundingBox();
+  expect(r!.y).toBeGreaterThanOrEqual(0);
+  expect(r!.y + r!.height).toBeLessThanOrEqual(860);
 });

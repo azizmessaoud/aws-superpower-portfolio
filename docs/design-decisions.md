@@ -30,7 +30,8 @@
 - **Supporting motion only where it explains state:** result cards rise 8 px once; nav underline marks the current section; buttons press to 0.97 for 100 ms.
 - **CSS transitions, no Motion library.** The spec asked to compare: everything here is opacity/transform on known elements, so Motion's ~30 kB buys nothing yet.
 - **Canvas 2D, not WebGL:** ≈1,400 brain points and 64 nodes draw well inside a 60 fps budget, and 2D is simpler to test and pause.
-- **Controls:** visible Pause/Play (`aria-pressed`), remembered across reloads; nothing resumes it except the visitor. The loop stops offscreen and in hidden tabs. Reduced motion: no pin, no intro, one still frame, no pause button (nothing moves).
+- **Whole page (29 Oct):** one fixed canvas. At the end of the pinned scroll (80 svh) the brain shrinks and flies into the nav's "Ask my brain" link, which shows an empty ring until it arrives. Rejected first try: a floating bottom-right dock, because on phones it covered body text.
+- **Controls:** Pause/Play lives in the nav, so it is reachable on every screen (WCAG 2.2.2); remembered across reloads; nothing resumes it except the visitor. The loop runs only while the hero moves or the docked brain is hovered/focused; it stops in hidden tabs. Reduced motion: no pin, no intro, still frames that follow the scroll, no pause button (nothing moves).
 - **Clear text:** the scene measures the headline, lead, buttons and hint every resize and never draws brain dots, nodes or labels inside them, nor behind the pause button.
 
 ## Retrieval

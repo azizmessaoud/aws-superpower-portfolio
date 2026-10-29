@@ -1,15 +1,26 @@
 import { useEffect, useRef, useState } from "react";
+import type { Scene } from "../scene/scene";
 import Icon from "./Icon";
 
 const LINKS = [
   ["about", "About"],
   ["skills", "Skills"],
   ["projects", "Projects"],
-  ["ask", "Ask my brain"],
   ["contact", "Contact"],
 ] as const;
 
-export default function Nav() {
+interface Props { scene: Scene | null; reduced: boolean; paused: boolean; onTogglePause: () => void; docked: boolean }
+
+/* Move keyboard focus to where an in-page link lands, so Tab continues from there. */
+function landOn(id: string) {
+  const el = id === "ask" ? document.getElementById("ask-input") : document.getElementById(id);
+  if (!el) return;
+  if (id !== "ask" && !el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+  /* after the browser has followed the #fragment, which would otherwise reset focus */
+  setTimeout(() => el.focus({ preventScroll: true }), 0);
+}
+
+export default function Nav({ scene, reduced, paused, onTogglePause, docked }: Props) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -25,13 +36,17 @@ export default function Nav() {
       (entries) => entries.forEach((e) => e.isIntersecting && setCurrent(e.target.id)),
       { rootMargin: "-45% 0px -50% 0px" },
     );
-    LINKS.forEach(([id]) => { const el = document.getElementById(id); if (el) io.observe(el); });
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setOpen((o) => { if (o) toggle.current?.focus(); return false; }); } };
+    [...LINKS.map(([id]) => id), "ask"].forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen((o) => { if (o) toggle.current?.focus(); return false; }); };
     const onDoc = (e: MouseEvent) => { if (nav.current && !nav.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("keydown", onKey);
     document.addEventListener("click", onDoc);
     return () => { window.removeEventListener("scroll", onScroll); io.disconnect(); document.removeEventListener("keydown", onKey); document.removeEventListener("click", onDoc); };
   }, []);
+  /* the scene keeps out of the open menu panel */
+  useEffect(() => { const id = setTimeout(() => scene?.remeasure(), 220); return () => clearTimeout(id); }, [open, scene]);
+
+  const wake = (on: boolean) => () => scene?.setDockActive(on);
 
   return (
     <nav ref={nav} className={`nav${scrolled ? " is-scrolled" : ""}${open ? " is-open" : ""}`} aria-label="Main">
@@ -39,12 +54,24 @@ export default function Nav() {
       <ul className="nav-links" id="nav-links">
         {LINKS.map(([id, label]) => (
           <li key={id}>
-            <a href={`#${id}`} aria-current={current === id ? "true" : undefined} onClick={() => setOpen(false)}>{label}</a>
+            <a href={`#${id}`} aria-current={current === id ? "true" : undefined} onClick={() => { setOpen(false); landOn(id); }}>{label}</a>
           </li>
         ))}
       </ul>
       <div className="nav-end">
-        <a className="nav-cta" href="#ask">Ask my brain <Icon name="arrow" /></a>
+        {!reduced && (
+          /* the label states the action; no aria-pressed, so assistive tech never hears two conflicting states */
+          <button className={`motion-toggle${paused ? " is-paused" : ""}`} type="button" onClick={onTogglePause}>
+            <Icon name={paused ? "play" : "pause"} />
+            <span className="motion-label">{paused ? "Play motion" : "Pause motion"}</span>
+          </button>
+        )}
+        {/* The brain docks here at the end of the hero; the link is the hint to the creative feature on every screen. */}
+        <a className={`nav-cta${docked ? " is-docked" : ""}`} href="#ask" aria-current={current === "ask" ? "true" : undefined} onClick={() => { setOpen(false); landOn("ask"); }}
+          onMouseEnter={wake(true)} onMouseLeave={wake(false)} onFocus={wake(true)} onBlur={wake(false)}>
+          <span className="dock-brain" aria-hidden="true" />
+          <span className="cta-label">Ask my brain</span>
+        </a>
         <button ref={toggle} className="nav-toggle" type="button" aria-expanded={open} aria-controls="nav-links"
           aria-label={open ? "Close menu" : "Menu"} onClick={() => setOpen((o) => !o)}>
           <Icon name={open ? "close" : "menu"} />

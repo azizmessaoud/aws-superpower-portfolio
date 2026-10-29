@@ -1,0 +1,84 @@
+{
+ "axe-desktop": [],
+ "axe-desktop-incomplete": [
+  "color-contrast (124)"
+ ],
+ "targets-desktop": [],
+ "axe-mobile": [],
+ "axe-mobile-incomplete": [
+  "color-contrast (124)"
+ ],
+ "targets-mobile": [],
+ "reflow-320px": {
+  "overflowX": 0,
+  "clipped": 0
+ },
+ "reflow-zoom200": {
+  "overflowX": 0,
+  "clipped": 0
+ },
+ "keyboard": [
+  "1. Skip to content",
+  "2. Aziz Messaoud, back to top",
+  "3. About",
+  "4. Skills",
+  "5. Projects",
+  "6. Contact",
+  "7. Pause motion",
+  "8. Ask my brain",
+  "9. Ask my brain",
+  "10. See the projects",
+  "11. “Are ambulances faster with Traffi",
+  "12. README @ d54b071  (opens GitHub) [OFFSCREEN] [OBSCURED by hero-stage]",
+  "13. Validation report §5.3–5.5  (opens [OFFSCREEN] [OBSCURED by hero-stage]",
+  "14. Capstone report @ a220b9e  (opens  [OFFSCREEN] [OBSCURED by hero-stage]",
+  "15. Notebook w05 (cell output)  (opens [OFFSCREEN] [OBSCURED by hero-stage]",
+  "16. README @ 437a514  (opens GitHub) [OFFSCREEN] [OBSCURED by hero-stage]",
+  "17. Live portfolio HR card source  (op [OFFSCREEN] [OBSCURED by hero-stage]",
+  "18. e.g. How do you process scanned do [OFFSCREEN] [OBSCURED by hero-stage]",
+  "19. Search [OFFSCREEN] [OBSCURED by hero-stage]",
+  "20. Is TraffiX deployed in Tunis? [OFFSCREEN] [OBSCURED by hero-stage]",
+  "21. How did you avoid data leakage? [OFFSCREEN] [OBSCURED by hero-stage]",
+  "22. What is the OCR accuracy on real d [OFFSCREEN] [OBSCURED by hero-stage]",
+  "23. What did you personally build in t [OFFSCREEN] [OBSCURED by hero-stage]",
+  "24. Copy [OFFSCREEN] [OBSCURED by hero-stage]",
+  "25. Email [OFFSCREEN] [OBSCURED by hero-stage]",
+  "26. GitHub [OFFSCREEN] [OBSCURED by hero-stage]",
+  "27. LinkedIn [OFFSCREEN] [OBSCURED by hero-stage]",
+  "28. Main portfolio [OFFSCREEN] [OBSCURED by hero-stage]",
+  "29. Source code on GitHub [OFFSCREEN] [OBSCURED by hero-stage]",
+  "30. Skip to contentAMAboutSkillsProjec [NO RING]",
+  "31. Skip to content",
+  "32. Aziz Messaoud, back to top",
+  "33. About",
+  "34. Skills",
+  "35. Projects",
+  "36. Contact",
+  "37. Pause motion",
+  "38. Ask my brain",
+  "39. Ask my brain",
+  "40. See the projects"
+ ],
+ "unnamed": [],
+ "headings": [
+  "H1 Ask my brain what I've built.",
+  "H2 I study data science and test my work against a ba",
+  "H2 Tools, tied to where I used them.",
+  "H3 Used in the projects below",
+  "H3 Also in my toolkit",
+  "H2 Three projects, each with its evidence.",
+  "H3 TraffiX",
+  "H4 Limits",
+  "H3 Which pages should an editor review first?",
+  "H4 Limits",
+  "H3 HR document checks",
+  "H4 Limits",
+  "H2 Ask my brain",
+  "H2 Ask me directly."
+ ],
+ "landmarks": "NAV MAIN SECTION SECTION SECTION SECTION HEADER HEADER HEADER SECTION FORM[search] SECTION FOOTER",
+ "textSpacing": {
+  "overflowX": 0,
+  "clipped": []
+ }
+}

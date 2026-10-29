@@ -1,13 +1,13 @@
 
- RUN  v2.1.8 /tmp/claude-0/-home-user-projectx0/e461c7fd-ece7-5cc5-9774-0c861a8081d5/scratchpad/aws-superpower-portfolio
+ RUN  v2.1.8 /home/user/aws-superpower-portfolio
 
  ✓ tests/unit/bm25.test.ts (4 tests) 4ms
- ✓ tests/unit/geometry.test.ts (5 tests) 13ms
- ✓ tests/unit/retriever.test.ts (8 tests) 6ms
+ ✓ tests/unit/geometry.test.ts (6 tests) 12ms
+ ✓ tests/unit/retriever.test.ts (8 tests) 7ms
  ✓ tests/unit/tokenize.test.ts (3 tests) 3ms
 
  Test Files  4 passed (4)
-      Tests  20 passed (20)
-   Start at  22:45:32
-   Duration  542ms (transform 232ms, setup 0ms, collect 364ms, tests 26ms, environment 1ms, prepare 312ms)
+      Tests  21 passed (21)
+   Start at  00:24:33
+   Duration  513ms (transform 207ms, setup 0ms, collect 289ms, tests 26ms, environment 1ms, prepare 248ms)
 
