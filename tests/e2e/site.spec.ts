@@ -585,3 +585,102 @@ test("the question box understands typos and a recruiter's questions", async ({ 
   }
 });
 
+/* ── motion control: the cases the PR left open ── */
+const toggleRect = (page: Page) => page.locator(".motion-toggle").boundingBox();
+
+test("the scene draws no brain dots or labels behind the motion button", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(600);
+  let worst = 0;
+  for (let i = 0; i < 12; i++) {
+    worst = Math.max(worst, await page.evaluate(() => {
+      const c = document.querySelector<HTMLCanvasElement>(".brain-canvas")!, r = document.querySelector(".motion-toggle")!.getBoundingClientRect();
+      const k = c.width / innerWidth, d = c.getContext("2d")!.getImageData(Math.round(r.left * k), Math.round(r.top * k), Math.round(r.width * k), Math.round(r.height * k)).data;
+      let n = 0; for (let j = 3; j < d.length; j += 4) if (d[j] > 120) n++;
+      return n;
+    }));
+    await page.waitForTimeout(250);
+  }
+  expect(worst).toBe(0);
+});
+
+test("pausing, then scrolling across the dock threshold, still docks and undocks correctly", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(900);
+  const run = await runway(page);
+  await page.getByRole("button", { name: "Pause motion" }).click();
+  await scrollPage(page, Math.round(run * 0.4));
+  await scrollPage(page, run + 500);
+  await page.waitForTimeout(300);
+  await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/);
+  await scrollPage(page, 0);
+  await page.waitForTimeout(300);
+  await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
+  expect(await frames(page)).toBe(await frames(page));
+  await page.getByRole("button", { name: "Resume motion" }).click();
+  await scrollPage(page, run + 500);
+  await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/, { timeout: 2000 });
+});
+
+test("resizing while paused keeps the scene still and the layout intact", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(700);
+  await page.getByRole("button", { name: "Pause motion" }).click();
+  const f = await frames(page);
+  for (const [w, h] of [[900, 700], [390, 844], [1280, 860]] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.waitForTimeout(250);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${w}px overflow`).toBe(0);
+  }
+  expect(await frames(page)).toBe(f);
+  await expect(page.getByRole("button", { name: "Resume motion" })).toBeVisible();
+});
+
+test("the question box still works while motion is paused, and the text status still moves", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForTimeout(700);
+  await page.getByRole("button", { name: "Pause motion" }).click();
+  const f = await frames(page);
+  await ask(page, "Does Aziz use Bedrock?");
+  await expect(page.locator(".ask-status")).toContainText("Retrieving evidence");
+  await expect(page.locator(".ask-answer")).toContainText("Not verified");
+  await expect(page.locator(".ask-status")).toContainText("Not verified");
+  expect(await frames(page)).toBe(f);
+});
+
+test("the motion button is reachable by keyboard, 44 px, and fits beside the other nav controls at 320 and 390 px", async ({ page }) => {
+  for (const w of [320, 390, 1280]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    await page.goto("/");
+    await page.waitForTimeout(500);
+    const b = (await toggleRect(page))!;
+    expect(b.width, `${w}px width`).toBeGreaterThanOrEqual(44);
+    expect(b.height, `${w}px height`).toBeGreaterThanOrEqual(44);
+    expect(b.x + b.width, `${w}px right edge`).toBeLessThanOrEqual(w);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${w}px overflow`).toBe(0);
+    const overlap = await page.evaluate(() => {
+      const r = (s: string) => document.querySelector(s)!.getBoundingClientRect();
+      const a = r(".motion-toggle"), others = [r(".nav-cta"), r(".nav-toggle")].filter((o) => o.width > 0);
+      return others.some((o) => a.left < o.right && a.right > o.left && a.top < o.bottom && a.bottom > o.top);
+    });
+    expect(overlap, `${w}px overlap`).toBe(false);
+  }
+  await page.setViewportSize({ width: 1280, height: 860 });
+  await page.goto("/");
+  await page.locator(".nav-cta").focus();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Pause motion" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: "Resume motion" })).toBeFocused();
+});
+
+test.describe("reduced motion hides the button and ignores a stored pause", () => {
+  test.use({ reducedMotion: "reduce" });
+  test("no motion button, still frames", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("portfolio-motion-paused", "true"));
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: /motion/i })).toHaveCount(0);
+    await expect(page.locator(".hero-h1")).toBeVisible();
+  });
+});
+
