@@ -41,7 +41,7 @@ export default function App() {
   return (
     <>
       <a className="skip" href="#main">Skip to content</a>
-      <Nav scene={scene} docked={docked} />
+      <Nav scene={scene} docked={docked} reduced={reduced} />
       <Suspense fallback={null}>
         <NeuralScene reduced={reduced} onReady={onReady} onDocked={onDocked} />
       </Suspense>

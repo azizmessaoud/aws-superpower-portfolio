@@ -56,7 +56,7 @@ export function createScene(o: SceneOptions) {
   const tint = { r: 34, g: 211, b: 238 };
   const TINTS: Record<MindState, [number, number, number]> = { idle: [34, 211, 238], listening: [34, 211, 238], retrieving: [34, 211, 238], answering: [34, 211, 238], uncertain: [254, 188, 46], error: [255, 95, 87] };
   const mindLive = () => mind !== "idle";
-  let heroVisible = true, paused = false, destroyed = false;
+  let heroVisible = true, paused = false, destroyed = false, pausedAt = 0;
   let travelFrom = 0, travelTo = 0, travelStart = 0;
   const introStart = o.intro && !o.reducedMotion ? performance.now() : 0;
   const excitation = new Map<number, number>();
@@ -160,7 +160,7 @@ export function createScene(o: SceneOptions) {
       }
     } else setDocked(stageTop + stageH < H * 0.35); /* reduced motion: docked once the hero has mostly left */
   }
-  const travelNow = (t: number) => (travelStart ? travelAt(travelFrom, travelTo, t - travelStart) : travelTo);
+  const travelNow = (t: number) => (travelStart ? travelAt(travelFrom, travelTo, ((paused && pausedAt) ? pausedAt : t) - travelStart) : travelTo);
   const travelling = (t: number) => travelStart !== 0 && t - travelStart < TRAVEL_MS && travelFrom !== travelTo;
   function setDocked(d: boolean) { if (d !== docked) { docked = d; o.onDocked?.(docked); sync(); } }
 
@@ -415,8 +415,19 @@ export function createScene(o: SceneOptions) {
   draw(performance.now());
 
   return {
-    pause() { paused = true; if (travelStart) { travelFrom = travelTo; } sync(); still(); },
-    resume() { paused = false; sync(); },
+    pause() {
+      if (paused) return;
+      paused = true;
+      pausedAt = performance.now();
+      sync(); still();
+    },
+    resume() {
+      if (!paused) return;
+      if (pausedAt && travelStart) travelStart += performance.now() - pausedAt;
+      pausedAt = 0;
+      paused = false;
+      sync();
+    },
     /** dock hovered or focused: the docked brain may move (if not paused) */
     /** The question lifecycle changed. Tints and paces the animation; maps to no model internals. */
     setMindState(next: MindState) {

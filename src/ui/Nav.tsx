@@ -11,7 +11,7 @@ const LINKS = [
   ["contact", "Contact"],
 ] as const;
 
-interface Props { scene: Scene | null; docked: boolean }
+interface Props { scene: Scene | null; docked: boolean; reduced: boolean }
 
 /* Move keyboard focus to where an in-page link lands, so Tab continues from there. */
 function landOn(id: string) {
@@ -22,10 +22,14 @@ function landOn(id: string) {
   setTimeout(() => el.focus({ preventScroll: true }), 0);
 }
 
-export default function Nav({ scene, docked }: Props) {
+export default function Nav({ scene, docked, reduced }: Props) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [motionPaused, setMotionPaused] = useState(() => {
+    try { return localStorage.getItem("portfolio-motion-paused") === "true"; }
+    catch { return false; }
+  });
   const toggle = useRef<HTMLButtonElement>(null);
   const nav = useRef<HTMLElement>(null);
 
@@ -45,6 +49,18 @@ export default function Nav({ scene, docked }: Props) {
     document.addEventListener("click", onDoc);
     return () => { window.removeEventListener("scroll", onScroll); io.disconnect(); document.removeEventListener("keydown", onKey); document.removeEventListener("click", onDoc); };
   }, []);
+  useEffect(() => {
+    try { localStorage.setItem("portfolio-motion-paused", String(motionPaused)); }
+    catch { /* Motion control still works for this visit if storage is unavailable. */ }
+  }, [motionPaused]);
+
+  /* Keep the control and scene in sync, including when the scene is recreated after a preference change. */
+  useEffect(() => {
+    if (!scene) return;
+    if (motionPaused) scene.pause();
+    else scene.resume();
+  }, [scene, motionPaused]);
+
   /* the scene keeps out of the open menu panel */
   useEffect(() => { const id = setTimeout(() => scene?.remeasure(), 220); return () => clearTimeout(id); }, [open, scene]);
 
@@ -67,6 +83,7 @@ export default function Nav({ scene, docked }: Props) {
           <span className="dock-brain" aria-hidden="true" />
           <span className="cta-label">Terminal Explorer</span>
         </a>
+        {!reduced && <button className="motion-toggle" type="button" onClick={() => setMotionPaused((paused) => !paused)} aria-label={motionPaused ? "Resume motion" : "Pause motion"} title={motionPaused ? "Resume animation" : "Pause animation"}><Icon name={motionPaused ? "play" : "pause"} /></button>}
         <button ref={toggle} className="nav-toggle" type="button" aria-expanded={open} aria-controls="nav-links"
           aria-label={open ? "Close menu" : "Menu"} onClick={() => setOpen((o) => !o)}>
           <Icon name={open ? "close" : "menu"} />

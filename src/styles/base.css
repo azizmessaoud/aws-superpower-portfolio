@@ -304,3 +304,14 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+
+/* Quiet, persistent motion control: visible to everyone, labelled for assistive technology. */
+.motion-toggle {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 44px; height: 44px; border: 1px solid var(--border-strong); border-radius: var(--radius-pill);
+  background: transparent; color: var(--fg-muted); cursor: pointer;
+  transition: color var(--dur-base), border-color var(--dur-base), background var(--dur-base);
+}
+.motion-toggle .icon { width: 17px; height: 17px; }
+.motion-toggle:hover, .motion-toggle:focus-visible { color: var(--fg); border-color: var(--violet-hover); background: var(--glass5); }
