@@ -636,3 +636,24 @@ test("failure mode: without JavaScript the visitor is told where the evidence is
   for (const repo of ["traffix", "flyrank", "hr-anomaly-detection"]) await expect(page.locator(`noscript a[href="https://github.com/azizmessaoud/${repo}"]`)).toHaveCount(1);
   await ctx.close();
 });
+
+test("the name stays on the first screen even on a short laptop window; only the secondary line yields", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 620 });
+  await page.goto("/");
+  await page.waitForTimeout(600);
+  await expect(page.locator(".eyebrow-name")).toBeVisible();
+  await expect(page.locator(".eyebrow-name")).toHaveText("Aziz Messaoud");
+  await expect(page.locator(".eyebrow-role")).toBeHidden();
+});
+
+test("sample questions are at least 44 px tall on phones, so they are easy to tap", async ({ page }) => {
+  for (const [w, h] of [[390, 844], [320, 640]] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.goto("/");
+    await page.waitForTimeout(500);
+    const chips = page.locator(".ask-samples .suggest-q:visible");
+    const n = await chips.count();
+    expect(n).toBeGreaterThan(0);
+    for (let i = 0; i < n; i++) expect((await chips.nth(i).boundingBox())!.height, `${w}px chip ${i}`).toBeGreaterThanOrEqual(43.5);
+  }
+});

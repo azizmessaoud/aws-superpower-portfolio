@@ -105,6 +105,7 @@ async function main() {
   if (layers.includes("n")) group.add(fib.nodes);
   if (layers.includes("t")) group.add(fib.tips);
   fib.setBeads(layers.includes("b"));
+  fib.setGain(tier === "mobile" ? 2.5 : 1.7);
   fib.setPulses(layers.includes("p"));
   const nrm = (geo.getAttribute("normal") as BufferAttribute).array as Float32Array;
   const nParticles = tier === "mobile" ? 700 : 1500;

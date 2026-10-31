@@ -15,7 +15,7 @@ export default function Hero({ mind, setMind, reduced, onLayout }: Props) {
     <section id="top" className="hero" aria-labelledby="hero-title">
       <div className="hero-stage">
         <div className="hero-inner">
-          <p className="eyebrow">Aziz Messaoud · Data Science Engineering, ESPRIT</p>
+          <p className="eyebrow"><span className="eyebrow-name">Aziz Messaoud</span><span className="eyebrow-role"> · Data Science Engineering, ESPRIT</span></p>
           <h1 id="hero-title" className="hero-h1">I build <span className="hl">practical AI systems.</span></h1>
           <p className="hero-lead">
             Applied ML, document AI, ranking and multi-agent simulation. Every project links to its repo, report or

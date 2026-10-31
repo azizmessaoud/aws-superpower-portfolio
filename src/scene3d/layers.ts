@@ -222,6 +222,8 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
   return {
     ribbons: mesh as Object3D, nodes: nodes as Object3D, tips: tips as Object3D, segments: M, branchNodes: nodeIdx.length, tipCount: tipIdx.length,
     setPulses(on: boolean) { all.forEach((m) => { (m.uniforms.uPulseOn as { value: number }).value = on ? 1 : 0; }); },
+    /** a sparser, thinner network (the mobile tier) needs more light per strand to carry the same form */
+    setGain(g: number) { (ribbon.uniforms.uGain as { value: number }).value = g; },
     setBeads(on: boolean) { (ribbon.uniforms.uBeads as { value: number }).value = on ? 1 : 0; },
     setNodes(on: boolean) { (nodeMat.uniforms.uNodeOn as { value: number }).value = on ? 1 : 0; },
     update(time: number, width: number, height: number, fovDeg: number, dpr: number) {
