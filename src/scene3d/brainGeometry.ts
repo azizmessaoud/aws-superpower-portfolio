@@ -9,8 +9,10 @@
  *   3. the cortical folds are carved along the zero lines of layered noise, which gives wormy, branching grooves;
  *   4. cerebellum (fine parallel folia + a midline vermis cleft) and brainstem (pons swelling) are separate pieces.
  * The `sulcus` attribute (0 = crown of a fold, 1 = bottom of a groove) is kept for shading and, later, filament paths. */
-import { BufferAttribute, BufferGeometry, CatmullRomCurve3, IcosahedronGeometry, Vector3 } from "three";
-import { mergeGeometries, mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+import { BufferAttribute, BufferGeometry, CatmullRomCurve3, Vector3 } from "three";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { hash01 } from "../scene/rng";
+import { icosphereDirections, icosphereIndex, tubeIndex } from "./icosphere";
 import { createNoise3, type Noise3 } from "./noise";
 
 export interface BrainOptions {
@@ -19,6 +21,8 @@ export interface BrainOptions {
   detail?: number;
   /** 1 = default fold depth, 0 = bare lobes */
   foldDepth?: number;
+  /** brainstem resolution: rings along its length, vertices around it */
+  stem?: { rings: number; sides: number };
 }
 
 export const PART = { cerebrum: 0, cerebellum: 1, stem: 2 } as const;
@@ -29,11 +33,12 @@ const sp = (t: number, e: number) => Math.sign(t) * Math.pow(Math.abs(t), e);
 const sq = (v: number) => v * v;
 const softMax = (a: number, b: number, k: number) => 0.5 * (a + b + Math.sqrt(sq(a - b) + k * k));
 
-function sphere(detail: number): BufferGeometry {
-  const g = new IcosahedronGeometry(1, detail);
-  g.deleteAttribute("normal");
-  g.deleteAttribute("uv");
-  return mergeVertices(g, 1e-5);
+/** A unit icosphere with n subdivisions per edge, as an indexed geometry with a fixed vertex order. */
+function sphere(n: number): BufferGeometry {
+  const g = new BufferGeometry();
+  g.setAttribute("position", new BufferAttribute(icosphereDirections(n), 3));
+  g.setIndex(new BufferAttribute(icosphereIndex(n), 1));
+  return g;
 }
 
 /** distance from p to the polyline through pts (all [x, y, z]) */
@@ -103,8 +108,9 @@ const CENTRAL = [[0.16, 0.56, 0.0], [0.32, 0.54, 0.05], [0.48, 0.42, 0.1], [0.62
  *  surface facing along its gradient) and one set wins per patch, so the grain turns like a real cortex, without crosshatching.
  *  A warp field makes the stripes wander and branch, and a fade mask lets them end. */
 function fineFolds(noise: Noise3, u: number, y: number, z: number, nx: number, ny: number, nz: number) {
-  const f = 7.4;
-  const warp = noise(u * 1.7 + 6.1, y * 1.7 + 3.3, z * 1.7) * 1.05 + noise(u * 4.4 + 8, y * 4.4, z * 4.4) * 0.25;
+  const f = 7.2;
+  /* a broad, strong warp changes the local spacing and direction of the stripes; a finer one makes them wander */
+  const warp = noise(u * 1.1 + 6.1, y * 1.1 + 3.3, z * 1.1) * 1.7 + noise(u * 2.6 + 2, y * 2.6, z * 2.6 + 9) * 0.65 + noise(u * 5.1 + 8, y * 5.1, z * 5.1) * 0.16;
   const psi = [
     f * (z * 0.95 + y * 0.32) + warp, /* grooves of constant z: they run top-to-bottom on the side */
     f * (y + z * 0.22 - u * 0.1) + warp * 0.9 + 0.5, /* run front-to-back, like the temporal gyri */
@@ -118,11 +124,15 @@ function fineFolds(noise: Noise3, u: number, y: number, z: number, nx: number, n
     if (i === 1) w *= 1 + 3 * wTemporal;
     w = Math.pow(w, 3); /* winner takes the patch */
     const p = psi[i]!;
-    const d = Math.abs(p - Math.round(p)); /* distance to the nearest groove line, in stripe periods */
-    const main = Math.exp(-sq(d / 0.15));
-    const h = p * 0.5 + 0.23; /* half-period set, a different phase: branches off the main grooves */
-    const d2 = Math.abs(h - Math.round(h));
-    const branch = 0.5 * Math.exp(-sq(d2 / 0.12)) * smooth(-0.1, 0.5, noise(u * 3.1 + 21, y * 3.1, z * 3.1));
+    const k = Math.round(p); /* which groove this is: constant along it */
+    const d = Math.abs(p - k); /* distance to the groove line, in stripe periods */
+    /* every groove gets its own depth and width: a few deep primary sulci, many shallow ones, not a regular comb */
+    const hk = hash01(k * 7 + i * 131, 3);
+    const width = 0.09 + 0.12 * hash01(k * 13 + i * 17, 9);
+    const main = Math.exp(-sq(d / width)) * (0.3 + 0.7 * hk * hk);
+    const h = p * 0.5 + 0.23; /* a half-period set, a different phase: branches off the main grooves */
+    const k2 = Math.round(h), d2 = Math.abs(h - k2);
+    const branch = 0.45 * Math.exp(-sq(d2 / 0.11)) * (0.3 + 0.7 * hash01(k2 * 11 + i * 29, 5)) * smooth(-0.1, 0.5, noise(u * 3.1 + 21, y * 3.1, z * 3.1));
     g += w * (1 - (1 - main) * (1 - branch));
     sum += w;
   }
@@ -131,8 +141,8 @@ function fineFolds(noise: Noise3, u: number, y: number, z: number, nx: number, n
   return g * smooth(-1.05, -0.5, noise(u * 2.3 + 40, y * 2.3 + 7, z * 2.3));
 }
 
-function hemisphere(side: 1 | -1, seed: number, detail: number, foldDepth: number): BufferGeometry {
-  const g = sphere(detail);
+function hemisphere(side: 1 | -1, seed: number, sub: number, foldDepth: number): BufferGeometry {
+  const g = sphere(sub);
   const pos = g.getAttribute("position") as BufferAttribute;
   const n = pos.count;
   const local = new Float32Array(n * 3);
@@ -164,14 +174,14 @@ function hemisphere(side: 1 | -1, seed: number, detail: number, foldDepth: numbe
     const groove = fineFolds(noise, u, y, z, nor.getX(i), nor.getY(i), nor.getZ(i));
     const depth = 0.02 + 0.008 * (noise(u * 2.1, y * 2.1 + 40, z * 2.1) * 0.5 + 0.5);
     const dSyl = distToPolyline(u, y, z, sylvian), dCen = distToPolyline(u, y, z, central);
-    const gSyl = Math.exp(-sq(dSyl / 0.04)), gCen = Math.exp(-sq(dCen / 0.028));
+    const gSyl = Math.exp(-sq(dSyl / 0.052)), gCen = Math.exp(-sq(dCen / 0.036));
     const insula = u > 0.4 ? Math.exp(-sq(dSyl / 0.11)) : 0;
 
-    const disp = foldDepth * (-depth * groove * mask + 0.008 * (1 - groove) * mask - 0.062 * gSyl - 0.04 * gCen - 0.03 * insula);
+    const disp = foldDepth * (-depth * groove * mask + 0.008 * (1 - groove) * mask - 0.04 * gSyl - 0.026 * gCen - 0.02 * insula);
     out[i * 3] = u + nor.getX(i) * disp;
     out[i * 3 + 1] = y + nor.getY(i) * disp;
     out[i * 3 + 2] = z + nor.getZ(i) * disp;
-    sulcus[i] = clamp01(Math.max(groove * mask, gSyl, gCen));
+    sulcus[i] = clamp01(Math.max(groove * mask, 0.55 * gSyl, 0.5 * gCen)); /* the two big fissures shade lighter than they cut, so they do not read as black slots */
   }
   /* mirror for the left hemisphere (x flips, so the triangle winding must flip too) */
   for (let i = 0; i < n; i++) { out[i * 3] = out[i * 3]! * side; }
@@ -190,8 +200,8 @@ function hemisphere(side: 1 | -1, seed: number, detail: number, foldDepth: numbe
 
 /* ── cerebellum ───────────────────────────────────────────────────────────────────────────────── */
 
-function cerebellum(seed: number, detail: number, foldDepth: number): BufferGeometry {
-  const g = sphere(detail);
+function cerebellum(seed: number, sub: number, foldDepth: number): BufferGeometry {
+  const g = sphere(sub);
   const pos = g.getAttribute("position") as BufferAttribute;
   const n = pos.count;
   const base = new Float32Array(n * 3);
@@ -226,8 +236,7 @@ function cerebellum(seed: number, detail: number, foldDepth: number): BufferGeom
 
 /* ── brainstem ────────────────────────────────────────────────────────────────────────────────── */
 
-function brainstem(): BufferGeometry {
-  const L = 48, A = 40;
+function brainstem(L: number, A: number): BufferGeometry {
   const curve = new CatmullRomCurve3([new Vector3(0, -0.1, 0.0), new Vector3(0, -0.3, -0.05), new Vector3(0, -0.5, -0.12), new Vector3(0, -0.7, -0.2)], false, "centripetal");
   const position = new Float32Array(L * A * 3);
   const sulcus = new Float32Array(L * A);
@@ -253,15 +262,9 @@ function brainstem(): BufferGeometry {
       sulcus[r * A + a] = 0.2 * pons * Math.max(0, -sn);
     }
   }
-  const index: number[] = [];
-  for (let r = 0; r < L - 1; r++) for (let a = 0; a < A; a++) {
-    const a2 = (a + 1) % A;
-    const p = r * A + a, q = r * A + a2, p2 = (r + 1) * A + a, q2 = (r + 1) * A + a2;
-    index.push(p, q, p2, q, q2, p2);
-  }
   const g = new BufferGeometry();
   g.setAttribute("position", new BufferAttribute(position, 3));
-  g.setIndex(index);
+  g.setIndex(new BufferAttribute(tubeIndex(L, A), 1));
   g.setAttribute("sulcus", new BufferAttribute(sulcus, 1));
   g.setAttribute("part", new BufferAttribute(new Float32Array(L * A).fill(PART.stem), 1));
   g.setAttribute("hemi", new BufferAttribute(new Float32Array(L * A), 1));
@@ -273,10 +276,10 @@ function brainstem(): BufferGeometry {
 export function buildBrain(opts: BrainOptions = {}): BufferGeometry {
   const seed = opts.seed ?? 7, detail = opts.detail ?? 60, foldDepth = opts.foldDepth ?? 1;
   const parts = [
-    hemisphere(1, seed, detail, foldDepth),
-    hemisphere(-1, seed, detail, foldDepth),
-    cerebellum(seed, Math.max(20, Math.round(detail * 0.62)), foldDepth),
-    brainstem(),
+    hemisphere(1, seed, detail + 1, foldDepth),
+    hemisphere(-1, seed, detail + 1, foldDepth),
+    cerebellum(seed, Math.max(14, Math.round(detail * 0.62)) + 1, foldDepth),
+    brainstem(opts.stem?.rings ?? 48, opts.stem?.sides ?? 40),
   ];
   const merged = mergeGeometries(parts, false);
   parts.forEach((p) => p.dispose());

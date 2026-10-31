@@ -1,0 +1,26 @@
+{
+  "generator": "brain-v2",
+  "seed": 7,
+  "tiers": {
+    "full": {
+      "file": "brain-full.brain",
+      "bytesGzip": 374547,
+      "bytesRaw": 828345,
+      "vertices": 90786,
+      "triangles": 181480,
+      "fiberNodes": 13737,
+      "sha256Raw": "4dca6e4d6e4974eaa35c73ebf155465fc870688195daa8784afdb38bb2f4cd7d",
+      "bakeMs": 1601
+    },
+    "mobile": {
+      "file": "brain-mobile.brain",
+      "bytesGzip": 149695,
+      "bytesRaw": 274268,
+      "vertices": 30018,
+      "triangles": 59976,
+      "fiberNodes": 4544,
+      "sha256Raw": "ce357b2dae4cf6065f26e576220656c759cbc1bababac880ae0d632a7ada1723",
+      "bakeMs": 630
+    }
+  }
+}

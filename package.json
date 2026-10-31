@@ -12,7 +12,9 @@
     "test": "vitest run",
     "eval:retrieval": "npm run content && tsx scripts/eval-retrieval.ts",
     "contrast": "tsx scripts/contrast-check.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "bake:brain": "tsx scripts/bake-brain.ts",
+    "check:fibers": "tsx scripts/check-fibers.ts"
   },
   "dependencies": {
     "react": "18.3.1",
