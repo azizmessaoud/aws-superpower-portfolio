@@ -13,7 +13,7 @@ const GENERATOR = "brain-v2";
 const SEED = 7;
 
 const TIERS = {
-  full: { detail: 60, stem: { rings: 48, sides: 40 }, fibers: { primary: 0.12, secondary: 0.055, trunks: 8, branches: 56 } },
+  full: { detail: 60, stem: { rings: 48, sides: 40 }, fibers: { primary: 0.1, secondary: 0.042, trunks: 9, branches: 70 } },
   mobile: { detail: 34, stem: { rings: 28, sides: 24 }, fibers: { primary: 0.16, secondary: 0.085, trunks: 6, branches: 36 } },
 } as const;
 
@@ -35,7 +35,10 @@ for (const [name, t] of Object.entries(TIERS)) {
   const Vs = V - 2 * Vh - Vc;
 
   const fibers = buildFibers(
-    { positions, normals, sulcus, index, hemispheres: [{ lo: 0, hi: Vh, side: 1 }, { lo: Vh, hi: 2 * Vh, side: -1 }] },
+    {
+      positions, normals, sulcus, index, hemispheres: [{ lo: 0, hi: Vh, side: 1 }, { lo: Vh, hi: 2 * Vh, side: -1 }],
+      cerebellum: { lo: 2 * Vh, hi: 2 * Vh + Vc }, stem: { lo: 2 * Vh + Vc, rings: t.stem.rings, sides: t.stem.sides },
+    },
     { seed: SEED, ...t.fibers },
   );
   const raw = encodeBrain({

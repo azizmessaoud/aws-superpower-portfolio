@@ -1,12 +1,14 @@
 /* Development lab: the baked brain, with its luminous layers switched on one at a time.
  *   ?view=lateral|three-quarter|front-quarter|top|front|back   &w=1280&h=720
  *   ?tier=full|mobile          (default: mobile under 700 px wide)
- *   ?layers=sfpnd              s sculpture, f fibres, p pulses, n branch nodes, d particles
+ *   ?layers=sfpntbd            s body, f fibres, p pulses, n branch nodes, t tips, b flowing beads, d particles
+ *   ?body=ghost|solid|off      ghost: an invisible occluder plus a faint rim (the fibre-optic look); solid: the old sculpture
+ *   ?rim=0.12                  strength of the ghost rim
  *   ?t=7.5                     freeze time (for repeatable stills); without it the lab animates
  * Not part of the production build; nothing in the site imports it. */
 import {
   ACESFilmicToneMapping, AmbientLight, BufferAttribute, BufferGeometry, Color, DirectionalLight, Group, HemisphereLight,
-  Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer,
+  AdditiveBlending, Mesh, MeshBasicMaterial, MeshStandardMaterial, PerspectiveCamera, Scene, ShaderMaterial, WebGLRenderer,
 } from "three";
 import { decodeBrain } from "./brainAsset";
 import { createFiberLayers, createParticles } from "./layers";
@@ -17,7 +19,9 @@ const q = new URLSearchParams(location.search);
 const view = q.get("view") ?? "lateral";
 const W = Number(q.get("w")) || innerWidth, H = Number(q.get("h")) || innerHeight;
 const tier = q.get("tier") ?? (W < 700 ? "mobile" : "full");
-const layers = q.get("layers") ?? "sfpnd";
+const layers = q.get("layers") ?? "sfpntbd";
+const body = q.get("body") ?? "ghost";
+const rimStrength = Number(q.get("rim") ?? 0.1);
 const fixedT = q.has("t") ? Number(q.get("t")) : null;
 const FOV = 26;
 
@@ -79,12 +83,28 @@ async function main() {
   geo.setAttribute("color", new BufferAttribute(colors, 3));
   const group = new Group();
   scene.add(group);
-  if (layers.includes("s")) group.add(new Mesh(geo, new MeshStandardMaterial({ vertexColors: true, roughness: 0.5, metalness: 0 })));
+  if (layers.includes("s")) {
+    if (body === "solid") group.add(new Mesh(geo, new MeshStandardMaterial({ vertexColors: true, roughness: 0.5, metalness: 0 })));
+    else if (body === "ghost") {
+      /* draws nothing, but writes depth: strands on the near side hide strands on the far side, which gives the volume */
+      const occluder = new Mesh(geo, new MeshBasicMaterial({ colorWrite: false }));
+      occluder.renderOrder = -1;
+      /* a faint rim of light so the silhouette holds even where strands are sparse */
+      const rim = new Mesh(geo, new ShaderMaterial({
+        uniforms: { uRim: { value: rimStrength } }, transparent: true, depthWrite: false, blending: AdditiveBlending,
+        vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }",
+        fragmentShader: "uniform float uRim; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 3.0); gl_FragColor = vec4(mix(vec3(0.23,0.51,0.96), vec3(0.55,0.36,0.96), 0.35) * f * uRim, 1.0); }",
+      }));
+      group.add(occluder, rim);
+    }
+  }
   T.colorMs = performance.now() - t; t = performance.now();
 
   const fib = createFiberLayers(brain.fibers, {});
   if (layers.includes("f")) group.add(fib.ribbons);
   if (layers.includes("n")) group.add(fib.nodes);
+  if (layers.includes("t")) group.add(fib.tips);
+  fib.setBeads(layers.includes("b"));
   fib.setPulses(layers.includes("p"));
   const nrm = (geo.getAttribute("normal") as BufferAttribute).array as Float32Array;
   const nParticles = tier === "mobile" ? 700 : 1500;

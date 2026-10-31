@@ -2,7 +2,7 @@
  * Criteria were written before the first run. Exit code 1 if any criterion fails.
  *   npm run check:fibers
  *
- *  H1 valid forest        parents precede children, exactly two roots, one per hemisphere
+ *  H1 valid forest        parents precede children; at least two roots (one tree per hemisphere), plus one root per extra strand
  *  H2 on the surface      every node within 0.03 of a mesh vertex; no segment longer than 0.04
  *  H3 thick to thin       flow never grows towards the tips; trunk flow at least 50x the median twig
  *  H4 highways work       with the highway passes, at least twice the fibre length sits in thick bundles (flow >= 0.05)
@@ -10,7 +10,9 @@
  *  H5 the network is the form   at least 85% of the outer cortex lies within 0.06 of a fibre node, so the brain still
  *                         reads when the solid surface is not drawn
  *  H6 pulse paths         at least 6 of the 8 pulse paths exist, each at least 1.0 long
- *  H7 reproducible        re-baking gives byte-identical data to the committed asset */
+ *  H7 reproducible        re-baking gives byte-identical data to the committed asset
+ *  H8 whole brain         the brainstem is a cable of at least 6 strands, and at least 85% of the cerebellum is within 0.06 of a fibre,
+ *                         so the form is complete once the solid surface is not drawn */
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
@@ -48,7 +50,7 @@ for (const tier of ["full", "mobile"] as const) {
   /* H1 */
   let roots = 0, ordered = true;
   for (let i = 0; i < N; i++) { const p = f.parent[i]!; if (p < 0) roots++; else if (p >= i) ordered = false; }
-  rec("H1 valid forest", tier, ordered && roots === 2, `${N} nodes, ${roots} roots, parents precede children: ${ordered}`);
+  rec("H1 valid forest", tier, ordered && roots >= 2, `${N} nodes, ${roots} roots (2 hemisphere trees + ${roots - 2} extra strands), parents precede children: ${ordered}`);
 
   /* H2 */
   const near = grid(brain.positions, 0.05);
@@ -77,6 +79,14 @@ for (const tier of ["full", "mobile"] as const) {
   const paths = Array.from(f.pulseLen).filter((l) => l >= 1.0).length;
   rec("H6 pulse paths", tier, paths >= 6, `${paths} of 8 pulse paths are at least 1.0 long (lengths ${Array.from(f.pulseLen).map((l) => l.toFixed(1)).join(", ")})`);
 
+  /* H8: the whole brain, not just the cerebrum */
+  let cb = 0, cbCovered = 0;
+  const { hemi: Vh0, cereb: Vc0 } = brain.meta.counts;
+  for (let v = 2 * Vh0; v < 2 * Vh0 + Vc0; v++) { cb++; if (nodeNear(brain.positions[v * 3]!, brain.positions[v * 3 + 1]!, brain.positions[v * 3 + 2]!, 0.06) !== Infinity) cbCovered++; }
+  let stemStrands = 0;
+  for (let i = 0; i < N; i++) if (f.parent[i]! < 0 && f.pos[i * 3 + 1]! < -0.05 && Math.abs(f.pos[i * 3]!) < 0.3 && f.flow[i]! >= 0.4) stemStrands++;
+  rec("H8 whole brain", tier, stemStrands >= 6 && cbCovered / cb >= 0.85, `${stemStrands} brainstem strands, ${(100 * cbCovered / cb).toFixed(1)}% of the cerebellum within 0.06 of a fibre`);
+
   /* H4 and H7 need the generator: only the full tier is regenerated (the baseline takes seconds) */
   if (tier === "full") {
     const g = buildBrain({ seed: 7, detail: 60, stem: { rings: 48, sides: 40 } });
@@ -84,14 +94,17 @@ for (const tier of ["full", "mobile"] as const) {
     const P = A("position"), Nn = A("normal"), S = A("sulcus"), H = A("hemi"), idx = g.getIndex()!.array as Uint32Array;
     const Vh = H.reduce((n, h) => n + (h > 0 ? 1 : 0), 0);
     const input = { positions: P, normals: Nn, sulcus: S, index: idx, hemispheres: [{ lo: 0, hi: Vh, side: 1 as const }, { lo: Vh, hi: 2 * Vh, side: -1 as const }] };
-    const plain = buildFibers(input, { seed: 7, primary: 0.12, secondary: 0.055, trunks: 0, branches: 0 });
-    const withHw = buildFibers(input, { seed: 7, primary: 0.12, secondary: 0.055, trunks: 8, branches: 56 });
+    const Vc = Array.from((g.getAttribute("part") as BufferAttribute).array as Float32Array).reduce((n, p) => n + (p === 1 ? 1 : 0), 0);
+    const full = { ...input, cerebellum: { lo: 2 * Vh, hi: 2 * Vh + Vc }, stem: { lo: 2 * Vh + Vc, rings: 48, sides: 40 } };
+    const plain = buildFibers(input, { seed: 7, primary: 0.1, secondary: 0.042, trunks: 0, branches: 0 });
+    const withHw = buildFibers(input, { seed: 7, primary: 0.1, secondary: 0.042, trunks: 9, branches: 70 }); /* cortex trees only: the extra strands are thick in both runs and would hide the effect */
+    const withExtras = buildFibers(full, { seed: 7, primary: 0.1, secondary: 0.042, trunks: 9, branches: 70 });
     const a = thickShare(plain), b = thickShare(withHw);
     rec("H4 highways work", tier, b.share >= 2 * a.share && b.share >= 0.08,
       `thick-bundle share of fibre length: plain routes ${(100 * a.share).toFixed(1)}% -> with highways ${(100 * b.share).toFixed(1)}% (${(b.share / (a.share || 1e-9)).toFixed(1)}x); total length ${a.all.toFixed(1)} -> ${b.all.toFixed(1)}`);
     const baked = decodeBrain(new Uint8Array(gunzipSync(readFileSync(new URL("brain-full.brain", ASSETS)))));
-    rec("H7 reproducible", tier, manifest.tiers.full!.sha256Raw === createHash("sha256").update(gunzipSync(readFileSync(new URL("brain-full.brain", ASSETS)))).digest("hex") && baked.fibers.parent.length === withHw.parent.length,
-      `committed asset has ${baked.fibers.parent.length} fibre nodes, a fresh build has ${withHw.parent.length}`);
+    rec("H7 reproducible", tier, manifest.tiers.full!.sha256Raw === createHash("sha256").update(gunzipSync(readFileSync(new URL("brain-full.brain", ASSETS)))).digest("hex") && baked.fibers.parent.length === withExtras.parent.length,
+      `committed asset has ${baked.fibers.parent.length} fibre nodes, a fresh build has ${withExtras.parent.length}`);
   }
 }
 const failed = results.filter((r) => !r.pass);

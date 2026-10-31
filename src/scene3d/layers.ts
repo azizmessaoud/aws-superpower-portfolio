@@ -2,7 +2,7 @@
  * Every layer is additive light that sits on or just above the surface and is depth-tested against it, so the sculpture
  * stays visible and the far side of the brain stays hidden behind the near side. */
 import {
-  AdditiveBlending, BufferAttribute, BufferGeometry, Mesh, Points, ShaderMaterial, Vector2, type Object3D,
+  AdditiveBlending, BufferAttribute, BufferGeometry, DoubleSide, Mesh, Points, ShaderMaterial, Vector2, Vector3, type Object3D,
 } from "three";
 import { mulberry32 } from "../scene/rng";
 import { childCounts, type FiberNetwork } from "./fibers";
@@ -56,7 +56,7 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
   let M = 0;
   for (let i = 0; i < N; i++) if (f.parent[i]! >= 0) M++;
   const pos = new Float32Array(M * 4 * 3), other = new Float32Array(M * 4 * 3);
-  const side = new Float32Array(M * 4), flow = new Float32Array(M * 4), dist = new Float32Array(M * 4), mask = new Float32Array(M * 4);
+  const end = new Float32Array(M * 4), side = new Float32Array(M * 4), flow = new Float32Array(M * 4), dist = new Float32Array(M * 4), mask = new Float32Array(M * 4);
   const index = new Uint32Array(M * 6);
   let s = 0;
   for (let i = 0; i < N; i++) {
@@ -67,7 +67,7 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
       const v = s * 4 + c, a = ends[c], b = others[c];
       pos.set([f.pos[a * 3]!, f.pos[a * 3 + 1]!, f.pos[a * 3 + 2]!], v * 3);
       other.set([f.pos[b * 3]!, f.pos[b * 3 + 1]!, f.pos[b * 3 + 2]!], v * 3);
-      side[v] = sd[c]; flow[v] = f.flow[a]!; dist[v] = f.dist[a]!; mask[v] = f.mask[i]!; /* a segment belongs to a pulse path if its child does */
+      side[v] = sd[c]; end[v] = c < 2 ? 0 : 1; flow[v] = f.flow[a]!; dist[v] = f.dist[a]!; mask[v] = f.mask[i]!; /* a segment belongs to a pulse path if its child does */
     }
     index.set([s * 4, s * 4 + 1, s * 4 + 2, s * 4 + 1, s * 4 + 3, s * 4 + 2], s * 6);
     s++;
@@ -76,18 +76,24 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
   g.setAttribute("position", new BufferAttribute(pos, 3));
   g.setAttribute("aOther", new BufferAttribute(other, 3));
   g.setAttribute("aSide", new BufferAttribute(side, 1));
+  g.setAttribute("aEnd", new BufferAttribute(end, 1));
   g.setAttribute("aFlow", new BufferAttribute(flow, 1));
   g.setAttribute("aDist", new BufferAttribute(dist, 1));
   g.setAttribute("aMask", new BufferAttribute(mask, 1));
   g.setIndex(new BufferAttribute(index, 1));
 
-  const shared = { ...pulseUniforms(f, o), uRes: { value: new Vector2(1280, 720) }, uPx: { value: 800 }, uMinPx: { value: 1.1 }, uWMin: { value: 0.0016 }, uWMax: { value: 0.0135 } };
+  let maxDist = 0;
+  for (let i = 0; i < N; i++) maxDist = Math.max(maxDist, f.dist[i]!);
+  const shared = {
+    ...pulseUniforms(f, o), uRes: { value: new Vector2(1280, 720) }, uPx: { value: 800 }, uMinPx: { value: 1.1 }, uWMin: { value: 0.0016 }, uWMax: { value: 0.0135 },
+    uCenter: { value: new Vector3(0, 0.03, -0.02) }, uMaxDist: { value: maxDist }, uDpr: { value: 1 }, uBeads: { value: 1 }, uGain: { value: 1.7 },
+  };
   const ribbon = new ShaderMaterial({
-    uniforms: shared, transparent: true, depthWrite: false, blending: AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+    uniforms: shared, transparent: true, depthWrite: false, side: DoubleSide, blending: AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
     vertexShader: /* glsl */ `
-      uniform vec2 uRes; uniform float uPx, uMinPx, uWMin, uWMax;
-      attribute vec3 aOther; attribute float aSide, aFlow, aDist, aMask;
-      varying float vSide, vFlow, vDist, vMask;
+      uniform vec2 uRes; uniform float uPx, uMinPx, uWMin, uWMax, uDpr; uniform vec3 uCenter;
+      attribute vec3 aOther; attribute float aSide, aEnd, aFlow, aDist, aMask;
+      varying float vSide, vFlow, vDist, vMask, vWpx, vFres;
       void main() {
         vec4 a = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         vec4 b = projectionMatrix * modelViewMatrix * vec4(aOther, 1.0);
@@ -96,21 +102,42 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
         vec2 dir = l > 1e-4 ? d / l : vec2(1.0, 0.0);
         float wWorld = uWMin + (uWMax - uWMin) * pow(aFlow, 0.3);
         float wPx = max(uMinPx, wWorld * uPx / a.w);
-        vec2 off = vec2(-dir.y, dir.x) * aSide * wPx * 0.5 - dir * wPx * 0.45; /* sideways, plus a little past the end so joints close */
+        float quad = wPx * 2.6; /* the quad is wider than the strand: the extra is the soft halo */
+        /* dir points at the other end, so it is reversed at the parent end: flip the sideways sign there, or the ribbon twists into a bow-tie */
+        float sgn = aEnd > 0.5 ? -1.0 : 1.0;
+        vec2 off = vec2(-dir.y, dir.x) * aSide * sgn * quad * 0.5 - dir * wPx * 0.22; /* sideways, plus a little past the end so joints close without doubling up */
         gl_Position = a;
         gl_Position.xy += off / (uRes * 0.5) * a.w;
-        vSide = aSide; vFlow = aFlow; vDist = aDist; vMask = aMask;
+        vSide = aSide; vFlow = aFlow; vDist = aDist; vMask = aMask; vWpx = wPx / uDpr;
+        /* a stand-in surface normal (outward from the middle of the brain) brightens strands near the silhouette */
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vFres = pow(1.0 - abs(dot(normalize(normalMatrix * normalize(position - uCenter)), normalize(-mv.xyz))), 2.0);
       }`,
     fragmentShader: /* glsl */ `
       ${PULSE_GLSL}
-      varying float vSide, vFlow, vDist, vMask;
+      uniform float uMaxDist, uBeads, uGain;
+      varying float vSide, vFlow, vDist, vMask, vWpx, vFres;
       void main() {
-        float core = smoothstep(1.0, 0.15, abs(vSide));
+        float cv = vSide * 2.6;                          /* across the strand itself: -1..1 inside the core */
+        float core = smoothstep(1.0, 0.2, abs(cv));
+        float halo = exp(-vSide * vSide * 3.4) * 0.22;   /* soft light around it */
         float strength = pow(vFlow, 0.5);
-        vec3 base = mix(${VIOLET}, ${BLUE_LIGHT}, smoothstep(0.0, 0.5, strength));
-        float a = (0.34 + 0.66 * strength) * core;
+        /* a thick bundle is drawn as parallel strands with dark gaps: a cable, not a fat line */
+        float strands = 1.0;
+        if (vWpx > 2.6) {
+          float n = clamp(floor(vWpx / 1.7), 2.0, 6.0);
+          strands = 0.25 + 0.75 * pow(abs(cos(clamp(cv, -1.0, 1.0) * 1.5708 * n)), 1.6);
+        }
+        float t = clamp(vDist / uMaxDist, 0.0, 1.0);
+        /* violet at the root, electric blue through the middle, a little ice towards the tips */
+        vec3 base = mix(${VIOLET}, ${BLUE_LIGHT}, smoothstep(0.0, 0.55, t));
+        base = mix(base, ${ICE}, smoothstep(0.65, 1.0, t) * 0.4);
+        float edge = 0.55 + 0.95 * vFres;
+        float a = (0.3 + 0.6 * strength) * (core * strands + halo * (0.5 + strength)) * edge * uGain;
+        /* faint beads of light drifting outward along every strand, so the whole network is alive between pulses */
+        float beads = pow(0.5 + 0.5 * sin(vDist * 17.0 - uTime * 1.35), 10.0) * (0.5 + 0.5 * sin(vDist * 2.3 + vMask * 0.37)) * uBeads;
         float p = pulseAt(vMask, vDist);
-        vec3 col = base * a + mix(${BLUE}, ${ICE}, 0.65) * p * core * 1.25;
+        vec3 col = base * a * (1.0 + 1.1 * beads) + mix(${BLUE}, ${ICE}, 0.7) * p * (core + 0.9 * halo * 3.0) * 1.7;
         gl_FragColor = vec4(col, 1.0);
       }`,
   });
@@ -153,10 +180,49 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
   const nodes = new Points(ng, nodeMat);
   nodes.frustumCulled = false;
 
-  const all = [ribbon, nodeMat];
+  /* fibre tips: where a strand ends it glows, like the ends of a fibre-optic lamp */
+  const tipIdx: number[] = [];
+  for (let i = 0; i < N; i++) if (kids[i]! === 0 && f.parent[i]! >= 0) tipIdx.push(i);
+  const tp = new Float32Array(tipIdx.length * 3), ts = new Float32Array(tipIdx.length), td = new Float32Array(tipIdx.length), tm = new Float32Array(tipIdx.length);
+  tipIdx.forEach((i, k) => { tp.set([f.pos[i * 3]!, f.pos[i * 3 + 1]!, f.pos[i * 3 + 2]!], k * 3); ts[k] = ((i * 2654435761) >>> 0) / 4294967296; td[k] = f.dist[i]!; tm[k] = f.mask[i]!; });
+  const tg = new BufferGeometry();
+  tg.setAttribute("position", new BufferAttribute(tp, 3));
+  tg.setAttribute("aSeed", new BufferAttribute(ts, 1));
+  tg.setAttribute("aDist", new BufferAttribute(td, 1));
+  tg.setAttribute("aMask", new BufferAttribute(tm, 1));
+  const tipMat = new ShaderMaterial({
+    uniforms: { ...shared, uTipOn: { value: 1 } }, transparent: true, depthWrite: false, blending: AdditiveBlending,
+    vertexShader: /* glsl */ `
+      uniform float uPx, uTime; uniform vec3 uCenter; attribute float aSeed, aDist, aMask;
+      varying float vSeed, vDist, vMask, vFres;
+      void main() {
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_Position = projectionMatrix * mv;
+        gl_PointSize = clamp((0.009 + 0.007 * aSeed) * uPx / -mv.z, 3.0, 11.0);
+        vFres = pow(1.0 - abs(dot(normalize(normalMatrix * normalize(position - uCenter)), normalize(-mv.xyz))), 2.0);
+        vSeed = aSeed; vDist = aDist; vMask = aMask;
+      }`,
+    fragmentShader: /* glsl */ `
+      ${PULSE_GLSL}
+      uniform float uTipOn; varying float vSeed, vDist, vMask, vFres;
+      void main() {
+        float r = length(gl_PointCoord - 0.5) * 2.0;
+        if (r > 1.0) discard;
+        float twinkle = 0.55 + 0.45 * sin(uTime * (0.9 + vSeed) + vSeed * 60.0);
+        float glow = exp(-r * r * 3.0);
+        float p = pulseAt(vMask, vDist);
+        vec3 col = mix(${BLUE_LIGHT}, ${ICE}, 0.55) * glow * twinkle * (0.75 + 1.0 * vFres) + ${ICE} * p * glow * 1.8;
+        gl_FragColor = vec4(col * uTipOn, 1.0);
+      }`,
+  });
+  const tips = new Points(tg, tipMat);
+  tips.frustumCulled = false;
+
+  const all = [ribbon, nodeMat, tipMat];
   return {
-    ribbons: mesh as Object3D, nodes: nodes as Object3D, segments: M, branchNodes: nodeIdx.length,
+    ribbons: mesh as Object3D, nodes: nodes as Object3D, tips: tips as Object3D, segments: M, branchNodes: nodeIdx.length, tipCount: tipIdx.length,
     setPulses(on: boolean) { all.forEach((m) => { (m.uniforms.uPulseOn as { value: number }).value = on ? 1 : 0; }); },
+    setBeads(on: boolean) { (ribbon.uniforms.uBeads as { value: number }).value = on ? 1 : 0; },
     setNodes(on: boolean) { (nodeMat.uniforms.uNodeOn as { value: number }).value = on ? 1 : 0; },
     update(time: number, width: number, height: number, fovDeg: number, dpr: number) {
       for (const m of all) {
@@ -164,9 +230,10 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
         (m.uniforms.uRes as { value: Vector2 }).value.set(width * dpr, height * dpr);
         (m.uniforms.uPx as { value: number }).value = (height * dpr * 0.5) / Math.tan((fovDeg * Math.PI) / 360);
         (m.uniforms.uMinPx as { value: number }).value = 1.1 * dpr;
+        (m.uniforms.uDpr as { value: number }).value = dpr;
       }
     },
-    dispose() { g.dispose(); ng.dispose(); ribbon.dispose(); nodeMat.dispose(); },
+    dispose() { g.dispose(); ng.dispose(); tg.dispose(); ribbon.dispose(); nodeMat.dispose(); tipMat.dispose(); },
   };
 }
 

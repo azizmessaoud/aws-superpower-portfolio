@@ -4,23 +4,23 @@
   "tiers": {
     "full": {
       "file": "brain-full.brain",
-      "bytesGzip": 374547,
-      "bytesRaw": 828345,
+      "bytesGzip": 406605,
+      "bytesRaw": 908440,
       "vertices": 90786,
       "triangles": 181480,
-      "fiberNodes": 13737,
-      "sha256Raw": "4dca6e4d6e4974eaa35c73ebf155465fc870688195daa8784afdb38bb2f4cd7d",
-      "bakeMs": 1601
+      "fiberNodes": 19458,
+      "sha256Raw": "ca3ff083876638445596005fd10c26a44e634f0c06a3e2662fe3d075463b2e85",
+      "bakeMs": 1506
     },
     "mobile": {
       "file": "brain-mobile.brain",
-      "bytesGzip": 149695,
-      "bytesRaw": 274268,
+      "bytesGzip": 154503,
+      "bytesRaw": 285793,
       "vertices": 30018,
       "triangles": 59976,
-      "fiberNodes": 4544,
-      "sha256Raw": "ce357b2dae4cf6065f26e576220656c759cbc1bababac880ae0d632a7ada1723",
-      "bakeMs": 630
+      "fiberNodes": 5367,
+      "sha256Raw": "6b682e8498bd9afd06b5890d9e8109199086c128713bc946d334162c9e524866",
+      "bakeMs": 507
     }
   }
 }

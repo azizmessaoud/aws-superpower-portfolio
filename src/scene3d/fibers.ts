@@ -32,6 +32,9 @@ export interface FiberInput {
   index: Uint32Array;
   /** vertex ranges of the two hemispheres */
   hemispheres: Array<{ lo: number; hi: number; side: 1 | -1 }>;
+  /** when given, the cerebellum gets fine arcs along its folia and the brainstem a cable of parallel strands */
+  cerebellum?: { lo: number; hi: number };
+  stem?: { lo: number; rings: number; sides: number };
 }
 
 export interface FiberOptions {
@@ -125,7 +128,7 @@ function growHemisphere(inp: FiberInput, range: { lo: number; hi: number; side: 
      still, so later routes prefer to join an existing bundle instead of running beside it. */
   const K = 4;
   const hw = new Uint8Array(V); /* 0 plain, 1 branch, 2 trunk */
-  const MUL = [1, 0.42, 0.16];
+  const MUL = [1, 0.36, 0.1];
   let dist = new Float64Array(V), par = new Int32Array(V), order: number[] = [], settled = new Uint8Array(V);
   const runRoutes = () => {
     dist = new Float64Array(V).fill(Infinity); par = new Int32Array(V).fill(-1); order = []; settled = new Uint8Array(V);
@@ -228,11 +231,71 @@ function growHemisphere(inp: FiberInput, range: { lo: number; hi: number; side: 
   return tree;
 }
 
+
+/* Strands that are not part of the cortex tree: the brainstem as a cable of parallel strands, and the cerebellum as fine
+ * arcs following its horizontal folia. Without them the form would lose exactly the parts that make it read as a brain
+ * once the solid surface is not drawn. Each chain is a root plus a run of children. */
+interface Chain { pts: number[]; flow: number }
+function extraChains(inp: FiberInput, lift: number): Chain[] {
+  const P = inp.positions, N = inp.normals, S = inp.sulcus, out: Chain[] = [];
+  if (inp.stem) {
+    const { lo, rings, sides } = inp.stem;
+    const strands = 8, stepA = Math.max(1, Math.round(sides / strands)), stepR = Math.max(1, Math.round(rings / 22));
+    for (let a = 0; a < sides; a += stepA) {
+      const pts: number[] = [];
+      for (let r = 0; r < rings - 2; r += stepR) {
+        const g = (lo + r * sides + a) * 3;
+        pts.push(P[g]! + N[g]! * lift, P[g + 1]! + N[g + 1]! * lift, P[g + 2]! + N[g + 2]! * lift);
+      }
+      if (pts.length >= 6) out.push({ pts, flow: 0.5 });
+    }
+  }
+  if (inp.cerebellum) {
+    const { lo, hi } = inp.cerebellum;
+    let yMin = Infinity, yMax = -Infinity, cx = 0, cz = 0, n = 0;
+    for (let v = lo; v < hi; v++) { yMin = Math.min(yMin, P[v * 3 + 1]!); yMax = Math.max(yMax, P[v * 3 + 1]!); cx += P[v * 3]!; cz += P[v * 3 + 2]!; n++; }
+    cx /= n; cz /= n;
+    const band = 0.03, bands = new Map<number, number[]>();
+    /* a coarser mesh has fewer vertices near each band, so the band is as wide as the mesh is coarse */
+    const spacing = Math.sqrt(1.2 / (hi - lo)), tol = Math.max(0.0055, 0.55 * spacing);
+    for (let v = lo; v < hi; v++) {
+      if (S[v]! > 0.25) continue; /* on the crowns of the folia, not in the grooves */
+      const k = Math.round((P[v * 3 + 1]! - yMin) / band);
+      if (Math.abs(P[v * 3 + 1]! - (yMin + k * band)) > tol) continue;
+      const l = bands.get(k); if (l) l.push(v); else bands.set(k, [v]);
+    }
+    for (const verts of bands.values()) {
+      verts.sort((a, b) => Math.atan2(P[a * 3 + 2]! - cz, P[a * 3]! - cx) - Math.atan2(P[b * 3 + 2]! - cz, P[b * 3]! - cx));
+      let pts: number[] = [];
+      const flush = () => { if (pts.length >= 18) out.push({ pts, flow: 0.07 }); pts = []; };
+      let prev = -1;
+      for (let i = 0; i < verts.length; i += 2) {
+        const v = verts[i]!, g = v * 3;
+        if (prev >= 0 && Math.hypot(P[g]! - P[prev * 3]!, P[g + 1]! - P[prev * 3 + 1]!, P[g + 2]! - P[prev * 3 + 2]!) > 0.038) flush();
+        pts.push(P[g]! + N[g]! * lift, P[g + 1]! + N[g + 1]! * lift, P[g + 2]! + N[g + 2]! * lift);
+        prev = v;
+      }
+      flush();
+    }
+  }
+  /* smooth every chain (moving average, ends fixed) so arcs are clean curves and not vertex jitter */
+  for (const c of out) {
+    const n = c.pts.length / 3;
+    for (let pass = 0; pass < 3; pass++) {
+      const q = c.pts.slice();
+      for (let i = 1; i < n - 1; i++) for (let k = 0; k < 3; k++) c.pts[i * 3 + k] = 0.25 * q[(i - 1) * 3 + k]! + 0.5 * q[i * 3 + k]! + 0.25 * q[(i + 1) * 3 + k]!;
+    }
+  }
+  return out;
+}
+
 export function buildFibers(inp: FiberInput, opts: FiberOptions = {}): FiberNetwork {
   const o: Required<FiberOptions> = { seed: 7, primary: 0.12, secondary: 0.055, secondaryWeight: 0.12, pulsePaths: 4, lift: 0.004, trunks: 8, branches: 56, ...opts };
   const rand = mulberry32(o.seed + 5150);
   const trees = inp.hemispheres.map((h) => growHemisphere(inp, h, o, rand));
-  const N = trees.reduce((s, t) => s + t.parent.length, 0);
+  const extra = extraChains(inp, o.lift);
+  const treeN = trees.reduce((s, t) => s + t.parent.length, 0);
+  const N = treeN + extra.reduce((s, c) => s + c.pts.length / 3, 0);
   const pos = new Float32Array(N * 3), parent = new Int32Array(N), flow = new Float32Array(N), dist = new Float32Array(N), mask = new Uint8Array(N);
   const pulseLen = new Float32Array(8);
   let base = 0;
@@ -282,6 +345,17 @@ export function buildFibers(inp: FiberInput, opts: FiberOptions = {}): FiberNetw
     });
     base += n;
   });
+  /* the extra chains: a root, then each point a child of the one before */
+  let at = treeN;
+  for (const c of extra) {
+    const n = c.pts.length / 3;
+    for (let i = 0; i < n; i++, at++) {
+      pos.set([c.pts[i * 3]!, c.pts[i * 3 + 1]!, c.pts[i * 3 + 2]!], at * 3);
+      parent[at] = i === 0 ? -1 : at - 1;
+      flow[at] = c.flow;
+      dist[at] = i === 0 ? 0 : dist[at - 1]! + Math.hypot(pos[at * 3]! - pos[(at - 1) * 3]!, pos[at * 3 + 1]! - pos[(at - 1) * 3 + 1]!, pos[at * 3 + 2]! - pos[(at - 1) * 3 + 2]!);
+    }
+  }
   return { pos, parent, flow, dist, mask, pulseLen };
 }
 
