@@ -2,7 +2,6 @@ import { Evidence } from "./Evidence";
 import Label from "./Label";
 
 const RD = "https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md";
-const LIVE = "https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts#L196-L204";
 
 /* HR-01, HR-04 (limitation), HR-05, HR-06. Prototype on synthetic documents; no accuracy figure. */
 const STEPS: { step: string; detail: string; outcome?: string }[] = [
@@ -37,7 +36,7 @@ export default function HrDocs() {
         ))}
       </ol>
       <Label project="hr" />
-      <Evidence links={[{ label: "README @ 437a514", url: `${RD}#L1-L16` }, { label: "Live portfolio HR card source", url: LIVE }]} />
+      <Evidence links={[{ label: "README @ 437a514", url: `${RD}#L1-L16` }]} />
     </article>
   );
 }
