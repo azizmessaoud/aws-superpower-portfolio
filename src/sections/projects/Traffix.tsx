@@ -37,16 +37,16 @@ export default function Traffix() {
           </ol>
         </figure>
         <div>
-          <table className="results">
+          <table className="results" role="table">
             <caption>Trained models vs SUMO actuated signals · Tunis map · mean of 3 seeds · 20 Oct 2026</caption>
-            <thead><tr><th scope="col">Measure</th><th scope="col">TraffiX</th><th scope="col">Actuated</th><th scope="col">Reading</th></tr></thead>
-            <tbody>
+            <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Measure</th><th scope="col" role="columnheader">TraffiX</th><th scope="col" role="columnheader">Actuated</th><th scope="col" role="columnheader">Reading</th></tr></thead>
+            <tbody role="rowgroup">
               {RESULTS.map((r) => (
-                <tr key={r.measure}>
-                  <th scope="row">{r.measure}</th>
-                  <td>{r.ours}</td>
-                  <td>{r.base}</td>
-                  <td className={r.good ? "read-good" : "read-bad"}>{r.good ? "Better: " : "Worse: "}{r.read}</td>
+                <tr key={r.measure} role="row">
+                  <th scope="row" role="rowheader">{r.measure}</th>
+                  <td role="cell" data-label="TraffiX">{r.ours}</td>
+                  <td role="cell" data-label="Actuated">{r.base}</td>
+                  <td role="cell" data-label="Reading" className={r.good ? "read-good" : "read-bad"}>{r.good ? "Better: " : "Worse: "}{r.read}</td>
                 </tr>
               ))}
             </tbody>

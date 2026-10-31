@@ -657,3 +657,85 @@ test("sample questions are at least 44 px tall on phones, so they are easy to ta
     for (let i = 0; i < n; i++) expect((await chips.nth(i).boundingBox())!.height, `${w}px chip ${i}`).toBeGreaterThanOrEqual(43.5);
   }
 });
+
+/* ── UI pass: aligned cards, shared measure, calm menu, nav states ── */
+test("Selected work: kicker, title, result, caveat and links line up across the three cards on desktop", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "side-by-side layout is for wide screens");
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/#selected");
+  await page.waitForTimeout(700);
+  for (const cls of ["selected-kind", "selected-title", "selected-result", "selected-caveat", "selected-links"]) {
+    const tops = await page.locator(`#selected .${cls}`).evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+    expect(tops, cls).toHaveLength(3);
+    expect(Math.max(...tops) - Math.min(...tops), `${cls} tops ${tops}`).toBeLessThanOrEqual(1);
+  }
+  const over = await page.locator("#selected .selected-card").evaluateAll((els) => els.filter((e) => e.scrollWidth > e.clientWidth + 1).length);
+  expect(over).toBe(0);
+});
+
+test("Selected work: the main action is a button-weight link of at least 44 px, the proof link is secondary", async ({ page }) => {
+  await page.goto("/#selected");
+  const open = page.locator("#selected .selected-open").first(), proof = page.locator("#selected .selected-proof").first();
+  expect((await open.boundingBox())!.height).toBeGreaterThanOrEqual(43.5);
+  expect(await open.evaluate((e) => getComputedStyle(e).borderTopWidth)).not.toBe("0px");
+  expect(await proof.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeLessThan(await open.evaluate((e) => parseFloat(getComputedStyle(e).fontSize)));
+});
+
+test("case studies use one measure on desktop: the Result block, the figures and the label share the column", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "wide-screen layout");
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/#projects");
+  for (const id of ["traffix", "flyrank", "hr"]) {
+    const m = await page.evaluate((i) => {
+      const c = document.querySelector(`#project-${i}`)!, g = c.querySelector(".glance")!.getBoundingClientRect(), l = c.querySelector(".plabel")!.getBoundingClientRect(), a = c.getBoundingClientRect();
+      return { glance: g.width, label: l.width, col: a.width, gr: g.right, lr: l.right };
+    }, id);
+    expect(m.glance / m.col, `${id}: glance fills the column`).toBeGreaterThan(0.95);
+    expect(Math.abs(m.gr - m.lr), `${id}: glance and label share a right edge`).toBeLessThanOrEqual(2);
+  }
+});
+
+test("mobile menu: opaque and blurred, so headline text does not ghost through; items are 44 px tall", async ({ page }, info) => {
+  test.skip(info.project.name !== "mobile", "menu exists below 760px");
+  await page.goto("/");
+  await page.locator(".nav-toggle").click();
+  await page.waitForTimeout(500);
+  const s = await page.locator(".nav-links").evaluate((e) => { const c = getComputedStyle(e); return { bg: c.backgroundColor, blur: c.backdropFilter || (c as unknown as { webkitBackdropFilter: string }).webkitBackdropFilter }; });
+  expect(Number(s.bg.match(/[\d.]+(?=\)$)/)?.[0])).toBeGreaterThanOrEqual(0.98);
+  expect(s.blur).toContain("blur");
+  const hs = await page.locator(".nav-links a").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
+  for (const h of hs) expect(h).toBeGreaterThanOrEqual(43.5);
+});
+
+test("nav: the active section follows the page, and keyboard focus shows a visible ring", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "desktop nav");
+  await page.goto("/");
+  await page.waitForTimeout(600);
+  await page.evaluate(() => document.getElementById("projects")!.scrollIntoView({ behavior: "instant" as ScrollBehavior }));
+  await page.waitForTimeout(700);
+  await expect(page.locator('.nav-links a[aria-current="true"]')).toHaveText("Projects");
+  await page.locator(".nav-links a", { hasText: "Skills" }).focus();
+  const ring = await page.locator(".nav-links a", { hasText: "Skills" }).evaluate((e) => { const c = getComputedStyle(e); return { style: c.outlineStyle, width: parseFloat(c.outlineWidth) }; });
+  expect(ring.style).not.toBe("none");
+  expect(ring.width).toBeGreaterThanOrEqual(2);
+});
+
+test("results table on a 320 px phone: each row stacks, numbers stay with their units, columns line up, table roles are kept", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto("/#projects");
+  await page.waitForTimeout(500);
+  const t = page.locator("table.results");
+  await expect(t).toHaveAttribute("role", "table");
+  await expect(t.locator("tbody td[data-label]").first()).toHaveAttribute("data-label", "TraffiX");
+  expect(await t.evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
+  /* a value and its unit never split across lines */
+  const split = await t.locator("tbody td").evaluateAll((els) => els.slice(0, -1).filter((e) => { const r = document.createRange(); r.selectNodeContents(e); return e.textContent!.includes(" s") && r.getClientRects().length > 2; }).length);
+  expect(split).toBe(0);
+  /* the three columns start at the same x in every row */
+  for (const k of [0, 1, 2]) {
+    const xs = await t.locator("tbody tr").evaluateAll((rows, i) => rows.map((r) => Math.round(r.querySelectorAll("td")[i]!.getBoundingClientRect().left)), k);
+    expect(Math.max(...xs) - Math.min(...xs), `column ${k} x positions ${xs}`).toBeLessThanOrEqual(1);
+  }
+  await expect(t.locator("caption")).toBeVisible();
+  expect((await t.locator("caption").boundingBox())!.width).toBeGreaterThan(250);
+});

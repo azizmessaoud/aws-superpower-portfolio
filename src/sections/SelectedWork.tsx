@@ -17,7 +17,7 @@ export default function SelectedWork() {
               <p className="selected-caveat"><Icon name="alert" /><span><strong>Caveat:</strong> {c.caveat}</span></p>
               {c.myPart && <p className="selected-part"><strong>My part:</strong> {c.myPart}</p>}
               <div className="selected-links">
-                <a className="selected-open" href={`#project-${c.id}`}>Read the case study</a>
+                <a className="selected-open" href={`#project-${c.id}`}>Read the case study <Icon name="arrow" /></a>
                 <a className="selected-proof" href={c.proof.url}>{c.proof.label} <Icon name="external" /><span className="sr-only"> (opens GitHub)</span></a>
               </div>
             </li>

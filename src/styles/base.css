@@ -322,6 +322,55 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .glance-caveat dd { color: var(--fg-lead); }
 @media (max-width: 520px) { .glance-row { grid-template-columns: 1fr; gap: 0; } }
 
+/* ── UI pass 31 Oct: aligned cards, a clear primary link, one measure for the case-study blocks, a calmer mobile menu ── */
+
+/* Selected work: the three cards share their rows, so kicker, title, result, caveat, part and links line up across cards
+   even when one kicker wraps. Only when cards sit side by side (two columns or more); a single phone column has nothing to align
+   to. Browsers without subgrid keep the stacked layout above. */
+@supports (grid-template-rows: subgrid) { @media (min-width: 640px) {
+  .selected-card { display: grid; grid-row: span 6; grid-template-rows: subgrid; row-gap: var(--space-sm); }
+  .selected-card > * { margin: 0; }
+  .selected-kind { grid-row: 1; } .selected-title { grid-row: 2; } .selected-result { grid-row: 3; }
+  .selected-caveat { grid-row: 4; } .selected-part { grid-row: 5; } .selected-links { grid-row: 6; align-self: end; }
+} }
+/* the main action is a button-weight link; the proof link is quiet */
+.selected-links { align-items: center; }
+.selected-links .selected-open { padding: 0 var(--space-md); border: 1px solid var(--violet-line); border-radius: var(--radius-pill); background: var(--violet-tint); color: var(--fg); text-decoration: none; transition: background var(--dur-base), border-color var(--dur-base); }
+.selected-links .selected-open:hover { background: var(--violet-hover); border-color: var(--violet); }
+.selected-links .selected-proof { color: var(--fg-muted); font-size: var(--text-small); text-underline-offset: 3px; }
+.selected-links .selected-proof:hover { color: var(--violet-light); }
+
+/* case studies: on wide screens the Result/Caveat/My part/Boundary block and the four-part label use the full column
+   in two columns, so the header, the figures and the label share one measure instead of two narrow boxes */
+@media (min-width: 900px) {
+  .glance { grid-template-columns: 1fr 1fr; max-width: none; gap: var(--space-md) var(--space-2xl); }
+  .glance-row { grid-template-columns: 1fr; gap: var(--space-2xs); align-content: start; }
+  .glance-row:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .plabel { max-width: none; }
+  .plabel dl { display: grid; grid-template-columns: 1fr 1fr; }
+  .plabel-row { grid-template-columns: 1fr; gap: var(--space-xs); align-content: start; } /* a short cell must not stretch its rows to match a tall neighbour */
+  .plabel-row + .plabel-row { border-top: 0; }
+  .plabel-row:nth-child(n + 3) { border-top: 1px solid var(--border); }
+  .plabel-row:nth-child(odd) { border-right: 1px solid var(--border); }
+}
+
+/* phones: the open menu blurs whatever is behind it, so large headline text does not ghost through */
+@media (max-width: 760px) { .nav-links { background: rgba(10, 25, 41, 0.985); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); } }
+
+/* results table on phones: each row stacks (the measure on its own line, then three labelled values) so a number is never
+   split from its unit and the measure is not squeezed into a sliver. Roles are explicit in the markup, so assistive
+   technology still reads it as a table. */
+@media (max-width: 520px) {
+  table.results, .results tbody, .results thead, .results tr, .results th, .results td { display: block; }
+  .results thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .results caption { display: block; width: 100%; text-align: left; padding-bottom: var(--space-sm); }
+  .results tbody tr { display: grid; grid-template-columns: 4.6rem 5.4rem 1fr; /* fixed, so the three columns line up from row to row */ gap: var(--space-2xs) var(--space-sm); padding: var(--space-sm) 0; border-top: 1px solid var(--border); }
+  .results tbody th { grid-column: 1 / -1; padding: 0; text-align: left; font-weight: 600; }
+  .results tbody td { padding: 0; white-space: nowrap; }
+  .results tbody td:last-child { white-space: normal; }
+  .results tbody td::before { content: attr(data-label); display: block; font-family: var(--font-m); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-muted); font-weight: 400; }
+}
+
 /* ── contact + footer ── */
 .contact { background: var(--bg-deep); }
 .contact-grid { max-width: 40rem; }
