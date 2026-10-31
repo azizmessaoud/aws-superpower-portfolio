@@ -76,6 +76,10 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--violet); }
 .hero-h1 { font-family: var(--font-h); font-size: clamp(2.1rem, 4.4vw, 3.5rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; text-wrap: balance; margin-bottom: var(--space-lg); }
 .hl { color: var(--cyan); }
+.hero-avail { display: flex; align-items: flex-start; gap: var(--space-xs); margin-bottom: var(--space-md); font-size: 14px; line-height: 1.45; color: var(--fg-lead); }
+.avail-dot { flex: none; width: 8px; height: 8px; margin-top: 0.4em; border-radius: 50%; background: var(--signal-green); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-bottom: var(--space-lg); }
+.hero-actions .btn-primary, .hero-actions .btn-ghost { padding: 0.5rem var(--space-xl); text-decoration: none; }
 /* Dragging or double-clicking on the animation must not highlight the headline. The question box and the answer stay selectable. */
 .hero-stage { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .hero-stage .ask-input, .hero-stage .ask-answer { -webkit-user-select: text; user-select: text; }
@@ -234,6 +238,8 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .ask-samples .suggest-q { min-height: 40px; font-size: 14px; }
 .ask-answer { flex: 0 1 auto; min-height: 4.5rem; margin-top: var(--space-xs); padding: var(--space-md) var(--space-lg); max-height: 40vh; max-height: 40svh; overflow-y: auto; overscroll-behavior: contain; background: var(--surface); border: 1px solid var(--border-strong); border-left: 3px solid var(--cyan); border-radius: var(--radius-md); }
 .ask-answer, .t-line, .aws-status { overflow-wrap: anywhere; } /* long URLs (e.g. the Amplify address) must wrap, not widen the page on a 320px phone */
+.ask-open { margin: var(--space-xs) 0 var(--space-sm); }
+.ask-open a { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 44px; font-weight: 600; color: var(--violet-light); }
 .ask-answer.is-contradicted { border-left-color: var(--signal-amber); }
 .ask-answer.is-not_verified { border-left-color: var(--signal-amber); border-style: dashed; border-left-style: dashed; }
 .ask-answer.is-error { border-left-color: var(--signal-red); }
@@ -251,14 +257,16 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
   .hero-lead { display: none; }
 }
 
-@media (max-height: 700px) { .ask-samples li:nth-child(n + 3) { display: none; } .hero-inner .eyebrow { display: none; } }
+@media (max-height: 700px) { .ask-samples li:nth-child(n + 3) { display: none; } .hero-inner .eyebrow, .hero-inner .hero-avail { display: none; } }
 /* once an answer is on screen the intro paragraph makes room for it */
-.hero-inner:has(.ask-answer) .hero-lead { display: none; }
+.hero-inner:has(.ask-answer) .hero-lead, .hero-inner:has(.ask-answer) .hero-avail, .hero-inner:has(.ask-answer) .hero-actions { display: none; }
 
 /* ── aws status ── */
 .aws { background: var(--surface); }
 .aws-status { max-width: 62ch; padding: var(--space-md) var(--space-lg); margin-bottom: var(--space-xl); border: 1px dashed var(--signal-amber); border-radius: var(--radius-md); color: var(--fg-lead); }
 .aws-status.is-live { border-style: solid; border-color: var(--signal-green); }
+.aws-status p + p { margin-top: var(--space-xs); }
+.aws-gap { color: var(--signal-amber); }
 .aws-status a { color: var(--violet-light); }
 .aws-checked { color: var(--fg-muted); font-size: var(--text-small); }
 .aws-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3xl); margin-bottom: var(--space-xl); }
@@ -288,6 +296,26 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .small-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg); }
 .small-grid p { color: var(--fg-muted); font-size: var(--text-small); margin-bottom: var(--space-sm); }
 .small-grid .chips { margin-bottom: var(--space-sm); }
+
+/* ── selected work (under the hero) and the case-study glance ── */
+.selected { padding: var(--space-3xl) 0 var(--space-2xl); background: var(--bg-deep); border-top: 1px solid var(--border); }
+.selected-h2 { font-family: var(--font-h); font-size: var(--text-h3, 1.5rem); margin-bottom: var(--space-lg); }
+.selected-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: var(--space-lg); list-style: none; padding: 0; }
+.selected-card { display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-lg); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+.selected-kind { font-family: var(--font-m); font-size: 12px; letter-spacing: 0.04em; color: var(--fg-muted); }
+.selected-title { font-family: var(--font-h); font-size: 1.25rem; }
+.selected-result { color: var(--fg); line-height: 1.55; }
+.selected-caveat { display: flex; gap: var(--space-xs); align-items: flex-start; color: var(--fg-lead); font-size: var(--text-small); line-height: 1.5; }
+.selected-caveat svg { flex: none; margin-top: 0.15em; color: var(--signal-amber); }
+.selected-part { font-size: var(--text-small); color: var(--fg-lead); line-height: 1.5; }
+.selected-links { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-lg); margin-top: auto; padding-top: var(--space-sm); }
+.selected-links a { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 44px; color: var(--violet-light); }
+.selected-open { font-weight: 600; }
+.glance { display: grid; gap: var(--space-xs); margin: var(--space-md) 0; padding: var(--space-md) var(--space-lg); background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--cyan); border-radius: var(--radius-md); max-width: 62ch; }
+.glance-row { display: grid; grid-template-columns: 5.5rem 1fr; gap: var(--space-sm); line-height: 1.5; }
+.glance-row dt { font-family: var(--font-m); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-muted); padding-top: 0.15em; }
+.glance-caveat dd { color: var(--fg-lead); }
+@media (max-width: 520px) { .glance-row { grid-template-columns: 1fr; gap: 0; } }
 
 /* ── contact + footer ── */
 .contact { background: var(--bg-deep); }

@@ -1,8 +1,8 @@
 # Terminal Explorer: a portfolio that shows its work (draft for the Builder Center "Your project" entry)
 
-> Status 29 Oct 2026: built and tested locally; code public on GitHub; **not deployed on AWS yet**. Every `TODO` must be replaced with what actually happened. Don't list an AWS service that wasn't used.
+> Status 31 Oct 2026: built and tested locally; code public on GitHub; **hosted with AWS Amplify Hosting** (endpoint checked 2026-10-31). The Amplify console build ID and screenshot are **not captured yet**, so they are marked TODO below. Every `TODO` must be replaced with what actually happened. Don't list an AWS service that wasn't used.
 
-**Live site:** TODO (no Amplify deployment yet)
+**Live site:** https://main.d3j3qw8xj45viu.amplifyapp.com/ (AWS Amplify Hosting, Region `eu-north-1`; address checked 2026-10-31, HTTP 200 and the full page rendered). TODO: add the Amplify build ID and console screenshot.
 **GitHub:** https://github.com/azizmessaoud/aws-superpower-portfolio
 
 ## Problem
@@ -33,11 +33,11 @@ browser only (static site)
            --> Answer { outcome, answer, evidence[], limitations[] }
            --> hero panel and terminal (same engine), mind state --> Canvas scene
 
-hosting (prepared, NOT deployed): GitHub --> AWS Amplify Hosting build (npm ci, npm run build) --> serve dist/
+hosting: GitHub (main) --> AWS Amplify Hosting build (npm ci, npm run build) --> serve dist/
 ```
 
-- No backend, no model, no network call while answering. `content/aws-status.yaml` is the one place AWS facts live; the build fails if it claims a deployment without a URL and a build record, or a service without evidence.
-- **AWS services actually used: none yet.** Planned and not built: AWS Amplify Hosting (console deploy), Amazon API Gateway, AWS Lambda, Amazon Bedrock, S3 or Bedrock Knowledge Bases. If a backend is added later, the browser retriever stays as the fallback.
+- No backend, no model, no network call while answering. `content/aws-status.yaml` is the one place AWS facts live; the build fails if it claims a deployment without a URL and an endpoint check, or a service without evidence.
+- **AWS services actually used: AWS Amplify Hosting only** (console GitHub connection, branch `main`, set up by me following the Day 4 guide). Planned and not built: Amazon API Gateway, AWS Lambda, Amazon Bedrock, S3 or Bedrock Knowledge Bases. If a backend is added later, the browser retriever stays as the fallback. AWS Budgets from Day 1 is account setup: TODO confirm and add a screenshot before listing it.
 
 ## What worked
 
@@ -72,7 +72,7 @@ hosting (prepared, NOT deployed): GitHub --> AWS Amplify Hosting build (npm ci, 
 
 ## What remains unproven
 
-- **The AWS deployment itself.** No live URL, no Amplify build record, no AWS screenshots yet. Live checks (headers, links, the demo flow in a private window) are NOT RUN until then.
+- **The Amplify console record.** The address serves the site (checked 2026-10-31 through an external renderer), but I have no console build ID or AWS screenshots yet. Live checks of security headers, every link and the demo flow in a private window are NOT RUN against the final build.
 - The retrieval score is optimistic: I wrote both the judged questions and the passage tags. Nobody else has tested it.
 - Passage text and certification links were copied from my repositories and earlier portfolio on 28-29 Oct 2026 and have not been re-checked at the issuers since.
 - The page-wide motion cannot be stopped by the visitor, and the manual keyboard and screen-reader audit from 28 Oct has not been repeated on the new hero.

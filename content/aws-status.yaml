@@ -3,8 +3,18 @@
 checkedOn: "2026-10-31"
 deployed: true
 liveUrl: "https://main.d3j3qw8xj45viu.amplifyapp.com/"
-# TODO(Aziz): add the Amplify build number and a console screenshot under reports/screens/ and mention them here.
-buildRecord: "AWS Amplify Hosting app in the Stack of Dreams project (Region eu-north-1, Europe Stockholm), branch main, created by Aziz in the console on 2026-10-31; the URL served the page on 2026-10-31."
+# Verified: the address serves the full site. This is NOT a console record.
+endpointCheck:
+  on: "2026-10-31"
+  method: "Fetched and rendered by an external page renderer (the checking machine could not reach the host directly)"
+  result: "HTTP 200 and the complete portfolio rendered (hero, projects, AWS section, terminal, contact)."
+# Stated by Aziz, not independently verified from a console record.
+setupNote: "Set up by Aziz in the AWS Console (Amplify Hosting, GitHub connection, branch main, Region eu-north-1, project Stack of Dreams), following the Day 4 guide. That is his account of the setup; no console record backs it here yet."
+# TODO(Aziz): when you capture the Amplify build page, uncomment and fill in (the screenshot file must exist):
+# consoleRecord:
+#   buildId: "<build number from the Amplify console>"
+#   screenshot: "reports/screens/amplify-build.png"
+#   capturedOn: "2026-11-01"
 buildChain:
   - npm ci
   - npm run build (validates content, regenerates data, type-checks, builds)

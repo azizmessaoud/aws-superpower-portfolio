@@ -1,5 +1,6 @@
 import { Evidence } from "./Evidence";
 import Label from "./Label";
+import CaseGlance from "./CaseGlance";
 
 const RD = "https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md";
 
@@ -16,10 +17,11 @@ const STEPS: { step: string; detail: string; outcome?: string }[] = [
 
 export default function HrDocs() {
   return (
-    <article className="case case-hr" aria-labelledby="hr-title">
+    <article id="project-hr" className="case case-hr" aria-labelledby="hr-title">
       <header className="case-head">
         <p className="case-kind">Prototype · synthetic documents · 2026</p>
         <h3 id="hr-title" className="case-title">HR document checks</h3>
+        <CaseGlance id="hr" />
         <p className="case-framing">
           A local, self-hosted pipeline that checks HR documents and explains every flag before a person decides whether the
           record can enter an HR information system. Today it runs as a synchronous FastAPI demo with in-memory jobs.

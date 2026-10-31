@@ -43,8 +43,8 @@ Precedence: Aziz's messages → `CLAUDE_CODE_PROMPT.md` → `docs/` → everythi
 - Day 2 guide: https://builder.aws.com/content/3LKlKCv8mLiBiKLXVGTq0TKUdLR/how-to-connect-your-coding-agent-to-aws
 - Days 3 and 4: linked from the event page once published (29 and 30 Oct)
 
-## Current state (29 Oct 2026)
+## Current state (31 Oct 2026)
 
 - Site built and tested locally (Vitest, Playwright, axe, contrast; logs in `reports/logs/`); code public on GitHub.
-- **Not deployed.** Stage 6 (Amplify) waits for the Day 4 guide and Aziz's go-ahead.
+- **Deployed with AWS Amplify Hosting** at https://main.d3j3qw8xj45viu.amplifyapp.com/ (address checked 2026-10-31). The Amplify console build ID and screenshot are not captured yet (`consoleRecord` in `content/aws-status.yaml`); don't claim a build record until they are.
 - Open decisions: D1 (console only vs CLI), D8 (CV link), result-to-node highlighting.

@@ -3,7 +3,7 @@
   passage: tr-ambulance
 - question: None of the TraffiX differences is significant with three seeds. What would you run next?
   passage: tr-mixed
-- question: Which parts of TraffiX did you build, and which came from traffix3?
+- question: Which parts of TraffiX did you build, and which did your teammates build?
   passage: tr-control
 - question: How did you keep clients apart in FlyRank, and what did the planted leakage test show?
   passage: fr-leakage

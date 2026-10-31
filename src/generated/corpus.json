@@ -44,9 +44,9 @@
    "projectTitle": "TraffiX",
    "title": "One writer per light, a reason for every decision",
    "text": "Only one controller per traffic light may change it, a supermaster coordinates the junctions, and every decision is logged with a reason code. A language layer, Synapse, explains decisions from that log and never acts on the simulation.",
-   "context": "Architecture adopted by the team from aymenhamzik/traffix3.",
+   "context": "Architecture made by our team of six.",
    "limitations": [
-    "The agent architecture was adopted from aymenhamzik/traffix3, not designed by me alone."
+    "The agent architecture was made by our team of six, not by me alone."
    ],
    "evidence": [
     {

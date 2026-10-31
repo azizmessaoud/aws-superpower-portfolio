@@ -1,6 +1,7 @@
 import type { Portfolio } from "../content/schema";
 import portfolio from "../generated/portfolio.json";
 import Icon from "../ui/Icon";
+import { consoleRecordLine, endpointLine } from "../content/awsRecord";
 
 /* Everything here is read from content/aws-status.yaml. The page never says more than that file proves:
  * a build file is not a deployment, and a planned service is not a connected one. */
@@ -12,12 +13,17 @@ export default function Aws() {
       <div className="inner">
         <p className="sec-label">AWS</p>
         <h2 id="aws-title" className="sec-h2">What is running on AWS, and what is not.</h2>
-        <p className={`aws-status${aws.deployed ? " is-live" : ""}`} role="status">
+        <div className={`aws-status${aws.deployed ? " is-live" : ""}`} role="status">
           {aws.deployed && aws.liveUrl
-            ? <>Deployed: <a href={aws.liveUrl}>{aws.liveUrl}</a>. Build record: {aws.buildRecord}</>
-            : <><strong>Not deployed yet.</strong> The Amplify build configuration is prepared; no live URL or build record exists, so no deployment is claimed.</>}
-          <span className="aws-checked"> Checked {aws.checkedOn}.</span>
-        </p>
+            ? <>
+                <p><strong>Hosted with AWS Amplify Hosting:</strong> <a href={aws.liveUrl}>{aws.liveUrl}</a></p>
+                <p>{endpointLine(aws)}</p>
+                <p className={aws.consoleRecord ? undefined : "aws-gap"}>{consoleRecordLine(aws)}</p>
+                {aws.setupNote && <p>{aws.setupNote}</p>}
+              </>
+            : <p><strong>Not deployed yet.</strong> The Amplify build configuration is prepared; no live URL or build record exists, so no deployment is claimed.</p>}
+          <p className="aws-checked">Record checked {aws.checkedOn}.</p>
+        </div>
         <div className="aws-grid">
           <div>
             <h3 className="aws-h">Verified</h3>

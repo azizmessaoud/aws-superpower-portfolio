@@ -2,14 +2,14 @@
 
 **Revision:** 3 — 28 October 2026, 23:00 (Africa/Lagos, UTC+1). Revision 2 text kept below each status change.
 **Official source, re-opened this session:** the event page (rendered live 28 Oct 2026; 263 participants at fetch time), plus the Day 1 and Day 2 guides. Quotations below are copied from that render.
-**Status words:** NOT STARTED · NOT RUN (artifact exists, check not run) · PASS · FAIL · BLOCKED. Built and tested locally on 28 Oct; nothing deployed. Statuses cite logs in `reports/logs/`.
+**Status words:** NOT STARTED · NOT RUN (artifact exists, check not run) · PASS · FAIL · BLOCKED. Built and tested locally on 28 Oct; hosted with AWS Amplify Hosting at https://main.d3j3qw8xj45viu.amplifyapp.com/ (address checked 31 Oct, external renderer, HTTP 200; the console build record is not captured yet). Statuses cite logs in `reports/logs/`.
 
 ## A. Official submission requirements
 
 | ID | Official wording | Planned evidence | Verification | Status |
 |---|---|---|---|---|
-| R-00 | "Follow the step-by-step guides to build and deploy your portfolio website with **AWS Amplify Hosting**." | Amplify Hosting app connected to the GitHub repo; build record; notes on which guide steps were followed | Amplify console build history; screenshots; `WRITEUP.md` | **BLOCKED.** Day 3 (29 Oct) and Day 4 (30 Oct) not yet published; Day 2 conflicts with the no-AWS-CLI rule (D1); deploy not authorised. |
-| R-01 | "A public portfolio website hosted on AWS that loads at a live URL and stays accessible through the judging window." | Live Amplify URL | Fresh-context Playwright smoke test; daily check 9–23 Nov | **BLOCKED** (no deploy) |
+| R-00 | "Follow the step-by-step guides to build and deploy your portfolio website with **AWS Amplify Hosting**." | Amplify Hosting app connected to the GitHub repo; build record; notes on which guide steps were followed | Amplify console build history; screenshots; `WRITEUP.md` | **PARTIAL.** Day 3 and Day 4 guides are published; the Day 4 console flow was followed by Aziz (his account) and the Amplify address serves the site. The console build record is not captured. Day 2 (AWS CLI connection) was not followed, per the no-AWS-CLI rule (D1 still open). |
+| R-01 | "A public portfolio website hosted on AWS that loads at a live URL and stays accessible through the judging window." | Live Amplify URL | Fresh-context Playwright smoke test; daily check 9–23 Nov | **PARTIAL**: address served the full page on 31 Oct (external renderer). Playwright smoke test against the live URL **NOT RUN** (the build host cannot reach amplifyapp.com); daily checks 9–23 Nov not started |
 | R-02 | "Three core sections: About Me, Skills or Tech Superpowers, and Projects or Achievements (learning projects count)." | `#about`, `#skills`, `#projects` built from `content/` | Playwright presence and nav tests at 390 and 1280 px | **PASS (local)** — `#about`, `#skills`, `#projects` render; nav + mobile menu tested at 1280/390 (`reports/logs/playwright.txt`). Live: BLOCKED. |
 | R-03 | "One creative feature that works without getting in the way of navigation." Plus, from About: "has to be interactive and it has to work, and visitors need a **visible hint** to find it." | "Ask my brain" with suggested questions as the hint; neural scene linked to verified passages | ≥ 12 judged questions + eval report; Playwright for hint, results, fallback, keyboard; nav still works | **PASS (local)** — 15 judged questions, hit@3 1.00, MRR 0.964; hero hint, results, no-result state, keyboard and suggestions tested. Embedding fallback NOT APPLICABLE (no embeddings). Live: BLOCKED. |
 | R-04 | "A link to your GitHub repository." | Public `azizmessaoud/aws-superpower-portfolio`, linked in the footer | Open the link signed out | **PASS** — created and pushed on your request (28–29 Oct) |
@@ -42,7 +42,7 @@ Judging process (official): Gate 1 "AI and human scoring", top 50 advance; Gate 
 | Contrast script | Usability | **PASS** 38/38 — `reports/logs/contrast.txt` |
 | gitleaks + `.gitignore` | AWS implementation hygiene | **PASS** no leaks (dir scan); `.env*` and Amplify local config ignored (`git check-ignore`). Pre-commit hook and CI NOT SET UP |
 | Labels never cross text (automated bounding-box test) | Usability | **NOT RUN** — checked by eye in screenshots only |
-| Amplify build record + live URL | AWS implementation | **BLOCKED** (Day 4 guide; your authorisation) |
+| Amplify build record + live URL | AWS implementation | **PARTIAL**: live URL verified 31 Oct; console build ID and screenshot **NOT CAPTURED** (Aziz to supply) |
 | Live Playwright + Lighthouse | AWS implementation; usability | **BLOCKED** |
 | Genuine AWS console screenshots | Communication; AWS implementation | **BLOCKED** |
 

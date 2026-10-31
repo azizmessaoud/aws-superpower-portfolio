@@ -1,9 +1,10 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { Component, lazy, Suspense, useCallback, useEffect, useState, type ReactNode } from "react";
 import type { Scene } from "./scene/scene";
 import Nav from "./ui/Nav";
 import Hero from "./sections/Hero";
 import Aws from "./sections/Aws";
 import type { MindState } from "./mind/state";
+import SelectedWork from "./sections/SelectedWork";
 import About from "./sections/About";
 import Skills from "./sections/Skills";
 import Projects from "./sections/Projects";
@@ -12,6 +13,15 @@ import Contact from "./sections/Contact";
 import Terminal from "./sections/Terminal";
 
 const NeuralScene = lazy(() => import("./scene/NeuralScene"));
+
+/* The animation is decoration. If its chunk fails to load (network, blocked script), render nothing for it and keep
+ * the rest of the page, instead of letting the failed import unmount the whole app. */
+class SceneBoundary extends Component<{ children: ReactNode; onFail: () => void }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onFail(); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
 
 export default function App() {
   const [reduced, setReduced] = useState(() => matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -42,11 +52,14 @@ export default function App() {
     <>
       <a className="skip" href="#main">Skip to content</a>
       <Nav scene={scene} docked={docked} />
-      <Suspense fallback={null}>
-        <NeuralScene reduced={reduced} onReady={onReady} onDocked={onDocked} />
-      </Suspense>
+      <SceneBoundary onFail={() => { setScene(null); setDocked(false); }}>
+        <Suspense fallback={null}>
+          <NeuralScene reduced={reduced} onReady={onReady} onDocked={onDocked} />
+        </Suspense>
+      </SceneBoundary>
       <main id="main">
         <Hero mind={mind} setMind={setMind} reduced={reduced} onLayout={onLayout} />
+        <SelectedWork />
         <About />
         <Skills />
         <Projects />

@@ -1,5 +1,6 @@
 import { Evidence } from "./Evidence";
 import Label from "./Label";
+import CaseGlance from "./CaseGlance";
 
 const V = "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md";
 const R = "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md";
@@ -15,15 +16,15 @@ const RESULTS = [
 
 export default function Traffix() {
   return (
-    <article className="case case-traffix" aria-labelledby="traffix-title">
+    <article id="project-traffix" className="case case-traffix" aria-labelledby="traffix-title">
       <header className="case-head">
         <p className="case-kind">Team simulation · ESPRIT course project · 2026</p>
         <h3 id="traffix-title" className="case-title">TraffiX</h3>
+        <CaseGlance id="traffix" />
         <p className="case-framing">
           A multi-agent traffic-control simulation of six junctions on the real streets of central Tunis, built on SUMO and
           driven through TraCI. It is a simulation: road demand is synthetic, and nothing here is deployment evidence.
         </p>
-        <p className="case-role"><strong>My part:</strong> the Control pair with Fares Ben Kacem: SUMO, observations, the A1 agent, safety and the controllers. The team adopted its agent architecture from aymenhamzik/traffix3; roles rotate.</p>
       </header>
       <div className="case-body">
         <figure className="hierarchy" aria-labelledby="traffix-fig">

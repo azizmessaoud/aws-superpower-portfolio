@@ -5,6 +5,7 @@ import portfolioJson from "../generated/portfolio.json";
 import { createAssistant, MAX_QUESTION, type Answer } from "../assistant/answer";
 import { DWELL_MS, nextState, STATE_TEXT, stateForOutcome, type MindState } from "../mind/state";
 import Icon from "../ui/Icon";
+import { CASES } from "./projects/summary";
 
 /* The sample that shows a weaker result is deliberately third-from-last: judges should find it. */
 const SAMPLES = [
@@ -15,6 +16,11 @@ const SAMPLES = [
   "What should I ask Aziz in an interview?",
   "Where did Aziz do internships?",
 ];
+/* Which flagship project an answer is about, read from the sources it cites. No match: no link. */
+const REPO_OF: Record<(typeof CASES)[number]["id"], string> = { traffix: "/azizmessaoud/traffix/", flyrank: "/azizmessaoud/flyrank/", hr: "/azizmessaoud/hr-anomaly-detection/" };
+export function projectOf(a: Answer) {
+  return CASES.find((c) => a.evidence.some((e) => e.url.includes(REPO_OF[c.id])));
+}
 const OUTCOME: Record<Answer["outcome"], string> = {
   supported: "Answer",
   contradicted: "Answer · the evidence disagrees with the question",
@@ -44,7 +50,15 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
 
   function submit(q: string) {
     const text = q.trim();
-    if (!text) return;
+    if (!text) {
+      /* an empty question gets the engine's own message, not silence */
+      clear();
+      setShown(assistant.ask(""));
+      const next = stateForOutcome("error");
+      setMind(next);
+      later(() => setMind(nextState(next, { type: "settle" })), reduced ? 1500 : DWELL_MS[next]);
+      return;
+    }
     const now = performance.now();
     if (now - lastAt.current < MIN_GAP_MS) return;
     lastAt.current = now;
@@ -64,7 +78,7 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
   return (
     <div className="ask" id="ask">
       <form className="ask-form" role="search" onSubmit={(e) => { e.preventDefault(); submit(value); }}>
-        <label htmlFor="hero-ask" className="ask-label">Terminal Explorer · check a claim against the evidence</label>
+        <label htmlFor="hero-ask" className="ask-label">Ask in plain English · the Terminal Explorer checks it against the evidence</label>
         <div className="ask-row">
           <input id="hero-ask" className="ask-input" type="search" value={value} maxLength={MAX_QUESTION} autoComplete="off"
             placeholder="e.g. Did TraffiX make ambulances faster?"
@@ -85,6 +99,7 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
           <p className="ask-outcome">{OUTCOME[shown.outcome]}</p>
           <h2 className="ask-title">{shown.title}</h2>
           <p className="ask-text">{shown.answer}</p>
+          {(() => { const p = projectOf(shown); return p && <p className="ask-open"><a href={`#project-${p.id}`}>Open the {p.title} case study <Icon name="arrow" /></a></p>; })()}
           {shown.evidence.length > 0 && (
             <>
               <h3 className="ask-sub">Evidence</h3>

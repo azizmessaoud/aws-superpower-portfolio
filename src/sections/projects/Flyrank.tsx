@@ -1,5 +1,6 @@
 import { Evidence } from "./Evidence";
 import Label from "./Label";
+import CaseGlance from "./CaseGlance";
 
 const C = "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md";
 const NB = "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/notebooks/w05_model.ipynb";
@@ -18,10 +19,11 @@ function Queue({ label, hits, value }: { label: string; hits: number; value: str
 
 export default function Flyrank() {
   return (
-    <article className="case case-flyrank" aria-labelledby="flyrank-title">
+    <article id="project-flyrank" className="case case-flyrank" aria-labelledby="flyrank-title">
       <header className="case-head">
         <p className="case-kind">Internship capstone · FlyRank AI · 2026</p>
         <h3 id="flyrank-title" className="case-title">Which pages should an editor review first?</h3>
+        <CaseGlance id="flyrank" />
         <p className="case-framing">
           From one day of search and analytics signals, rank webpages so the most useful ones reach a human reviewer first,
           then check the ranking on clients the model never saw. It is a prioritisation signal, not a claim about what a refresh causes.

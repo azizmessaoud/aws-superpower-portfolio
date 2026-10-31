@@ -1,5 +1,5 @@
 /* Fails the build when content could put an unsupported claim in front of a judge. */
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadContent } from "./content";
@@ -30,8 +30,9 @@ for (const p of passages) {
 }
 for (const q of interview) passageIds.has(q.passage) || errors.push(`interview question "${q.question.slice(0, 40)}": unknown passage ${q.passage}`);
 /* AWS: a deployment needs a URL and a build record; a connected service needs evidence and must not still be "planned". */
-if (awsStatus.deployed && !(awsStatus.liveUrl && awsStatus.buildRecord)) errors.push("aws-status: deployed: true needs liveUrl and buildRecord");
-if (!awsStatus.deployed && awsStatus.liveUrl) errors.push("aws-status: liveUrl set while deployed is false");
+if (awsStatus.deployed && !(awsStatus.liveUrl && awsStatus.endpointCheck)) errors.push("aws-status: deployed: true needs liveUrl and endpointCheck");
+if (!awsStatus.deployed && (awsStatus.liveUrl || awsStatus.consoleRecord)) errors.push("aws-status: liveUrl or consoleRecord set while deployed is false");
+if (awsStatus.consoleRecord && !existsSync(new URL(`../${awsStatus.consoleRecord.screenshot}`, import.meta.url))) errors.push(`aws-status: consoleRecord screenshot ${awsStatus.consoleRecord.screenshot} does not exist`);
 for (const c of awsStatus.connected) if (awsStatus.planned.some((p) => p.name.toLowerCase() === c.name.toLowerCase())) errors.push(`aws-status: ${c.name} is both connected and planned`);
 for (const s of skills) if (s.icon !== "toolkit" && !s.href) errors.push(`skills: ${s.title} has no evidence link`);
 for (const q of judged) q.relevant.forEach((id) => passageIds.has(id) || errors.push(`judged ${q.id}: unknown passage ${id}`));

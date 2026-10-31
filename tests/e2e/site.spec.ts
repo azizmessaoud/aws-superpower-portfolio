@@ -418,7 +418,7 @@ test("demo flow: the mind follows the question lifecycle and every answer shows 
   await ask(page, "What is the AWS hosting status?");
   await expect(box).toContainText("deployment recorded");
   await expect(box).toContainText("amplifyapp.com");
-  await expect(box).toContainText("Open the URL and the Amplify build record to check it");
+  await expect(box).toContainText("console build record is not captured yet");
   await expect(box.locator('.ask-evidence a[href$="amplify.yml"], .ask-evidence a[href*="/amplify.yml"]').first()).toBeVisible();
 
   await page.waitForTimeout(700);
@@ -496,7 +496,11 @@ test("refresh and hash links land on the right section", async ({ page }) => {
 test("the AWS section records the Amplify deployment and lists the other services as planned only", async ({ page }) => {
   await page.goto("/#aws");
   const sec = page.locator("#aws");
-  await expect(sec.locator(".aws-status")).toContainText("Deployed:");
+  const status = sec.locator(".aws-status");
+  await expect(status).toContainText("Hosted with AWS Amplify Hosting");
+  await expect(status).toContainText("Endpoint checked");
+  await expect(status).toContainText("console build record: not captured yet"); /* a reachable address is not a console record */
+  await expect(status).not.toContainText("Not deployed yet");
   await expect(sec.locator(".aws-status a")).toHaveAttribute("href", /amplifyapp\.com/);
   await expect(sec.getByRole("heading", { name: "Planned, not connected" })).toBeVisible();
   for (const svc of ["Amazon Bedrock", "AWS Lambda", "Amazon API Gateway"]) await expect(sec).toContainText(svc);
@@ -535,3 +539,100 @@ test("the question box understands typos and a recruiter's questions", async ({ 
   }
 });
 
+
+/* ── first screen, selected work, answer → project, states, failure modes ── */
+test("hero: name, direction, PFE availability and two distinct actions are on the first screen", async ({ page }) => {
+  await page.goto("/");
+  const hero = page.locator("#top");
+  await expect(hero.locator(".hero-avail")).toContainText("2027 final-year internship (PFE)");
+  await expect(hero.getByRole("link", { name: "See selected work" })).toHaveAttribute("href", "#selected");
+  await expect(hero.getByRole("link", { name: "Contact Aziz" })).toHaveAttribute("href", "#contact");
+  await expect(page.locator("#selected")).toBeAttached();
+});
+
+test("selected work: three flagships, each with a result, a caveat and a working link to its case study", async ({ page }) => {
+  await page.goto("/");
+  const cards = page.locator("#selected .selected-card");
+  await expect(cards).toHaveCount(3);
+  for (let i = 0; i < 3; i++) {
+    const c = cards.nth(i);
+    await expect(c.locator(".selected-result")).not.toBeEmpty();
+    await expect(c.locator(".selected-caveat")).toContainText("Caveat:");
+    const href = await c.getByRole("link", { name: "Read the case study" }).getAttribute("href");
+    expect(href).toMatch(/^#project-(traffix|flyrank|hr)$/);
+    await expect(page.locator(href!)).toBeAttached();
+  }
+  /* ownership is stated only where the evidence records it: TraffiX */
+  await expect(page.locator("#selected .selected-part")).toHaveCount(1);
+  await expect(cards.first()).toContainText("The Control pair");
+  await expect(cards.nth(1)).toContainText("observational");
+  await expect(cards.nth(2)).toContainText("synthetic");
+});
+
+test("each case study opens with result, caveat and boundary before the long text", async ({ page }) => {
+  await page.goto("/#projects");
+  for (const id of ["traffix", "flyrank", "hr"]) {
+    const g = page.locator(`#project-${id} .glance`);
+    await expect(g).toContainText("Result");
+    await expect(g).toContainText("Caveat");
+    await expect(g).toContainText("Boundary");
+  }
+  await expect(page.locator("#project-traffix .glance")).toContainText("My part");
+  await expect(page.locator("#project-flyrank .glance")).not.toContainText("My part");
+});
+
+test("an answer links to its case study; an answer about AWS does not pretend to be a project", async ({ page }) => {
+  await page.goto("/");
+  await ask(page, "What did Aziz personally build in TraffiX?");
+  const open = answerBox(page).getByRole("link", { name: /Open the TraffiX case study/ });
+  await expect(open).toHaveAttribute("href", "#project-traffix");
+  await open.click();
+  await expect(page.locator("#project-traffix")).toBeInViewport();
+  await page.goto("/");
+  await page.waitForTimeout(700);
+  await ask(page, "What is the AWS hosting status?");
+  await expect(answerBox(page)).toContainText("Endpoint checked");
+  await expect(answerBox(page).getByRole("link", { name: /case study/ })).toHaveCount(0);
+});
+
+test("the four result states are labelled in words, and an empty question gets a message, not silence", async ({ page }) => {
+  await page.goto("/");
+  await ask(page, "What did Aziz personally build in TraffiX?");
+  await expect(answerBox(page).locator(".ask-outcome")).toHaveText("Answer");
+  await page.waitForTimeout(700);
+  await ask(page, "Is TraffiX deployed in Tunis?");
+  await expect(answerBox(page).locator(".ask-outcome")).toContainText("the evidence disagrees");
+  await page.waitForTimeout(700);
+  await ask(page, "Do you know Kubernetes?");
+  await expect(answerBox(page).locator(".ask-outcome")).toHaveText("Not verified");
+  await page.waitForTimeout(700);
+  await page.locator("#hero-ask").fill("");
+  await page.locator(".ask-submit").click();
+  await expect(answerBox(page).locator(".ask-outcome")).toHaveText("Could not answer");
+  await expect(answerBox(page)).toContainText("Type a question first");
+  await expect(page.locator(".ask-status")).not.toBeEmpty();
+});
+
+test("failure mode: if the animation chunk never loads, the page and the question box still work", async ({ page }) => {
+  await page.route("**/assets/NeuralScene-*.js", (r) => r.abort());
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("practical AI systems");
+  await expect(page.locator("#selected .selected-card")).toHaveCount(3);
+  await ask(page, "Did TraffiX make ambulances faster?");
+  await expect(answerBox(page)).toContainText("240.0 s");
+  /* the failed import is expected here, and nothing else may have gone wrong; the global guard then sees a clean list */
+  const list = errors.get(page)!;
+  expect(list.some((m) => /NeuralScene/.test(m))).toBe(true);
+  errors.set(page, list.filter((m) => !/NeuralScene|dynamically imported module|Failed to load resource|ERR_FAILED/.test(m)));
+});
+
+test("failure mode: without JavaScript the visitor is told where the evidence is", async ({ browser }) => {
+  const ctx = await browser.newContext({ javaScriptEnabled: false });
+  const page = await ctx.newPage();
+  await page.goto("http://127.0.0.1:4173/");
+  const text = (await page.locator("noscript").first().textContent()) ?? "";
+  expect(text).toContain("2027 final-year internship (PFE)");
+  expect(text).toContain("aziz.messaoud@esprit.tn");
+  for (const repo of ["traffix", "flyrank", "hr-anomaly-detection"]) await expect(page.locator(`noscript a[href="https://github.com/azizmessaoud/${repo}"]`)).toHaveCount(1);
+  await ctx.close();
+});

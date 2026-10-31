@@ -2,6 +2,7 @@
  * no model, no network. Every factual answer carries the specific source that supports it, and four outcomes
  * stay distinct: supported, contradicted (the evidence says the opposite of the question's premise),
  * not_verified (no evidence either way) and error (the question could not be processed). */
+import { consoleRecordLine, endpointLine } from "../content/awsRecord";
 import type { Corpus, Portfolio } from "../content/schema";
 import { LABELS, LABEL_KEYS } from "../content/labels";
 import { isNear } from "../retrieval/fuzzy";
@@ -66,9 +67,9 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     if (aws.deployed && aws.liveUrl)
       return make({
         outcome: "supported", intent: "aws-status", title: "AWS hosting: deployment recorded",
-        answer: `Recorded as deployed at ${aws.liveUrl}. Build record: ${aws.buildRecord}`,
+        answer: `The site is hosted with AWS Amplify Hosting at ${aws.liveUrl}. ${endpointLine(aws)} ${consoleRecordLine(aws)} Amplify Hosting is the only AWS service recorded as connected.`,
         evidence: [awsStatusEvidence, amplifyEvidence],
-        limitations: ["This is the site's own record. Open the URL and the Amplify build record to check it.", ...aws.planned.map((p) => `${p.name}: planned, not connected.`)],
+        limitations: ["This is the site's own record. Open the URL to check it.", ...(aws.consoleRecord ? [] : ["The Amplify console build record is not captured yet."]), ...aws.planned.map((p) => `${p.name}: planned, not connected.`)],
       });
     return make({
       outcome: "not_verified", intent: "aws-status", title: "AWS hosting: deployment not verified",

@@ -21,6 +21,11 @@ export default function Hero({ mind, setMind, reduced, onLayout }: Props) {
             Applied ML, document AI, ranking and multi-agent simulation. Every project links to its repo, report or
             notebook, including what didn't work. Below, you can check any of it against the evidence.
           </p>
+          <p className="hero-avail"><span className="avail-dot" aria-hidden="true" />Open to a 2027 final-year internship (PFE) · AI/ML engineering, applied data science, AI research</p>
+          <div className="hero-actions">
+            <a className="btn-primary" href="#selected">See selected work</a>
+            <a className="btn-ghost" href="#contact">Contact Aziz</a>
+          </div>
           <AskPanel mind={mind} setMind={setMind} reduced={reduced} onLayout={onLayout} />
         </div>
       </div>

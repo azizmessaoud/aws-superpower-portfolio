@@ -37,9 +37,13 @@ These are hand-built because each has its own diagram and numbers. A new one nee
 
 ## AWS status (the one place AWS facts live)
 
-`content/aws-status.yaml` feeds the AWS section, the question box and the terminal. Rules the build enforces: `deployed: true` needs both `liveUrl` and `buildRecord`; a service under `connected` needs a link to the file or console record that proves it and cannot also be under `planned`. Never infer a deployment from `amplify.yml`, or a service from a dependency or a plan.
+`content/aws-status.yaml` feeds the AWS section, the question box and the terminal. Rules the build enforces: `deployed: true` needs both `liveUrl` and `endpointCheck` (a reachable address); `consoleRecord` (build ID, screenshot path that exists, date) is separate and optional, and while it is absent the site says the console record is not captured yet; a service under `connected` needs a link to the file or console record that proves it and cannot also be under `planned`. Never infer a deployment from `amplify.yml`, or a service from a dependency or a plan.
 
 ## A new skill domain
 
 Add an entry to `content/skills.yaml` with a link to where you used the tool. The Skills section and the "what tools did Aziz use?" answer both read it.
 
+
+## Flagship summaries (Selected work strip and the top of each case study)
+
+`src/sections/projects/summary.ts` holds one summary per flagship project: result, caveat, boundary, proof link, and `myPart` only where the evidence records Aziz's own part (today: TraffiX). The "Selected work" strip under the hero and the "Result / Caveat / My part / Boundary" block at the top of each case study both read it, so edit it in one place. Every line must repeat a statement already on the project card; do not add a `myPart` without a source.

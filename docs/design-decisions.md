@@ -58,3 +58,11 @@
 - Hero copy (29 Oct, after feedback that "Ask my brain" read like a product feature): the headline now leads with what I do ("I build practical AI systems.") and the evidence trail ("including what didn't work"); the question box stays, labelled as a way to check claims. Text in the hero is not selectable (so clicking the animation never highlights it); the question box and answers are.
 - Final alignment (29 Oct): the question box moved into the hero with the brain beside it; one answer engine (`src/assistant/answer.ts`) feeds both the hero panel and the terminal. Outcomes are `supported`, `contradicted`, `not_verified`, `error`. AWS facts come only from `content/aws-status.yaml`; a config file never implies a deployment and a dependency or plan never implies a service. Visual refinement was controlled, not a rebuild: no gradient headline, flatter skill cards, no hover lift; the brain, colours and type are unchanged. Bedrock, Lambda and API Gateway are planned only.
 
+
+## 31 Oct 2026: first-screen hiring path, case-study glance, failure modes
+
+- Hero gains one availability line (2027 PFE) and two different actions: "See selected work" (#selected) and "Contact Aziz" (#contact). There is no CV button because no verified CV file exists yet (D2/D8); do not add a link to an unverified file. Both extras hide once an answer is on screen, like the intro paragraph, so the answer never clips on a 320 px phone.
+- "Selected work" sits directly under the hero: three cards, each with result and caveat side by side. The same data (`projects/summary.ts`) opens each case study, so the preview and the detail cannot disagree. Ownership appears only where the evidence records it.
+- Answers link to the case study they cite (derived from the sources the answer already shows). An empty question now gets the engine's own message instead of silence.
+- The animation is optional: its chunk sits behind an error boundary, so a failed import no longer unmounts the page. The no-JavaScript page now carries name, availability, repository links and contact.
+- Not done on purpose: no Spline/WebGL/shader, no new dependency. The existing particle scene already carries the state story.

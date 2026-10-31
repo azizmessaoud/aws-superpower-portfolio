@@ -19,7 +19,7 @@ const PROJECTS: Record<string, { title: string; summary: string; facts: string[]
       "Pedestrian wait, morning peak: 116.3 s vs 144.1 s",
       "Ambulance trips: 240.0 s vs 213.2 s actuated (slower)",
     ],
-    limits: ["Simulation only; synthetic demand", "3 seeds, 3 scenarios; nothing significant at p < 0.05", "Architecture adopted from aymenhamzik/traffix3"],
+    limits: ["Simulation only; synthetic demand", "3 seeds, 3 scenarios; nothing significant at p < 0.05", "Agent architecture made by our team of six"],
     evidence: { text: "validation report §5.3–5.5", href: `${R}/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md` },
   },
   flyrank: {

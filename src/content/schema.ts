@@ -120,15 +120,24 @@ export interface Corpus {
 export const AwsStatus = z.object({
   checkedOn: z.string(),
   deployed: z.boolean(),
-  /** Required when deployed: the public URL, and a pointer to the Amplify build record that proves it. */
+  /** The public address. Required when deployed. */
   liveUrl: https.optional(),
-  buildRecord: z.string().min(10).optional(),
+  /** Proof that the address serves the site: when, how, and what came back. Required when deployed. */
+  endpointCheck: z.object({ on: z.string(), method: z.string().min(10), result: z.string().min(5) }).optional(),
+  /** Who configured the hosting, as stated by the owner. Not a console record. */
+  setupNote: z.string().min(10).optional(),
+  /** The Amplify console build record. Optional: when it is absent the site says the record is not captured yet.
+   *  When present, both the build ID and a screenshot path are needed. */
+  consoleRecord: z.object({ buildId: z.string().min(1), screenshot: z.string().min(3), capturedOn: z.string() }).optional(),
   buildChain: z.array(z.string()).min(1),
   verified: z.array(z.object({ text: z.string(), href: https })).min(1),
   /** Services actually connected. Each needs a link to the file or console record that proves it. */
   connected: z.array(z.object({ name: z.string(), evidence: https })),
   planned: z.array(z.object({ name: z.string(), note: z.string() })),
   costSafety: z.array(z.string()).min(1),
+}).superRefine((a, ctx) => {
+  if (a.deployed && !(a.liveUrl && a.endpointCheck)) ctx.addIssue({ code: "custom", message: "deployed: true needs liveUrl and endpointCheck" });
+  if (!a.deployed && (a.liveUrl || a.consoleRecord)) ctx.addIssue({ code: "custom", message: "liveUrl or consoleRecord set while deployed is false" });
 });
 export type AwsStatus = z.infer<typeof AwsStatus>;
 

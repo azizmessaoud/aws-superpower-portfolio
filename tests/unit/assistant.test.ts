@@ -36,12 +36,15 @@ describe("the required demo questions", () => {
     expect(portfolio.aws.deployed).toBe(true);
     expect(a.outcome).toBe("supported");
     expect(a.answer).toContain("amplifyapp.com");
-    expect(a.answer).toContain("Build record");
+    expect(a.answer).toContain("Endpoint checked");
+    expect(a.answer).toContain("not captured yet");
+    expect(a.answer).toContain("only AWS service recorded as connected");
     expect(a.limitations.join(" ")).toContain("Open the URL");
+    expect(a.limitations.join(" ")).toContain("console build record is not captured yet");
     expect(a.limitations.join(" ")).toContain("Amazon Bedrock: planned, not connected");
   });
   it("AWS hosting: a build config alone is not a deployment", () => {
-    const notYet = createAssistant(corpus, { ...portfolio, aws: { ...portfolio.aws, deployed: false, liveUrl: undefined, buildRecord: undefined } });
+    const notYet = createAssistant(corpus, { ...portfolio, aws: { ...portfolio.aws, deployed: false, liveUrl: undefined, endpointCheck: undefined, consoleRecord: undefined } });
     const a = notYet.ask("What is the AWS hosting status?");
     expect(a.outcome).toBe("not_verified");
     expect(a.answer).toContain("does not prove a deployment");
@@ -111,11 +114,12 @@ describe("outcomes stay distinct", () => {
 
 describe("AWS claims follow the evidence file, nothing else", () => {
   it("a recorded deployment needs a URL and a build record; it still does not imply services", () => {
-    const deployed = createAssistant(corpus, { ...portfolio, aws: { ...portfolio.aws, deployed: true, liveUrl: "https://main.example.amplifyapp.com", buildRecord: "Amplify console, build #1 succeeded" } });
+    const deployed = createAssistant(corpus, { ...portfolio, aws: { ...portfolio.aws, deployed: true, liveUrl: "https://main.example.amplifyapp.com", endpointCheck: { on: "2026-11-01", method: "Fetched by the test", result: "HTTP 200" }, consoleRecord: { buildId: "7", screenshot: "reports/screens/x.png", capturedOn: "2026-11-01" } } });
     const a = deployed.ask("What is the AWS hosting status?");
     expect(a.outcome).toBe("supported");
     expect(a.answer).toContain("https://main.example.amplifyapp.com");
-    expect(a.answer).toContain("Build record");
+    expect(a.answer).toContain("build 7");
+    expect(a.limitations.join(" ")).not.toContain("not captured");
     expect(deployed.ask("Does Aziz use Bedrock?").outcome).toBe("not_verified");
   });
   it("a service counts only when it is listed as connected with evidence", () => {
