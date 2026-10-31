@@ -299,6 +299,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .contact-links { display: flex; flex-wrap: wrap; gap: var(--space-lg); }
 .contact-links a { color: var(--fg); text-underline-offset: 4px; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; }
 .footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-md); padding: var(--space-xl) max(var(--space-md), env(safe-area-inset-left)); border-top: 1px solid var(--border); background: var(--bg-deep); color: var(--fg-muted); font-size: 13px; }
+.footer-links { display: flex; flex-wrap: wrap; column-gap: var(--space-lg); }
 .footer a { color: var(--violet-light); display: inline-flex; align-items: center; min-height: 44px; }
 
 @media (prefers-reduced-motion: reduce) {
