@@ -321,8 +321,10 @@
   }
  ],
  "aws": {
-  "checkedOn": "2026-10-29",
-  "deployed": false,
+  "checkedOn": "2026-10-31",
+  "deployed": true,
+  "liveUrl": "https://main.d3j3qw8xj45viu.amplifyapp.com/",
+  "buildRecord": "AWS Amplify Hosting app in the Stack of Dreams project (Region eu-north-1, Europe Stockholm), branch main, created by Aziz in the console on 2026-10-31; the URL served the page on 2026-10-31.",
   "buildChain": [
    "npm ci",
    "npm run build (validates content, regenerates data, type-checks, builds)",
@@ -338,12 +340,13 @@
     "href": "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/package.json"
    }
   ],
-  "connected": [],
-  "planned": [
+  "connected": [
    {
     "name": "AWS Amplify Hosting",
-    "note": "Console deployment of branch main. Not done yet."
-   },
+    "evidence": "https://main.d3j3qw8xj45viu.amplifyapp.com/"
+   }
+  ],
+  "planned": [
    {
     "name": "Amazon API Gateway",
     "note": "Would front a question endpoint with request throttling. Not built."

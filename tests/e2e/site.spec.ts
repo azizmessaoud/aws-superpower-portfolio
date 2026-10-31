@@ -416,9 +416,10 @@ test("demo flow: the mind follows the question lifecycle and every answer shows 
 
   await page.waitForTimeout(700);
   await ask(page, "What is the AWS hosting status?");
-  await expect(box).toContainText("Deployment is not verified");
-  await expect(box).toContainText("does not prove a deployment");
-  await expect(box.locator(".ask-evidence a").first()).toHaveAttribute("href", /amplify\.yml$/);
+  await expect(box).toContainText("deployment recorded");
+  await expect(box).toContainText("amplifyapp.com");
+  await expect(box).toContainText("Open the URL and the Amplify build record to check it");
+  await expect(box.locator('.ask-evidence a[href$="amplify.yml"], .ask-evidence a[href*="/amplify.yml"]').first()).toBeVisible();
 
   await page.waitForTimeout(700);
   await ask(page, "Does Aziz use Bedrock?");
@@ -492,10 +493,11 @@ test("refresh and hash links land on the right section", async ({ page }) => {
   }
 });
 
-test("the AWS section says not deployed and lists services as planned only", async ({ page }) => {
+test("the AWS section records the Amplify deployment and lists the other services as planned only", async ({ page }) => {
   await page.goto("/#aws");
   const sec = page.locator("#aws");
-  await expect(sec.locator(".aws-status")).toContainText("Not deployed yet");
+  await expect(sec.locator(".aws-status")).toContainText("Deployed:");
+  await expect(sec.locator(".aws-status a")).toHaveAttribute("href", /amplifyapp\.com/);
   await expect(sec.getByRole("heading", { name: "Planned, not connected" })).toBeVisible();
   for (const svc of ["Amazon Bedrock", "AWS Lambda", "Amazon API Gateway"]) await expect(sec).toContainText(svc);
   await expect(sec.getByRole("heading", { name: "Verified" })).toBeVisible();

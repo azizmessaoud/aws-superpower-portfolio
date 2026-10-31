@@ -233,6 +233,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .ask-samples { display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-xs); }
 .ask-samples .suggest-q { min-height: 40px; font-size: 14px; }
 .ask-answer { flex: 0 1 auto; min-height: 4.5rem; margin-top: var(--space-xs); padding: var(--space-md) var(--space-lg); max-height: 40vh; max-height: 40svh; overflow-y: auto; overscroll-behavior: contain; background: var(--surface); border: 1px solid var(--border-strong); border-left: 3px solid var(--cyan); border-radius: var(--radius-md); }
+.ask-answer, .t-line, .aws-status { overflow-wrap: anywhere; } /* long URLs (e.g. the Amplify address) must wrap, not widen the page on a 320px phone */
 .ask-answer.is-contradicted { border-left-color: var(--signal-amber); }
 .ask-answer.is-not_verified { border-left-color: var(--signal-amber); border-style: dashed; border-left-style: dashed; }
 .ask-answer.is-error { border-left-color: var(--signal-red); }

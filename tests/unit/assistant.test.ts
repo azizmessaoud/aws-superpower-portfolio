@@ -31,14 +31,22 @@ describe("the required demo questions", () => {
     expect(a.limitations.join(" ")).toContain("not comparable");
     expect(urls(a).length).toBeGreaterThanOrEqual(3);
   });
-  it("AWS hosting: a build config is not a deployment", () => {
+  it("AWS hosting: the recorded deployment gives the URL and the build record, and is open to checking", () => {
     const a = bot.ask("What is the AWS hosting status?");
-    expect(portfolio.aws.deployed).toBe(false);
+    expect(portfolio.aws.deployed).toBe(true);
+    expect(a.outcome).toBe("supported");
+    expect(a.answer).toContain("amplifyapp.com");
+    expect(a.answer).toContain("Build record");
+    expect(a.limitations.join(" ")).toContain("Open the URL");
+    expect(a.limitations.join(" ")).toContain("Amazon Bedrock: planned, not connected");
+  });
+  it("AWS hosting: a build config alone is not a deployment", () => {
+    const notYet = createAssistant(corpus, { ...portfolio, aws: { ...portfolio.aws, deployed: false, liveUrl: undefined, buildRecord: undefined } });
+    const a = notYet.ask("What is the AWS hosting status?");
     expect(a.outcome).toBe("not_verified");
     expect(a.answer).toContain("does not prove a deployment");
     expect(a.answer).not.toMatch(/https:\/\/\S*amplifyapp/);
     expect(urls(a).some((u) => u.endsWith("/amplify.yml"))).toBe(true);
-    expect(urls(a).some((u) => u.endsWith("/content/aws-status.yaml"))).toBe(true);
   });
   it("Bedrock and Lambda: not verified, planned only, never claimed", () => {
     for (const q of ["Does Aziz use Bedrock or Lambda?", "Does Aziz use Bedrock?", "Is AWS Lambda connected?", "Is there an API Gateway?"]) {
