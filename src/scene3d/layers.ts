@@ -2,7 +2,8 @@
  * Every layer is additive light that sits on or just above the surface and is depth-tested against it, so the sculpture
  * stays visible and the far side of the brain stays hidden behind the near side. */
 import {
-  AdditiveBlending, BufferAttribute, BufferGeometry, DoubleSide, Mesh, Points, ShaderMaterial, Vector2, Vector3, type Object3D,
+  AddEquation, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, Mesh, MeshBasicMaterial, OneFactor, Points,
+  ShaderMaterial, Vector2, Vector3, type Object3D,
 } from "three";
 import { mulberry32 } from "../scene/rng";
 import { childCounts, type FiberNetwork } from "./fibers";
@@ -10,10 +11,20 @@ import { childCounts, type FiberNetwork } from "./fibers";
 /* palette: the site's electric blue and violet, with a little ice-white */
 const BLUE = "vec3(0.231, 0.510, 0.965)", BLUE_LIGHT = "vec3(0.38, 0.65, 1.0)", VIOLET = "vec3(0.545, 0.361, 0.965)", ICE = "vec3(0.91, 0.96, 1.0)";
 
+/* Light adds to what is behind it. On a transparent canvas that means premultiplied output (colour, plus an alpha equal to its
+ * brightest channel) and One/One blending, so the page shows through everywhere the network is dark and nothing paints black. */
+const ADD = { blending: CustomBlending, blendEquation: AddEquation, blendSrc: OneFactor, blendDst: OneFactor, blendEquationAlpha: AddEquation, blendSrcAlpha: OneFactor, blendDstAlpha: OneFactor } as const;
+const EMIT_GLSL = /* glsl */ `vec4 emit(vec3 c) { return vec4(c, max(c.r, max(c.g, c.b))); }`;
+
 /* One shared description of the pulses, so ribbons and nodes light up together. */
 const PULSE_GLSL = /* glsl */ `
 uniform float uTime;
+uniform float uReveal;   /* 0..1: how far the network has grown out from its roots (the entrance) */
+uniform float uMaxDist;
+float grown(float dist) { float front = uReveal * (uMaxDist + 0.5); return smoothstep(front, front - 0.22, dist); }
+float growFront(float dist) { float front = uReveal * (uMaxDist + 0.5); return uReveal < 0.999 ? exp(-pow((dist - front) / 0.1, 2.0)) : 0.0; }
 uniform float uPulseOn;
+uniform float uPulseClock; /* integrated on the CPU, so a change of speed never makes a pulse jump */
 uniform float uPulseSpeed;
 uniform float uPulseGap;
 uniform float uPulseLen[8];
@@ -24,7 +35,7 @@ float pulseAt(float mask, float dist) {
     float member = mod(floor(mask / exp2(float(k)) + 0.01), 2.0);
     if (member < 0.5 || uPulseLen[k] <= 0.0) continue;
     float cycle = uPulseLen[k] + uPulseGap;
-    float head = mod(uTime * uPulseSpeed + uPulsePhase[k] * cycle, cycle);
+    float head = mod(uPulseClock + uPulsePhase[k] * cycle, cycle);
     float d = head - dist;                       /* > 0: behind the head */
     p += d < 0.0 ? exp(-pow(d / 0.03, 2.0)) : exp(-d / 0.2);
   }
@@ -45,7 +56,7 @@ function pulseUniforms(f: FiberNetwork, o: LayerOptions) {
   const rand = mulberry32(99);
   for (let k = 0; k < 8; k++) phase[k] = (k * 0.618034 + rand() * 0.2) % 1; /* spread the pulses out in time */
   return {
-    uTime: { value: 0 }, uPulseOn: { value: 1 }, uPulseSpeed: { value: o.pulseSpeed ?? 0.7 }, uPulseGap: { value: o.pulseGap ?? 5 },
+    uTime: { value: 0 }, uPulseClock: { value: 0 }, uPulseOn: { value: 1 }, uPulseSpeed: { value: o.pulseSpeed ?? 0.7 }, uPulseGap: { value: o.pulseGap ?? 5 },
     uPulseLen: { value: Array.from(f.pulseLen) }, uPulsePhase: { value: Array.from(phase) },
   };
 }
@@ -86,10 +97,10 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
   for (let i = 0; i < N; i++) maxDist = Math.max(maxDist, f.dist[i]!);
   const shared = {
     ...pulseUniforms(f, o), uRes: { value: new Vector2(1280, 720) }, uPx: { value: 800 }, uMinPx: { value: 1.1 }, uWMin: { value: 0.0016 }, uWMax: { value: 0.0135 },
-    uCenter: { value: new Vector3(0, 0.03, -0.02) }, uMaxDist: { value: maxDist }, uDpr: { value: 1 }, uBeads: { value: 1 }, uGain: { value: 1.7 },
+    uCenter: { value: new Vector3(0, 0.03, -0.02) }, uMaxDist: { value: maxDist }, uDpr: { value: 1 }, uBeads: { value: 1 }, uGain: { value: 1.7 }, uReveal: { value: 1 },
   };
   const ribbon = new ShaderMaterial({
-    uniforms: shared, transparent: true, depthWrite: false, side: DoubleSide, blending: AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+    uniforms: shared, transparent: true, depthWrite: false, side: DoubleSide, ...ADD, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
     vertexShader: /* glsl */ `
       uniform vec2 uRes; uniform float uPx, uMinPx, uWMin, uWMax, uDpr; uniform vec3 uCenter;
       attribute vec3 aOther; attribute float aSide, aEnd, aFlow, aDist, aMask;
@@ -115,8 +126,9 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
       }`,
     fragmentShader: /* glsl */ `
       ${PULSE_GLSL}
-      uniform float uMaxDist, uBeads, uGain;
+      uniform float uBeads, uGain;
       varying float vSide, vFlow, vDist, vMask, vWpx, vFres;
+      ${EMIT_GLSL}
       void main() {
         float cv = vSide * 2.6;                          /* across the strand itself: -1..1 inside the core */
         float core = smoothstep(1.0, 0.2, abs(cv));
@@ -137,8 +149,10 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
         /* faint beads of light drifting outward along every strand, so the whole network is alive between pulses */
         float beads = pow(0.5 + 0.5 * sin(vDist * 17.0 - uTime * 1.35), 10.0) * (0.5 + 0.5 * sin(vDist * 2.3 + vMask * 0.37)) * uBeads;
         float p = pulseAt(vMask, vDist);
-        vec3 col = base * a * (1.0 + 1.1 * beads) + mix(${BLUE}, ${ICE}, 0.7) * p * (core + 0.9 * halo * 3.0) * 1.7;
-        gl_FragColor = vec4(col, 1.0);
+        float g = grown(vDist);
+        vec3 col = (base * a * (1.0 + 1.1 * beads) + mix(${BLUE}, ${ICE}, 0.7) * p * (core + 0.9 * halo * 3.0) * 1.7) * g;
+        col += ${ICE} * growFront(vDist) * (core + halo * 2.0) * 1.2; /* a bright head where the network is growing */
+        gl_FragColor = emit(col);
       }`,
   });
   const mesh = new Mesh(g, ribbon);
@@ -156,7 +170,7 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
   ng.setAttribute("aDist", new BufferAttribute(nd, 1));
   ng.setAttribute("aMask", new BufferAttribute(nm, 1));
   const nodeMat = new ShaderMaterial({
-    uniforms: { ...shared, uNodeOn: { value: 1 } }, transparent: true, depthWrite: false, blending: AdditiveBlending,
+    uniforms: { ...shared, uNodeOn: { value: 1 } }, transparent: true, depthWrite: false, ...ADD,
     vertexShader: /* glsl */ `
       uniform float uPx; attribute float aFlow, aDist, aMask; varying float vFlow, vDist, vMask;
       void main() {
@@ -168,13 +182,14 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
     fragmentShader: /* glsl */ `
       ${PULSE_GLSL}
       uniform float uNodeOn; varying float vFlow, vDist, vMask;
+      ${EMIT_GLSL}
       void main() {
         float r = length(gl_PointCoord - 0.5) * 2.0;
         if (r > 1.0) discard;
         float glow = exp(-r * r * 3.2);
         float p = pulseAt(vMask, vDist);
         vec3 col = mix(${BLUE_LIGHT}, ${ICE}, 0.35) * glow * (0.3 + 0.35 * pow(vFlow, 0.4)) + ${ICE} * p * glow;
-        gl_FragColor = vec4(col * uNodeOn, 1.0);
+        gl_FragColor = emit(col * uNodeOn * grown(vDist));
       }`,
   });
   const nodes = new Points(ng, nodeMat);
@@ -191,7 +206,7 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
   tg.setAttribute("aDist", new BufferAttribute(td, 1));
   tg.setAttribute("aMask", new BufferAttribute(tm, 1));
   const tipMat = new ShaderMaterial({
-    uniforms: { ...shared, uTipOn: { value: 1 } }, transparent: true, depthWrite: false, blending: AdditiveBlending,
+    uniforms: { ...shared, uTipOn: { value: 1 } }, transparent: true, depthWrite: false, ...ADD,
     vertexShader: /* glsl */ `
       uniform float uPx, uTime; uniform vec3 uCenter; attribute float aSeed, aDist, aMask;
       varying float vSeed, vDist, vMask, vFres;
@@ -205,6 +220,7 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
     fragmentShader: /* glsl */ `
       ${PULSE_GLSL}
       uniform float uTipOn; varying float vSeed, vDist, vMask, vFres;
+      ${EMIT_GLSL}
       void main() {
         float r = length(gl_PointCoord - 0.5) * 2.0;
         if (r > 1.0) discard;
@@ -212,21 +228,34 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
         float glow = exp(-r * r * 3.0);
         float p = pulseAt(vMask, vDist);
         vec3 col = mix(${BLUE_LIGHT}, ${ICE}, 0.55) * glow * twinkle * (0.75 + 1.0 * vFres) + ${ICE} * p * glow * 1.8;
-        gl_FragColor = vec4(col * uTipOn, 1.0);
+        gl_FragColor = emit(col * uTipOn * grown(vDist));
       }`,
   });
   const tips = new Points(tg, tipMat);
   tips.frustumCulled = false;
 
   const all = [ribbon, nodeMat, tipMat];
+  let manualClock = false;
   return {
     ribbons: mesh as Object3D, nodes: nodes as Object3D, tips: tips as Object3D, segments: M, branchNodes: nodeIdx.length, tipCount: tipIdx.length,
     setPulses(on: boolean) { all.forEach((m) => { (m.uniforms.uPulseOn as { value: number }).value = on ? 1 : 0; }); },
     /** a sparser, thinner network (the mobile tier) needs more light per strand to carry the same form */
     setGain(g: number) { (ribbon.uniforms.uGain as { value: number }).value = g; },
+    /** 0..1: the entrance. The network grows outward from the brainstem as this rises. */
+    setReveal(v: number) { (shared.uReveal as { value: number }).value = v; },
+    /** the question lifecycle's mood: brightness, and how often pulses travel (a shorter gap means more of them at once) */
+    setMood(m: { gain?: number; pulseOn?: number; pulseSpeed?: number; pulseGap?: number }) {
+      if (m.gain !== undefined) (shared.uGain as { value: number }).value = m.gain;
+      if (m.pulseOn !== undefined) (shared.uPulseOn as { value: number }).value = m.pulseOn;
+      if (m.pulseSpeed !== undefined) (shared.uPulseSpeed as { value: number }).value = m.pulseSpeed;
+      if (m.pulseGap !== undefined) (shared.uPulseGap as { value: number }).value = m.pulseGap;
+    },
     setBeads(on: boolean) { (ribbon.uniforms.uBeads as { value: number }).value = on ? 1 : 0; },
     setNodes(on: boolean) { (nodeMat.uniforms.uNodeOn as { value: number }).value = on ? 1 : 0; },
+    /** drive the pulses from your own integrated clock (so the speed can change smoothly); without it they follow time x speed */
+    setPulseClock(c: number) { manualClock = true; (shared.uPulseClock as { value: number }).value = c; },
     update(time: number, width: number, height: number, fovDeg: number, dpr: number) {
+      if (!manualClock) (shared.uPulseClock as { value: number }).value = time * (shared.uPulseSpeed as { value: number }).value;
       for (const m of all) {
         (m.uniforms.uTime as { value: number }).value = time;
         (m.uniforms.uRes as { value: Vector2 }).value.set(width * dpr, height * dpr);
@@ -255,7 +284,7 @@ export function createParticles(surface: Float32Array, normals: Float32Array, co
   g.setAttribute("aSeed", new BufferAttribute(sd, 1));
   g.setAttribute("aFar", new BufferAttribute(far, 1));
   const mat = new ShaderMaterial({
-    uniforms: { uTime: { value: 0 }, uPx: { value: 800 }, uOn: { value: 1 } }, transparent: true, depthWrite: false, blending: AdditiveBlending,
+    uniforms: { uTime: { value: 0 }, uPx: { value: 800 }, uOn: { value: 1 } }, transparent: true, depthWrite: false, ...ADD,
     vertexShader: /* glsl */ `
       uniform float uTime, uPx; attribute vec3 aNormal; attribute float aSeed, aFar; varying float vA; varying float vSeed;
       void main() {
@@ -270,11 +299,12 @@ export function createParticles(surface: Float32Array, normals: Float32Array, co
       }`,
     fragmentShader: /* glsl */ `
       uniform float uOn; varying float vA; varying float vSeed;
+      ${EMIT_GLSL}
       void main() {
         float r = length(gl_PointCoord - 0.5) * 2.0;
         if (r > 1.0) discard;
         vec3 col = mix(${BLUE_LIGHT}, mix(${VIOLET}, ${ICE}, step(0.8, vSeed)), step(0.45, vSeed));
-        gl_FragColor = vec4(col * vA * exp(-r * r * 2.2) * uOn, 1.0);
+        gl_FragColor = emit(col * vA * exp(-r * r * 2.2) * uOn);
       }`,
   });
   const points = new Points(g, mat);
@@ -282,6 +312,8 @@ export function createParticles(surface: Float32Array, normals: Float32Array, co
   return {
     points: points as Object3D,
     set(on: boolean) { (mat.uniforms.uOn as { value: number }).value = on ? 1 : 0; },
+    /** 0..1: fades the whole scatter, for the entrance and for quality steps */
+    setAmount(v: number) { (mat.uniforms.uOn as { value: number }).value = v; },
     update(time: number, height: number, fovDeg: number, dpr: number) {
       (mat.uniforms.uTime as { value: number }).value = time;
       (mat.uniforms.uPx as { value: number }).value = (height * dpr * 0.5) / Math.tan((fovDeg * Math.PI) / 360);
@@ -291,3 +323,21 @@ export function createParticles(surface: Float32Array, normals: Float32Array, co
 }
 
 export type { Shared };
+
+/** The body of the brain when it is not drawn: an invisible mesh that still writes depth (so near strands hide far ones), plus a
+ *  faint rim of light so the silhouette holds where strands are sparse. */
+export function createGhostBody(geometry: BufferGeometry, rim = 0.1) {
+  const occluder = new Mesh(geometry, new MeshBasicMaterial({ colorWrite: false }));
+  occluder.renderOrder = -1;
+  const rimMat = new ShaderMaterial({
+    uniforms: { uRim: { value: rim } }, transparent: true, depthWrite: false, ...ADD,
+    vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }",
+    fragmentShader: `uniform float uRim; varying vec3 vN; varying vec3 vV; ${EMIT_GLSL} void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 3.0); gl_FragColor = emit(mix(vec3(0.23,0.51,0.96), vec3(0.55,0.36,0.96), 0.35) * f * uRim); }`,
+  });
+  const rimMesh = new Mesh(geometry, rimMat);
+  return {
+    objects: [occluder, rimMesh] as Object3D[],
+    setRim(v: number) { (rimMat.uniforms.uRim as { value: number }).value = v; },
+    dispose() { (occluder.material as MeshBasicMaterial).dispose(); rimMat.dispose(); },
+  };
+}

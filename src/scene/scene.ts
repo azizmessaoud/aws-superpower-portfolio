@@ -36,6 +36,9 @@ export interface SceneOptions {
   reducedMotion: boolean;
   intro: boolean;
   onDocked?: (docked: boolean) => void;
+  /** "canvas": this scene draws the hero sphere and brain itself (default). "webgl": a separate WebGL canvas is the hero; this scene
+   *  then draws only the docked brain in the nav and the flight's last stretch. */
+  heroMode?: "canvas" | "webgl";
 }
 
 interface Proj { x: number; y: number; z: number; s: number; inf: number; ex: number; a: number }
@@ -57,6 +60,10 @@ export function createScene(o: SceneOptions) {
   const TINTS: Record<MindState, [number, number, number]> = { idle: [34, 211, 238], listening: [34, 211, 238], retrieving: [34, 211, 238], answering: [34, 211, 238], uncertain: [254, 188, 46], error: [255, 95, 87] };
   const mindLive = () => mind !== "idle";
   let heroVisible = true, paused = false, destroyed = false;
+  /* webMix: 0 = this scene draws the hero, 1 = the WebGL canvas does; it eases between the two so a fallback or a late load never pops */
+  let heroMode: "canvas" | "webgl" = o.heroMode ?? "canvas";
+  let webMix = heroMode === "webgl" ? 1 : 0;
+  const webGoal = () => (heroMode === "webgl" ? 1 : 0);
   let travelFrom = 0, travelTo = 0, travelStart = 0;
   const introStart = o.intro && !o.reducedMotion ? performance.now() : 0;
   const excitation = new Map<number, number>();
@@ -179,8 +186,10 @@ export function createScene(o: SceneOptions) {
     const travel = o.reducedMotion ? 0 : travelNow(now);
     if (!o.reducedMotion && travelTo === 1 && travel >= 1) setDocked(true);
     const heroOn = stageTop + stageH > 0 && travel < 1;
-    const shell = clamp((1.9 - zoom) / 0.9, 0, 1) * (1 - span(travel, 0, 0.4));
-    const tags = span(1 - Math.pow(1 - intro, 3), 0.7, 1) * (1 - span(progress, 0, 0.25));
+    webMix += clamp(webGoal() - webMix, -0.07, 0.07);
+    const hero = 1 - webMix; /* how much of the hero this scene still draws */
+    const shell = clamp((1.9 - zoom) / 0.9, 0, 1) * (1 - span(travel, 0, 0.4)) * hero;
+    const tags = span(1 - Math.pow(1 - intro, 3), 0.7, 1) * (1 - span(progress, 0, 0.25)) * hero;
     const sway = still || (docked && !dockActive && !mindLive()) ? 0 : 1;
     const orbit = still ? 0.55 : t * 0.11, tilt = 0.32 + Math.sin(t * 0.07) * 0.05 * sway;
     const yaw = Math.PI / 2 + (still ? 0.35 : Math.sin(t * 0.18) * 0.45 * (docked ? sway : 1));
@@ -196,7 +205,7 @@ export function createScene(o: SceneOptions) {
     ctx.clearRect(0, 0, W, H);
 
     /* full-background neural field behind everything in the hero */
-    const fieldAlpha = heroOn ? (1 - span(travel, 0, 0.5)) * (0.35 + 0.65 * intro) : 0;
+    const fieldAlpha = heroOn ? (1 - span(travel, 0, 0.5)) * (0.35 + 0.65 * intro) * hero : 0;
     if (fieldAlpha > 0.01) drawField(fieldAlpha, t);
 
     /* the sphere and its skills: hero only */
@@ -228,8 +237,11 @@ export function createScene(o: SceneOptions) {
     /* the brain: in the hero, travelling, or docked */
     const kDock = dock.r / (BRAIN_HALF * 0.67 * 1.4);
     const docking = docked || travel > 0;
-    if (heroOn || (docked && dockAllowed)) {
-      const tt = docked ? 1 : travel;
+    /* With a WebGL hero the 3D canvas does the flight; this scene only fades its docked brain in over the last half of it */
+    const webHero = webMix > 0.5;
+    const showBrain = webHero ? (docked && dockAllowed) || (!docked && travel > 0.5) : heroOn || (docked && dockAllowed);
+    if (showBrain) {
+      const tt = webHero || docked ? 1 : travel;
       const cx = sphere.cx + (dock.cx - sphere.cx) * tt;
       const cy = cyHero + (dock.cy - cyHero) * tt;
       const k = Math.exp(Math.log(kHero) + (Math.log(kDock) - Math.log(kHero)) * tt);
@@ -237,7 +249,7 @@ export function createScene(o: SceneOptions) {
       const dockDot = Math.min(0.9, 0.45 * Math.sqrt(1400 / Math.max(1, brain.length / 3)));
       const grow = Math.min(zoom, 2.2) * (1 - tt) + dockDot * tt;
       const heroText = tt < 1; /* once docked the hero has scrolled away; only the nav's controls block */
-      const fade = docked && !dockAllowed ? 0 : 1;
+      const fade = (docked && !dockAllowed ? 0 : 1) * (webHero ? (docked ? 1 : span(travel, 0.5, 1)) : docked ? 1 : 1 - webMix);
       for (let i = 0; i < brain.length; i += 3) {
         project(brain[i], brain[i + 1], brain[i + 2], cx, cy, k, view.bCosY, view.bSinY);
         brainXY[i] = out.x; brainXY[i + 1] = out.y; brainXY[i + 2] = out.s;
@@ -369,7 +381,7 @@ export function createScene(o: SceneOptions) {
   }
 
   /* the loop runs only while something visible moves: the hero on screen, or a hovered/focused dock */
-  const shouldRun = () => !paused && !document.hidden && !o.reducedMotion && !destroyed && ((heroVisible && !docked) || travelling(performance.now()) || (docked && (dockActive || mindLive()) && dockAllowed));
+  const shouldRun = () => !paused && !document.hidden && !o.reducedMotion && !destroyed && ((heroVisible && !docked && webMix < 0.999) || Math.abs(webGoal() - webMix) > 0.001 || travelling(performance.now()) || (docked && (dockActive || mindLive()) && dockAllowed));
   function loop(now: number) {
     raf = 0;
     if (!shouldRun()) { still(); return; }
@@ -431,6 +443,19 @@ export function createScene(o: SceneOptions) {
     /** dock hidden (e.g. the visitor is already at the Terminal Explorer): don't draw the docked brain */
     setDockAllowed(on: boolean) { dockAllowed = on; measureFixed(); sync(); still(); },
     remeasure() { measure(); still(); },
+    /** which scene draws the hero. Switching eases over about a fifth of a second. */
+    setHeroMode(m: "canvas" | "webgl") { if (m === heroMode) return; heroMode = m; sync(); still(); },
+    get heroMode() { return heroMode; },
+    /** Everything a WebGL hero needs to follow this scene's choreography: layout, scroll progress, the flight to the dock. */
+    getHeroState() {
+      const now = performance.now();
+      return {
+        W, H, progress, stageTop, stageH, docked, text,
+        travel: o.reducedMotion ? 0 : travelNow(now), /* 0 in the hero, 1 landed in the nav, eased exactly as the 2D brain flew */
+        intro: introStart ? clamp((now - introStart) / 1800, 0, 1) : 1,
+        dock: { ...dock }, reduced: o.reducedMotion, dockAt: DOCK_AT,
+      };
+    },
     get paused() { return paused; },
     get frames() { return frame; },
     get pulseCount() { return pulses.length; },

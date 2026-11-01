@@ -59,12 +59,16 @@ button { font: inherit; color: inherit; }
 
 /* ── hero (pinned while scroll drives the camera) ── */
 .hero { position: relative; }
-.hero-stage { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; align-items: center; overflow: hidden; }
+.hero-stage { position: sticky; top: 0; z-index: 2; height: 100vh; height: 100svh; display: flex; align-items: center; overflow: hidden; }
 .hero-runway { height: 0; }
 @media (prefers-reduced-motion: no-preference) { html.js .hero-runway { height: 70vh; height: 70svh; } }
 /* one decorative canvas for the whole page, above everything so the brain can dock into the nav; it never
  * draws over text or controls (the scene keeps out of them) and never takes pointer events */
 .brain-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100lvh; display: block; z-index: 210; pointer-events: none; }
+/* the 3D brain: a fixed square canvas, moved and scaled by script along the flight to the nav. Its z-index is below the hero stage
+ * (which holds all the text), so the words are always drawn on top of the light, and above the page background. Light adds to the page
+ * where the browser supports plus-lighter; elsewhere it composites normally and still reads as light. */
+.brain3d { position: fixed; left: 0; top: 0; z-index: 1; display: block; pointer-events: none; opacity: 0; visibility: hidden; transform-origin: 50% 50%; will-change: transform, opacity; mix-blend-mode: plus-lighter; }
 .hero-inner { position: relative; z-index: 2; width: 100%; max-width: var(--container); margin: 0 auto; padding: 5.5rem max(var(--space-md), env(safe-area-inset-left)) 2rem; display: flex; flex-direction: column; justify-content: center; max-height: 100vh; max-height: 100svh; }
 .hero-inner > * { flex: none; }
 .hero-inner > .ask { flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; }
@@ -75,7 +79,8 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .eyebrow { display: flex; align-items: center; gap: var(--space-xs); margin-bottom: var(--space-lg); font-family: var(--font-m); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--violet-light); }
 .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--violet); }
 /* the name is the first thing a visitor should read: brighter, larger and heavier than the role line beside it */
-.eyebrow-name { font-size: 14px; font-weight: 600; letter-spacing: 0.14em; color: var(--fg); }
+.eyebrow { flex-wrap: wrap; row-gap: var(--space-2xs); }
+.eyebrow-name { white-space: nowrap; font-size: 14px; font-weight: 600; letter-spacing: 0.14em; color: var(--fg); }
 .eyebrow-role { white-space: pre-wrap; }
 /* touch targets: the sample questions are 44 px tall wherever a finger is the likely pointer, and on narrow screens */
 @media (pointer: coarse), (max-width: 760px) { .hero-inner .ask-samples .suggest-q { min-height: 44px; } }

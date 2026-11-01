@@ -14,7 +14,8 @@
     "contrast": "tsx scripts/contrast-check.ts",
     "e2e": "playwright test",
     "bake:brain": "tsx scripts/bake-brain.ts",
-    "check:fibers": "tsx scripts/check-fibers.ts"
+    "check:fibers": "tsx scripts/check-fibers.ts",
+    "check:budget": "tsx scripts/check-budget.ts"
   },
   "dependencies": {
     "react": "18.3.1",

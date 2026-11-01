@@ -8,10 +8,10 @@
  * Not part of the production build; nothing in the site imports it. */
 import {
   ACESFilmicToneMapping, AmbientLight, BufferAttribute, BufferGeometry, Color, DirectionalLight, Group, HemisphereLight,
-  AdditiveBlending, Mesh, MeshBasicMaterial, MeshStandardMaterial, PerspectiveCamera, Scene, ShaderMaterial, WebGLRenderer,
+  Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer,
 } from "three";
 import { decodeBrain } from "./brainAsset";
-import { createFiberLayers, createParticles } from "./layers";
+import { createFiberLayers, createGhostBody, createParticles } from "./layers";
 import fullUrl from "./assets/brain-full.brain?url";
 import mobileUrl from "./assets/brain-mobile.brain?url";
 
@@ -85,18 +85,7 @@ async function main() {
   scene.add(group);
   if (layers.includes("s")) {
     if (body === "solid") group.add(new Mesh(geo, new MeshStandardMaterial({ vertexColors: true, roughness: 0.5, metalness: 0 })));
-    else if (body === "ghost") {
-      /* draws nothing, but writes depth: strands on the near side hide strands on the far side, which gives the volume */
-      const occluder = new Mesh(geo, new MeshBasicMaterial({ colorWrite: false }));
-      occluder.renderOrder = -1;
-      /* a faint rim of light so the silhouette holds even where strands are sparse */
-      const rim = new Mesh(geo, new ShaderMaterial({
-        uniforms: { uRim: { value: rimStrength } }, transparent: true, depthWrite: false, blending: AdditiveBlending,
-        vertexShader: "varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }",
-        fragmentShader: "uniform float uRim; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 3.0); gl_FragColor = vec4(mix(vec3(0.23,0.51,0.96), vec3(0.55,0.36,0.96), 0.35) * f * uRim, 1.0); }",
-      }));
-      group.add(occluder, rim);
-    }
+    else if (body === "ghost") group.add(...createGhostBody(geo, rimStrength).objects);
   }
   T.colorMs = performance.now() - t; t = performance.now();
 

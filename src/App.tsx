@@ -11,8 +11,11 @@ import Projects from "./sections/Projects";
 import Certifications from "./sections/Certifications";
 import Contact from "./sections/Contact";
 import Terminal from "./sections/Terminal";
+import { canUseWebglHero } from "./scene3d/capability";
 
 const NeuralScene = lazy(() => import("./scene/NeuralScene"));
+/* the 3D hero is a separate, lazily loaded chunk (Three.js and the renderer); the page is complete without it */
+const HeroBrain = lazy(() => import("./scene3d/HeroBrain"));
 
 /* The animation is decoration. If its chunk fails to load (network, blocked script), render nothing for it and keep
  * the rest of the page, instead of letting the failed import unmount the whole app. */
@@ -28,6 +31,11 @@ export default function App() {
   const [scene, setScene] = useState<Scene | null>(null);
   const [docked, setDocked] = useState(false);
   const [mind, setMind] = useState<MindState>("idle");
+  /* "webgl" when this device can run the 3D hero; any failure later flips it back to "canvas" and the 2D hero returns */
+  const [heroMode, setHeroMode] = useState<"canvas" | "webgl">(() => (canUseWebglHero() ? "webgl" : "canvas"));
+  const heroFailed = useCallback((why: string) => { console.info(`3D hero unavailable (${why}); using the 2D hero`); setHeroMode("canvas"); }, []);
+  useEffect(() => { document.documentElement.dataset.brain = heroMode === "webgl" ? "loading" : "canvas"; }, [heroMode]);
+  useEffect(() => { scene?.setHeroMode(heroMode); }, [scene, heroMode]);
 
   /* The page is rendered by script, so the browser cannot scroll to #fragment on load or refresh; do it once the sections exist. */
   useEffect(() => {
@@ -54,9 +62,16 @@ export default function App() {
       <Nav scene={scene} docked={docked} />
       <SceneBoundary onFail={() => { setScene(null); setDocked(false); }}>
         <Suspense fallback={null}>
-          <NeuralScene reduced={reduced} onReady={onReady} onDocked={onDocked} />
+          <NeuralScene reduced={reduced} heroMode={heroMode} onReady={onReady} onDocked={onDocked} />
         </Suspense>
       </SceneBoundary>
+      {heroMode === "webgl" && (
+        <SceneBoundary onFail={() => heroFailed("the 3D chunk failed to load")}>
+          <Suspense fallback={null}>
+            <HeroBrain scene={scene} reduced={reduced} mind={mind} onFail={heroFailed} />
+          </Suspense>
+        </SceneBoundary>
+      )}
       <main id="main">
         <Hero mind={mind} setMind={setMind} reduced={reduced} onLayout={onLayout} />
         <SelectedWork />

@@ -159,11 +159,15 @@ export function decodeBrain(input: Uint8Array): BrainAsset {
   return { meta, positions, sulcus, part, hemi, index, fibers };
 }
 
-/** Fetch, gunzip and decode a baked brain. Throws if the browser cannot gunzip (the caller keeps the 2D brain). */
+/** Fetch, gunzip and decode a baked brain. Throws if the browser cannot gunzip (the caller keeps the 2D hero).
+ *  If something in between already decompressed the file (some proxies do), it is used as it is. */
 export async function loadBrain(url: string, signal?: AbortSignal): Promise<BrainAsset> {
-  if (typeof DecompressionStream === "undefined") throw new Error("DecompressionStream is not available");
   const res = await fetch(url, { signal });
-  if (!res.ok || !res.body) throw new Error(`brain asset: HTTP ${res.status}`);
-  const buf = await new Response(res.body.pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
-  return decodeBrain(new Uint8Array(buf));
+  if (!res.ok) throw new Error(`brain asset: HTTP ${res.status}`);
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
+    if (typeof DecompressionStream === "undefined") throw new Error("DecompressionStream is not available");
+    return decodeBrain(new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer()));
+  }
+  return decodeBrain(bytes);
 }
