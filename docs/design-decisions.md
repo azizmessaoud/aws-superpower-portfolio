@@ -66,3 +66,15 @@
 - Answers link to the case study they cite (derived from the sources the answer already shows). An empty question now gets the engine's own message instead of silence.
 - The animation is optional: its chunk sits behind an error boundary, so a failed import no longer unmounts the page. The no-JavaScript page now carries name, availability, repository links and contact.
 - Not done on purpose: no Spline/WebGL/shader, no new dependency. The existing particle scene already carries the state story.
+
+## 1 Nov 2026: the 3D hero is integrated (WebGL), with the 2D scene as fallback and as the nav motif
+
+- **Two canvases, never sharing a context.** The 2D scene keeps the whole page canvas and the small docked brain in the nav. The new 3D canvas is a fixed square placed in the hero's free area and moved with a CSS transform; its z-index is below the hero stage, so text is always drawn on top of the light.
+- **One choreography.** The 3D canvas reads the 2D scene's own scroll progress, eased flight and dock position (`scene.getHeroState()`), flies to the nav on the same curve, and fades while the 2D scene fades its docked brain in. The flight maths is a pure, unit-tested function.
+- **A "WebGL hero" mode in the 2D scene.** `heroMode: "webgl"` stops it drawing the skill sphere, labels, drifting field and old brain (the generic spherical network is gone in this mode), and eases back if the 3D hero fails. The default mode is unchanged, and its tests stay (they now run with `?hero=canvas`).
+- **Capability, not pointer type.** `canUseWebglHero()` and `chooseTier()` look at WebGL2, gzip streams, Save-Data, memory, cores and window size.
+- **Governor.** After the first frames the frame time is judged; one step down (device pixel ratio 1, no particles or beads), and if still slow the 3D hero is dropped for the 2D one.
+- **Geometry is baked.** Generating the brain takes about 1.3 s of computation, so it is generated offline and shipped as small gzip files; the loader rebuilds triangles from counts.
+- **Placement.** On a wide screen the brain sits right of the text; below the text on a phone. On the shortest phones it may tuck at most about 0.45 of its radius behind the last row (text stays on top).
+- **Budgets enforced by script.** `npm run check:budget`: 3D chunk 137.1 kB of 180 kB; main bundle 76.0 kB; geometry files on the wire 406.6 kB (full) and 154.5 kB (mobile), against proposed budgets of 450 and 180 kB.
+- **Not verified:** frame rate on physical GPUs and phones. Browser tests use software WebGL on a shared CPU, which is slower and noisier than real hardware.

@@ -46,6 +46,24 @@ npm run contrast       # WCAG pairs from src/styles/tokens.css
 npx playwright test    # browser checks at 1280 and 390 px (needs `npm run build` first)
 ```
 
+## The 3D hero (WebGL) and its fallback
+
+The hero brain is a network of light drawn with WebGL on its own canvas, below the hero text. It is loaded lazily (a separate JS chunk, plus one geometry file chosen by device), and the page is complete without it. When anything is missing, the 2D hero is used instead.
+
+| Flag | Effect |
+|---|---|
+| `?hero=canvas` | force the 2D hero (also what a device without WebGL2, with Save-Data, or without gzip streams gets) |
+| `?tier=full` / `?tier=mobile` | force the geometry tier (otherwise chosen by window size, memory and cores, never by "touch device" alone) |
+| `?gov=off` | turn off the frame-rate governor (used by tests, which render in software) |
+
+Falls back to 2D when: no WebGL2, the asset fails to load, the GPU context is lost, or frames stay too slow after one quality step. Reduced motion draws a still, with no animation loop.
+
+```
+npm run bake:brain     # regenerate the two geometry files from the generator (deterministic, seed 7)
+npm run check:fibers   # 14 structural criteria on the baked fibre networks
+npm run check:budget   # fails if the 3D chunk exceeds 180 kB gzip, or the assets exceed their budgets
+```
+
 ## Demo flow (run on the live URL)
 
 1. Open the site in a private window; the hero loads.

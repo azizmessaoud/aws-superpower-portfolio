@@ -24,6 +24,10 @@ It retrieves; it does not write answers or judge anyone.
 
 The point-cloud brain beside the question box is the interface's state, nothing else: idle, listening while you type, retrieving evidence, answering, uncertain (amber, calmer) or error. It never shows what a model "thinks" and it carries no confidence value. The same state is written as a line of text under the box, so it is readable without the animation and in reduced-motion mode. The brain is a picture of the honest part of the project: when the evidence is missing, it goes quiet instead of looking busy.
 
+## The hero brain: a network of light, not a model of a brain
+
+The brain in the hero is built entirely from fibres. There is no solid surface and no downloaded 3D model: my code generates a procedural cortex (two hemispheres, folds, cerebellum, brainstem), then grows a branching network over it as a river network. Fibres follow the crowns of the folds, merge into thick trunks and thin out to twigs, and a few light pulses travel along marked paths. The solid brain is used only as an invisible depth mask, so near strands hide far ones. The geometry is generated once, offline, and shipped as two small gzip files (full about 407 kB, mobile about 155 kB) that load lazily after the page; the page does not generate it on the visitor's device. If WebGL, the file or the frame rate is not good enough, the page keeps the 2D hero it had before.
+
 ## Architecture
 
 ```
@@ -64,6 +68,9 @@ hosting: GitHub (main) --> AWS Amplify Hosting build (npm ci, npm run build) -->
 - The hero panel was taller than the screen. I shrank the headline, hid the intro paragraph while an answer is showing, and added a test that the panel fits at 1280x860, 1280x720, 390x844 and 320x640.
 - I removed the page-wide pause button at my own request. That drops a WCAG 2.2.2 mechanism for motion longer than 5 seconds; reduced-motion visitors still get still frames, and the status text never depends on the animation.
 
+- The 3D hero's problems were mostly mine, and the checks found them: ribbons that twisted into bow-ties (every strand looked dotted), a neighbour-count bug that made fibre paths jump across the brain, a loop that parked itself on its first frame, and a "highway" check I first wrote wrongly. Each is fixed and covered by a test or a check (`npm run check:fibers`, 14 criteria).
+- Software WebGL on a shared CPU starves the page's animation loop; the flight to the nav took 1-7 s in my test browser (3 s even for the plain 2D hero). That is a property of the test machine, not measured on a real GPU.
+
 ## What I learned
 
 - My CVs disagree with my repositories (degree name, city, internship dates, one FlyRank metric, how autonomous the HR pipeline is). I built the site from the repositories and kept the conflicts off the page until I settle them.
@@ -73,6 +80,7 @@ hosting: GitHub (main) --> AWS Amplify Hosting build (npm ci, npm run build) -->
 ## What remains unproven
 
 - **The Amplify console record.** The address serves the site (checked 2026-10-31 through an external renderer), but I have no console build ID or AWS screenshots yet. Live checks of security headers, every link and the demo flow in a private window are NOT RUN against the final build.
+- **Frame rate and smoothness on real phones and laptops.** Everything about the 3D hero was verified in a browser with software WebGL. Bundle size (137 kB gzip for the 3D chunk) and transfer size (407 kB / 155 kB) are measured; frame timing on real GPUs is not.
 - The retrieval score is optimistic: I wrote both the judged questions and the passage tags. Nobody else has tested it.
 - Passage text and certification links were copied from my repositories and earlier portfolio on 28-29 Oct 2026 and have not been re-checked at the issuers since.
 - The page-wide motion cannot be stopped by the visitor, and the manual keyboard and screen-reader audit from 28 Oct has not been repeated on the new hero.
