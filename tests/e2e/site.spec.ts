@@ -290,8 +290,9 @@ test("tech superpowers: seven cards, every evidenced card links to a repository"
   await page.locator("#skills").screenshot({ path: `reports/screens/${info.project.name}-skills.png` });
 });
 
-test("the neural field fills the whole hero background, not only the sphere", async ({ page }) => {
-  await page.goto("/?seed=7");
+/* the next three describe the 2D hero (its drifting field and click pulses), which stays as the fallback: they run in that mode */
+test("2D hero: the neural field fills the whole hero background, not only the sphere", async ({ page }) => {
+  await page.goto("/?hero=canvas&seed=7");
   await page.waitForTimeout(2000);
   const lit = await page.evaluate(() => {
     const c = document.querySelector<HTMLCanvasElement>(".brain-canvas")!, k = c.width / innerWidth, ctx = c.getContext("2d")!;
@@ -302,8 +303,8 @@ test("the neural field fills the whole hero background, not only the sphere", as
   expect(lit.right).toBeGreaterThan(200);
 });
 
-test("the network flows behind the hero text instead of stopping at a box around it", async ({ page }) => {
-  await page.goto("/?seed=7");
+test("2D hero: the network flows behind the hero text instead of stopping at a box around it", async ({ page }) => {
+  await page.goto("/?hero=canvas&seed=7");
   await page.waitForTimeout(2000);
   /* the brightest canvas pixel inside the text column, over ~1 s of drift */
   const peak = await page.evaluate(async () => {
@@ -329,16 +330,17 @@ test("stopping the scroll mid-way never leaves the brain hanging: it finishes th
   await page.waitForTimeout(800);
   const run = await runway(page);
   await scrollPage(page, Math.round(run * 0.87));         /* just past the threshold, then stop */
-  await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/, { timeout: 2000 });
+  /* the flight itself takes 0.75 s; the budget is generous because software-rendered WebGL on a shared CPU can starve the animation loop (measured: 1-7 s here, 3 s even for the plain 2D hero). The property is that it always lands. */
+  await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/, { timeout: 12000 });
   await page.waitForTimeout(150);
   expect(await running(page)).toBe(false);               /* landed, loop idle */
   await scrollPage(page, Math.round(run * 0.5));          /* scroll back above it: the brain flies back out */
   await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
 });
 
-test("clicking on the hero text still sends a pulse through the network", async ({ page }, info) => {
+test("2D hero: clicking on the hero text still sends a pulse through the network", async ({ page }, info) => {
   test.skip(info.project.name === "mobile", "hover/click journey is for pointer devices");
-  await page.goto("/");
+  await page.goto("/?hero=canvas");
   await page.waitForTimeout(1500);
   const pulses = () => page.evaluate(() => (window as unknown as { __scene: { pulseCount: number } }).__scene.pulseCount);
   const before = await pulses();
@@ -738,4 +740,174 @@ test("results table on a 320 px phone: each row stacks, numbers stay with their 
   }
   await expect(t.locator("caption")).toBeVisible();
   expect((await t.locator("caption").boundingBox())!.width).toBeGreaterThan(250);
+});
+
+/* ── the 3D hero ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+const brainReady = (page: Page) => page.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 60000 });
+type Hook = { frames: number; level: number; size: number; tier: string; litPixels: () => { lit: number; total: number } };
+const hook = <T,>(page: Page, f: (h: Hook) => T) => page.evaluate((src) => { const h = (window as unknown as { __brain3d: Hook }).__brain3d; return (new Function("h", `return (${src})(h)`) as (h: Hook) => unknown)(h); }, f.toString()) as Promise<T>;
+
+test("3D hero: on by default, it draws real light, and the tier follows the window", async ({ page }) => {
+  await page.goto("/?gov=off");
+  await brainReady(page);
+  await page.waitForTimeout(3000);
+  const lit = await hook(page, (h) => h.litPixels());
+  expect(lit.lit / lit.total, "a few percent of the canvas is lit: a network, not a blob and not nothing").toBeGreaterThan(0.015);
+  expect(lit.lit / lit.total).toBeLessThan(0.5);
+  expect(await hook(page, (h) => h.frames)).toBeGreaterThan(5);
+  expect(await hook(page, (h) => h.tier)).toMatch(/^(full|mobile)$/);
+  expect(await page.locator(".brain3d").getAttribute("aria-hidden")).toBe("true"); /* decorative: the page's text carries the meaning */
+});
+
+test("3D hero: the canvas is below the hero text in z-order and clear of every line of text on desktop", async ({ page }, info) => {
+  await page.goto("/?gov=off");
+  await brainReady(page);
+  await page.waitForTimeout(1500);
+  const z = await page.evaluate(() => ({ canvas: Number(getComputedStyle(document.querySelector(".brain3d")!).zIndex), stage: Number(getComputedStyle(document.querySelector(".hero-stage")!).zIndex), nav: Number(getComputedStyle(document.querySelector(".nav")!).zIndex) }));
+  expect(z.canvas).toBeLessThan(z.stage);
+  expect(z.canvas).toBeLessThan(z.nav);
+  const pe = await page.locator(".brain3d").evaluate((e) => getComputedStyle(e).pointerEvents);
+  expect(pe).toBe("none"); /* it never takes a click or a tap */
+  if (info.project.name === "mobile") return;
+  const overlap = await page.evaluate(() => {
+    const c = document.querySelector(".brain3d")!.getBoundingClientRect(), range = document.createRange(), hits: string[] = [];
+    for (const el of document.querySelectorAll(".hero-inner > *")) {
+      range.selectNodeContents(el);
+      for (const r of Array.from(range.getClientRects())) {
+        if (r.width < 2) continue;
+        const w = Math.min(r.right, c.right) - Math.max(r.left, c.left), h = Math.min(r.bottom, c.bottom) - Math.max(r.top, c.top);
+        if (w > 1 && h > 1) hits.push(`${el.className || el.tagName} ${Math.round(w)}x${Math.round(h)}`);
+      }
+    }
+    return hits;
+  });
+  expect(overlap, "no line of text lies under the canvas").toEqual([]);
+});
+
+test("3D hero: a phone gets the lighter asset, and the brain sits below the text", async ({ page }, info) => {
+  test.skip(info.project.name !== "mobile", "phone layout");
+  const asked: string[] = [];
+  page.on("request", (r) => /brain-(full|mobile)/.test(r.url()) && asked.push(r.url()));
+  await page.goto("/?gov=off");
+  await brainReady(page);
+  await page.waitForTimeout(1200);
+  expect(asked.length).toBe(1);
+  expect(asked[0]).toContain("brain-mobile");
+  const g = await page.evaluate(() => {
+    const c = document.querySelector(".brain3d")!.getBoundingClientRect(), last = Array.from(document.querySelectorAll(".hero-inner > *")).pop()!.getBoundingClientRect();
+    return { top: c.top, size: c.height, lastBottom: last.bottom, vh: innerHeight };
+  });
+  expect(g.top + g.size * 0.5).toBeGreaterThan(g.lastBottom - 0.45 * g.size); /* the centre is under the text; at most a bounded tuck behind the last row */
+});
+
+test("3D hero: ?tier=full asks for the full asset, and it arrives gzipped (about 400 kB, not megabytes)", async ({ page }) => {
+  const sizes: number[] = [];
+  page.on("response", async (r) => { if (/brain-full/.test(r.url())) sizes.push((await r.body()).length); });
+  await page.goto("/?gov=off&tier=full");
+  await brainReady(page);
+  expect(await hook(page, (h) => h.tier)).toBe("full");
+  expect(sizes.length).toBe(1);
+  expect(sizes[0]!).toBeGreaterThan(300_000);
+  expect(sizes[0]!).toBeLessThan(500_000);
+});
+
+test("3D hero fallback: if the asset cannot be fetched, the 2D hero returns and the page still works", async ({ page }) => {
+  await page.route(/brain-(full|mobile).*\.brain/, (r) => r.abort());
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.brain === "canvas", null, { timeout: 30000 });
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("practical AI systems");
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __scene: { heroMode: string } }).__scene.heroMode)).toBe("canvas");
+  await ask(page, "Did TraffiX make ambulances faster?");
+  await expect(answerBox(page)).toContainText("240.0 s");
+  /* the failed fetch is the expected error; anything else would still fail the global guard */
+  const list = errors.get(page)!;
+  errors.set(page, list.filter((m) => !/Failed to load resource|ERR_FAILED|net::/.test(m)));
+});
+
+test("3D hero fallback: with no WebGL2 the 2D hero is used from the start, with no 3D download", async ({ page }) => {
+  const asked: string[] = [];
+  page.on("request", (r) => /brain-(full|mobile)/.test(r.url()) && asked.push(r.url()));
+  await page.addInitScript(() => {
+    const orig = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) { return type === "webgl2" || type === "webgl" ? null : (orig as (...a: unknown[]) => unknown).call(this, type, ...rest); } as typeof HTMLCanvasElement.prototype.getContext;
+  });
+  await page.goto("/");
+  await page.waitForTimeout(1500);
+  expect(await page.evaluate(() => document.documentElement.dataset.brain)).toBe("canvas");
+  expect(asked).toEqual([]);
+  await expect(page.locator(".brain3d")).toHaveCount(0);
+});
+
+test("3D hero fallback: ?hero=canvas forces the 2D hero", async ({ page }) => {
+  await page.goto("/?hero=canvas");
+  await page.waitForTimeout(800);
+  expect(await page.evaluate(() => document.documentElement.dataset.brain)).toBe("canvas");
+  await expect(page.locator(".brain3d")).toHaveCount(0);
+});
+
+test("3D hero fallback: if the GPU context is lost, the 2D hero takes over", async ({ page }) => {
+  await page.goto("/?gov=off");
+  await brainReady(page);
+  await page.waitForTimeout(800);
+  await page.evaluate(() => { const gl = document.querySelector<HTMLCanvasElement>(".brain3d")!.getContext("webgl2")!; gl.getExtension("WEBGL_lose_context")!.loseContext(); });
+  await page.waitForFunction(() => document.documentElement.dataset.brain === "canvas", null, { timeout: 10000 });
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __scene: { heroMode: string } }).__scene.heroMode)).toBe("canvas");
+});
+
+test("3D hero: reduced motion draws a still and runs no animation loop", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?gov=off");
+  await brainReady(page);
+  await page.waitForTimeout(1200);
+  const a = await hook(page, (h) => h.frames);
+  await page.waitForTimeout(900);
+  const b = await hook(page, (h) => h.frames);
+  expect(b, "no frames are drawn on a timer").toBe(a);
+  const lit = await hook(page, (h) => h.litPixels());
+  expect(lit.lit / lit.total, "but the stand-still image is there").toBeGreaterThan(0.015);
+  expect(await page.locator(".brain3d").evaluate((e) => getComputedStyle(e).visibility)).toBe("visible");
+});
+
+test("3D hero: it stops rendering once the hero is scrolled away, and starts again when you return", async ({ page }) => {
+  await page.goto("/?gov=off");
+  await brainReady(page);
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => window.scrollTo(0, 2400)); /* well past the hero */
+  await page.waitForTimeout(2500);
+  const a = await hook(page, (h) => h.frames);
+  await page.waitForTimeout(900);
+  expect(await hook(page, (h) => h.frames), "no frames while the hero is off screen").toBe(a);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(2500);
+  expect(await hook(page, (h) => h.frames), "frames resume when it is back on screen").toBeGreaterThan(a);
+});
+
+test("3D hero: the headline, name, actions and question box are all there with the animation switched off", async ({ page }) => {
+  await page.route(/brain-(full|mobile).*\.brain/, (r) => r.abort());
+  await page.goto("/?hero=canvas");
+  for (const t of ["Aziz Messaoud", "practical AI systems", "2027 final-year internship"]) await expect(page.locator("#top")).toContainText(t);
+  await expect(page.getByRole("link", { name: "See selected work" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Contact Aziz" })).toBeVisible();
+  await expect(page.locator("#hero-ask")).toBeVisible();
+});
+
+test("3D hero works under the production Content-Security-Policy and headers (customHttp.yml), with no violations", async ({ page }) => {
+  const { readFileSync } = await import("node:fs");
+  const yml = readFileSync("customHttp.yml", "utf8");
+  const csp = yml.match(/key: Content-Security-Policy\s+value: "([^"]+)"/)?.[1];
+  expect(csp, "the policy is found in customHttp.yml").toBeTruthy();
+  /* apply the real policy to the page, as Amplify will */
+  await page.route("**/*", async (route) => {
+    if (route.request().resourceType() !== "document") return route.continue();
+    const res = await route.fetch();
+    await route.fulfill({ response: res, headers: { ...res.headers(), "content-security-policy": csp! } });
+  });
+  const violations: string[] = [];
+  page.on("console", (m) => { if (/Content Security Policy|violates the following/i.test(m.text())) violations.push(m.text().slice(0, 160)); });
+  await page.goto("/?gov=off");
+  await brainReady(page);
+  await page.waitForTimeout(2500);
+  const lit = await hook(page, (h) => h.litPixels());
+  expect(lit.lit / lit.total).toBeGreaterThan(0.015);
+  expect(violations).toEqual([]);
 });
