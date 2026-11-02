@@ -21,7 +21,7 @@ export default function Skills() {
         </p>
         <ul className="skills-grid">
           {DOMAINS.map((d) => (
-            <li key={d.title} className="skill-card">
+            <li key={d.title} className="skill-card spot">
               <span className="skill-icon" aria-hidden="true"><Icon name={d.icon} /></span>
               <h3 className="skill-title">{d.title}</h3>
               <ul className="chips" aria-label={`${d.title} tools`}>

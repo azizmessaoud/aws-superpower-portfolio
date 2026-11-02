@@ -393,3 +393,82 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ── 2 Nov: project cards, and one hover language for the whole page ──
+   One lift, one glow, one border colour, for everything that is a card. Hover-only effects sit behind (hover: hover); movement sits
+   behind prefers-reduced-motion: no-preference, so touch and reduced-motion visitors still get the colour change, without motion. */
+.spot { position: relative; isolation: isolate; }
+.spot::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity var(--dur-slow);
+  background: radial-gradient(20rem circle at var(--mx, 50%) var(--my, 0%), rgba(139, 124, 246, 0.17), rgba(6, 182, 212, 0.06) 45%, transparent 70%); }
+@media (hover: hover) {
+  .spot:hover::before { opacity: 1; }
+  .selected-card:hover, .pcard:hover, .small-grid .skill-card:hover, .skills-grid .skill-card:hover { border-color: var(--violet-hover); box-shadow: var(--shadow-card-hover), 0 0 0 1px var(--violet-line); }
+}
+.selected-card:focus-within, .pcard:focus-within { border-color: var(--violet-hover); box-shadow: 0 0 0 1px var(--violet-line); }
+@media (prefers-reduced-motion: no-preference) {
+  .selected-card, .pcard, .small-grid .skill-card, .skills-grid .skill-card { transition: transform var(--dur-slow) var(--ease-out), border-color var(--dur-base), box-shadow var(--dur-slow) var(--ease-out); }
+  .selected-card:active, .pcard:active { transform: scale(0.99); transition-duration: var(--dur-press); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .selected-card:hover, .pcard:hover, .small-grid .skill-card:hover, .skills-grid .skill-card:hover { transform: translateY(-4px); }
+  .selected-card:hover .selected-open .icon, .pcard:hover .pcard-open .icon { transform: translateX(4px); }
+  .skill-evidence:hover .icon { transform: translate(2px, -2px); }
+  .btn-primary:hover { box-shadow: 0 14px 36px rgba(90, 32, 182, 0.5); }
+  .suggest-q:hover, .hint-q:hover { transform: translateY(-1px); }
+}
+.selected-open .icon, .pcard-open .icon, .skill-evidence .icon { transition: transform var(--dur-base) var(--ease-out); }
+@media (hover: hover) {
+  .nav-links a::after { transform-origin: left; }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .nav-cta:hover { border-color: var(--violet); box-shadow: 0 0 0 3px var(--violet-tint); }
+  .btn-ghost:hover { border-color: var(--violet-line); }
+  .suggest-q:hover, .hint-q:hover { border-color: var(--cyan-line); color: var(--cyan-light); }
+  .selected-card:hover .selected-open, .pcard:hover .pcard-open { background: var(--violet-hover); border-color: var(--violet); }
+  .selected-card:hover .selected-figure { text-shadow: 0 0 22px rgba(34, 211, 238, 0.35); }
+}
+
+/* Selected work: the figure is the card. The "Read the case study" link stretches over the whole card; the proof link sits above it. */
+.selected-card { position: relative; }
+.selected-open::after { content: ""; position: absolute; inset: 0; }
+.selected-links .selected-proof { position: relative; z-index: 1; }
+.selected-result { line-height: 1.3; }
+.selected-figure { display: block; font-family: var(--font-h); font-size: clamp(2.25rem, 4.2vw, 2.9rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; color: var(--cyan-light); transition: text-shadow var(--dur-slow); }
+.selected-figcap { display: block; margin-top: var(--space-2xs); color: var(--fg-lead); font-size: var(--text-small); line-height: 1.5; }
+
+/* Projects: three cards, one case study open under them */
+.projects .sec-lead { margin-bottom: var(--space-2xl); }
+.pcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: var(--space-lg); margin-bottom: var(--space-2xl); }
+.pcard { display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-xl); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.pcard[data-open="true"] { border-color: var(--violet); box-shadow: 0 0 0 1px var(--violet-line), var(--shadow-card-hover); }
+.pcard-kind { font-family: var(--font-m); font-size: 12px; letter-spacing: 0.04em; color: var(--fg-muted); }
+.pcard-title { font-family: var(--font-h); font-size: 1.25rem; line-height: 1.2; }
+.pcard-blurb { color: var(--fg-lead); font-size: var(--text-small); line-height: 1.55; }
+.pcard-open { align-self: flex-start; display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; margin-top: auto; padding: 0 var(--space-md); border: 1px solid var(--violet-line); border-radius: var(--radius-pill); background: var(--violet-tint); color: var(--fg); font-weight: 600; cursor: pointer; transition: background var(--dur-base), border-color var(--dur-base); }
+.pcard-open::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius-lg); } /* square-ish, not the button's pill: a pill-shaped hit area would leave the card's corners dead */
+.mini { display: flex; align-items: center; gap: 3px; height: 30px; margin-bottom: var(--space-2xs); }
+.mini li { transition: transform var(--dur-slow) var(--ease-out), background var(--dur-base), border-color var(--dur-base); transition-delay: calc(var(--i) * 14ms); }
+.mini-cells li { flex: 1; height: 100%; border-radius: 2px; }
+.mini-cells li.on { background: var(--cyan); opacity: 0.85; }
+.mini-cells li.off { border: 1px solid var(--border-strong); }
+.mini-dots { justify-content: space-between; gap: 0; background: linear-gradient(var(--border-strong), var(--border-strong)) center / 100% 1px no-repeat; }
+.mini-dots li { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--violet); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pcard:hover .mini-cells li.on { transform: scaleY(1.35); background: var(--cyan-light); }
+  .pcard:hover .mini-dots li { transform: scale(1.4); border-color: var(--cyan-light); }
+}
+/* the three cards share their rows (picture, kind, title, blurb, tools, button), so everything lines up even when a kind line wraps */
+@supports (grid-template-rows: subgrid) { @media (min-width: 640px) {
+  .pcard { display: grid; grid-row: span 6; grid-template-rows: subgrid; row-gap: var(--space-sm); }
+  .pcard > * { margin: 0; }
+  .pcard-open { align-self: end; justify-self: start; }
+} }
+.pcard .chips { align-content: flex-start; }
+.case-panel { margin-bottom: var(--space-2xl); padding: 0 var(--space-xl); border: 1px solid var(--violet-line); border-radius: var(--radius-lg); background: linear-gradient(180deg, rgba(139, 92, 246, 0.06), transparent 35%); }
+.case-panel .case { padding: var(--space-lg) 0 var(--space-2xl); border-top: 0; }
+.case-close { display: flex; align-items: center; gap: 0.4rem; min-height: 44px; margin: var(--space-sm) 0 0 auto; padding: 0 var(--space-md); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--glass5); color: var(--fg-muted); font-size: var(--text-small); cursor: pointer; transition: color var(--dur-base), border-color var(--dur-base), background var(--dur-base); }
+.case-close:hover { color: var(--fg); border-color: var(--violet); background: var(--glass10); }
+@media (prefers-reduced-motion: no-preference) {
+  .case-panel { animation: panel-in var(--dur-reveal) var(--ease-out); }
+  @keyframes panel-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+}
+@media (max-width: 520px) { .case-panel { padding: 0; border: 0; background: none; } }

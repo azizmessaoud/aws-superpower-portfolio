@@ -369,11 +369,12 @@ test("the terminal understands a plain question about certifications", async ({ 
 });
 
 test("every project ends with the same four-part label", async ({ page }) => {
-  await page.goto("/#projects");
-  const labels = page.locator(".plabel");
-  await expect(labels).toHaveCount(3);
-  for (const l of await labels.all()) {
-    await expect(l.locator("dt")).toHaveText([/Data/, /How it was judged/, /Where it fails/, /Who reviews the output/]);
+  /* one case study is open at a time (the cards are the overview), so each is opened in turn */
+  for (const id of ["traffix", "flyrank", "hr"]) {
+    await page.goto(`/#project-${id}`);
+    const labels = page.locator(".plabel");
+    await expect(labels).toHaveCount(1);
+    await expect(labels.locator("dt")).toHaveText([/Data/, /How it was judged/, /Where it fails/, /Who reviews the output/]);
   }
 });
 
@@ -562,7 +563,10 @@ test("selected work: three flagships, each with a result, a caveat and a working
     await expect(c.locator(".selected-caveat")).toContainText("Caveat:");
     const href = await c.getByRole("link", { name: "Read the case study" }).getAttribute("href");
     expect(href).toMatch(/^#project-(traffix|flyrank|hr)$/);
-    await expect(page.locator(href!)).toBeAttached();
+    /* the case study is opened by its link (one at a time), so follow the link and check it opens, then close it again */
+    await c.getByRole("link", { name: "Read the case study" }).click();
+    await expect(page.locator(href!)).toBeVisible();
+    await page.locator(".case-close").click();
   }
   /* ownership is stated only where the evidence records it: TraffiX */
   await expect(page.locator("#selected .selected-part")).toHaveCount(1);
@@ -572,14 +576,16 @@ test("selected work: three flagships, each with a result, a caveat and a working
 });
 
 test("each case study opens with result, caveat and boundary before the long text", async ({ page }) => {
-  await page.goto("/#projects");
   for (const id of ["traffix", "flyrank", "hr"]) {
+    await page.goto(`/#project-${id}`);
     const g = page.locator(`#project-${id} .glance`);
     await expect(g).toContainText("Result");
     await expect(g).toContainText("Caveat");
     await expect(g).toContainText("Boundary");
   }
+  await page.goto("/#project-traffix");
   await expect(page.locator("#project-traffix .glance")).toContainText("My part");
+  await page.goto("/#project-flyrank");
   await expect(page.locator("#project-flyrank .glance")).not.toContainText("My part");
 });
 
@@ -686,8 +692,8 @@ test("Selected work: the main action is a button-weight link of at least 44 px, 
 test("case studies use one measure on desktop: the Result block, the figures and the label share the column", async ({ page }, info) => {
   test.skip(info.project.name === "mobile", "wide-screen layout");
   await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto("/#projects");
   for (const id of ["traffix", "flyrank", "hr"]) {
+    await page.goto(`/#project-${id}`);
     const m = await page.evaluate((i) => {
       const c = document.querySelector(`#project-${i}`)!, g = c.querySelector(".glance")!.getBoundingClientRect(), l = c.querySelector(".plabel")!.getBoundingClientRect(), a = c.getBoundingClientRect();
       return { glance: g.width, label: l.width, col: a.width, gr: g.right, lr: l.right };
@@ -724,7 +730,7 @@ test("nav: the active section follows the page, and keyboard focus shows a visib
 
 test("results table on a 320 px phone: each row stacks, numbers stay with their units, columns line up, table roles are kept", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
-  await page.goto("/#projects");
+  await page.goto("/#project-traffix");
   await page.waitForTimeout(500);
   const t = page.locator("table.results");
   await expect(t).toHaveAttribute("role", "table");
@@ -910,4 +916,116 @@ test("3D hero works under the production Content-Security-Policy and headers (cu
   const lit = await hook(page, (h) => h.litPixels());
   expect(lit.lit / lit.total).toBeGreaterThan(0.015);
   expect(violations).toEqual([]);
+});
+
+/* ── project cards and hover (2 Nov) ───────────────────────────────────────────────
+ * The three flagship projects are cards; one case study opens under them at a time. These tests keep the cards short, keep every
+ * route to a case study working, and keep the hover behaviour (lift, glow, underline) and its reduced-motion and touch limits. */
+const words = (t: string) => t.trim().split(/\s+/).length;
+
+test("projects: three short cards; a case study opens only when chosen; closing it returns focus to its card", async ({ page }) => {
+  await page.goto("/#projects");
+  const cards = page.locator("#projects .pcard");
+  await expect(cards).toHaveCount(3);
+  await expect(page.locator("#project-traffix")).toHaveCount(0);
+  for (const c of await cards.all()) {
+    expect(words(await c.innerText()), "words on a project card").toBeLessThanOrEqual(40);
+    await expect(c.getByRole("button")).toHaveAttribute("aria-expanded", "false");
+  }
+  const first = cards.nth(0).getByRole("button");
+  await first.click();
+  await expect(page.locator("#project-traffix")).toBeVisible();
+  await expect(first).toHaveAttribute("aria-expanded", "true");
+  expect(new URL(page.url()).hash).toBe("#project-traffix");
+  await page.locator(".case-close").click();
+  await expect(page.locator("#project-traffix")).toHaveCount(0);
+  await expect(first).toBeFocused();
+  expect(new URL(page.url()).hash).toBe("#projects");
+  await page.keyboard.press("Enter");                       /* the card works from the keyboard */
+  await expect(page.locator("#project-traffix")).toBeVisible();
+});
+
+test("selected work: each card is a figure, its caption and a short caveat, not a paragraph", async ({ page }) => {
+  await page.goto("/#selected");
+  for (const c of await page.locator("#selected .selected-card").all()) {
+    expect(words(await c.innerText()), "words on a Selected work card").toBeLessThanOrEqual(80);
+    await expect(c.locator(".selected-figure")).not.toBeEmpty();
+    await expect(c.locator(".selected-caveat")).toContainText("Caveat:");
+  }
+});
+
+test("a whole card is the link: clicking its empty corner opens the case study", async ({ page }) => {
+  await page.goto("/#selected");
+  await page.locator("#selected .selected-card").nth(1).click({ position: { x: 14, y: 14 } });
+  await expect(page.locator("#project-flyrank")).toBeVisible();
+  expect(new URL(page.url()).hash).toBe("#project-flyrank");
+  await page.locator(".case-close").click();
+  await page.locator("#projects .pcard").nth(2).click({ position: { x: 14, y: 14 } });
+  await expect(page.locator("#project-hr")).toBeVisible();
+});
+
+test("a link to a case study works on first load and opens that study in view", async ({ page }) => {
+  await page.goto("/#project-flyrank");
+  await expect(page.locator("#project-flyrank")).toBeVisible();
+  await expect(page.locator("#project-flyrank")).toBeInViewport();
+  await expect(page.locator("#projects .pcard").nth(1).getByRole("button")).toHaveAttribute("aria-expanded", "true");
+});
+
+test("the small picture on each card matches the numbers in its case study, and is hidden from screen readers", async ({ page }) => {
+  await page.goto("/#projects");
+  const counts = await page.locator("#projects .pcard .mini").evaluateAll((els) => els.map((e) => ({ hidden: e.getAttribute("aria-hidden"), on: e.querySelectorAll("li.on").length, all: e.querySelectorAll("li").length })));
+  expect(counts).toEqual([{ hidden: "true", on: 6, all: 6 }, { hidden: "true", on: 47, all: 50 }, { hidden: "true", on: 7, all: 7 }]); /* 6 junctions; 47 hits of 50; 7 pipeline steps */
+});
+
+test("hover: a card lifts, its border lights, the glow follows the pointer, and a nav link underlines", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "hover is for pointer devices");
+  await page.goto("/#selected");
+  await page.waitForTimeout(800);
+  const card = page.locator("#selected .selected-card").first();
+  const rest = await card.evaluate((e) => getComputedStyle(e).borderTopColor);
+  const box = (await card.boundingBox())!;
+  await page.mouse.move(box.x + 60, box.y + 90);
+  await expect.poll(() => card.evaluate((e) => new DOMMatrixReadOnly(getComputedStyle(e).transform).f), { timeout: 4000 }).toBeLessThanOrEqual(-3.5);
+  await expect.poll(() => card.evaluate((e) => Number(getComputedStyle(e, "::before").opacity)), { timeout: 4000 }).toBeGreaterThan(0.9);   /* the glow fades in over 300 ms */
+  const lit = await card.evaluate((e) => ({ border: getComputedStyle(e).borderTopColor, mx: e.style.getPropertyValue("--mx") }));
+  expect(lit.border).not.toBe(rest);
+  expect(lit.mx).toMatch(/^\d+px$/);
+  await page.mouse.move(box.x + 260, box.y + 90);
+  await expect.poll(() => card.evaluate((e) => parseInt(e.style.getPropertyValue("--mx")))).toBeGreaterThan(parseInt(lit.mx) + 100);
+  const link = page.locator(".nav-links a", { hasText: "Skills" });
+  const x = (el: Element) => getComputedStyle(el, "::after").transform;
+  expect(await link.evaluate(x)).toMatch(/^matrix\(0,/);
+  await link.hover();
+  await expect.poll(() => link.evaluate(x)).toBe("matrix(1, 0, 0, 1, 0, 0)");
+});
+
+test("hover with reduced motion: the border and glow change, nothing moves, the pointer is not tracked", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "hover is for pointer devices");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#selected");
+  await page.waitForTimeout(800);
+  const card = page.locator("#selected .selected-card").first();
+  const rest = await card.evaluate((e) => getComputedStyle(e).borderTopColor);
+  const box = (await card.boundingBox())!;
+  await page.mouse.move(box.x + 60, box.y + 90);
+  await expect.poll(() => card.evaluate((e) => getComputedStyle(e).borderTopColor), { timeout: 4000 }).not.toBe(rest);
+  await page.waitForTimeout(500);
+  expect(await card.evaluate((e) => getComputedStyle(e).transform)).toBe("none");
+  expect(await card.evaluate((e) => e.style.getPropertyValue("--mx"))).toBe("");
+});
+
+test("each opened case study passes axe and does not overflow, at 1280 and at 320 px", async ({ page }) => {
+  for (const id of ["traffix", "flyrank", "hr"]) {
+    await page.goto(`/#project-${id}`);
+    await page.waitForTimeout(800);
+    const r = await new AxeBuilder({ page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]["page"] }).analyze();
+    const bad = r.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+    expect(bad.map((v) => `${v.id}: ${v.nodes.length}`), `axe, ${id}`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 320, height: 700 });
+  for (const id of ["traffix", "flyrank", "hr"]) {
+    await page.goto(`/#project-${id}`);
+    await page.waitForTimeout(500);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${id} overflow at 320 px`).toBe(0);
+  }
 });

@@ -78,3 +78,11 @@
 - **Placement.** On a wide screen the brain sits right of the text; below the text on a phone. On the shortest phones it may tuck at most about 0.45 of its radius behind the last row (text stays on top).
 - **Budgets enforced by script.** `npm run check:budget`: 3D chunk 137.1 kB of 180 kB; main bundle 76.0 kB; geometry files on the wire 406.6 kB (full) and 154.5 kB (mobile), against proposed budgets of 450 and 180 kB.
 - **Not verified:** frame rate on physical GPUs and phones. Browser tests use software WebGL on a shared CPU, which is slower and noisier than real hardware.
+
+## 2 Nov 2026: project cards, and one hover language
+
+- **Cards, not paragraphs.** Selected work shows, per project, one figure (−19%, 0.94, 7 steps), its caption and a short caveat. The Projects section shows three cards (a small picture, kind, title, one line, tools) and opens one full case study under them. Every card line is condensed from text already in the case study (`projects/summary.ts`); the caveat stays on the card, because a result without its limit is the thing this site does not do.
+- **One case study at a time.** Only the chosen case study is mounted. `#project-traffix` (from Selected work, from an answer, or typed) opens it and is kept in the address; Close returns focus to the card. Tests that read case-study internals now open each study first, and axe and overflow run over each opened study.
+- **The whole card is the link.** The "Read the case study" link stretches over the card; the proof link sits above it. The stretched area is square-cornered: a pill-shaped one left the card corners dead (found by a test).
+- **Hover.** Cards lift 4 px, light their border and show a soft glow that follows the pointer (`ui/spotlight.ts`, one passive listener); the nav underline slides in; buttons and chips respond. Hover-only effects sit behind `(hover: hover)`, movement behind `prefers-reduced-motion: no-preference`, so touch and reduced-motion visitors get colour feedback and no motion.
+- **Not verified:** hover feel on a real mouse and trackpad; the effects are checked by computed style in a headless browser.

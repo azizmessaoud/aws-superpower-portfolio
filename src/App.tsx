@@ -12,6 +12,7 @@ import Certifications from "./sections/Certifications";
 import Contact from "./sections/Contact";
 import Terminal from "./sections/Terminal";
 import { canUseWebglHero } from "./scene3d/capability";
+import { installSpotlight } from "./ui/spotlight";
 
 const NeuralScene = lazy(() => import("./scene/NeuralScene"));
 /* the 3D hero is a separate, lazily loaded chunk (Three.js and the renderer); the page is complete without it */
@@ -36,6 +37,7 @@ export default function App() {
   const heroFailed = useCallback((why: string) => { console.info(`3D hero unavailable (${why}); using the 2D hero`); setHeroMode("canvas"); }, []);
   useEffect(() => { document.documentElement.dataset.brain = heroMode === "webgl" ? "loading" : "canvas"; }, [heroMode]);
   useEffect(() => { scene?.setHeroMode(heroMode); }, [scene, heroMode]);
+  useEffect(() => installSpotlight(), []);
 
   /* The page is rendered by script, so the browser cannot scroll to #fragment on load or refresh; do it once the sections exist. */
   useEffect(() => {
