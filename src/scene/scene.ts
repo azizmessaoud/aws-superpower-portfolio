@@ -14,7 +14,8 @@ const SETTINGS = {
   desktop: { shell: 64, brain: 1400, neighbors: 3, fps: 60, labels: true, field: 46 },
 } as const;
 /* the intro's full-background neural field (the prototype's drifting network, in token colours) */
-const FIELD_COLORS = ["139,92,246", "6,182,212", "59,130,246", "167,139,250", "34,211,238"];
+/* the field is verdigris, bone and a little copper: no violet, no cyan (palette: docs/design-decisions.md) */
+const FIELD_COLORS = ["95,179,161", "95,179,161", "239,234,223", "217,160,102", "169,226,213"];
 const FIELD_LINK = 150;
 interface FieldNode { x: number; y: number; vx: number; vy: number; r: number; c: string; phase: number }
 type Breakpoint = keyof typeof SETTINGS;
@@ -56,8 +57,8 @@ export function createScene(o: SceneOptions) {
   let dock = { cx: 0, cy: 0, r: 0 }, dockAllowed = true, dockActive = false, docked = false;
   /* interface state of the question lifecycle (see src/mind/state.ts); it only tints and paces the animation */
   let mind: MindState = "idle";
-  const tint = { r: 34, g: 211, b: 238 };
-  const TINTS: Record<MindState, [number, number, number]> = { idle: [34, 211, 238], listening: [34, 211, 238], retrieving: [34, 211, 238], answering: [34, 211, 238], uncertain: [254, 188, 46], error: [255, 95, 87] };
+  const tint = { r: 95, g: 179, b: 161 };
+  const TINTS: Record<MindState, [number, number, number]> = { idle: [95, 179, 161], listening: [95, 179, 161], retrieving: [95, 179, 161], answering: [95, 179, 161], uncertain: [226, 162, 59], error: [224, 112, 92] };
   const mindLive = () => mind !== "idle";
   let heroVisible = true, paused = false, destroyed = false;
   /* webMix: 0 = this scene draws the hero, 1 = the WebGL canvas does; it eases between the two so a fallback or a late load never pops */
@@ -98,8 +99,11 @@ export function createScene(o: SceneOptions) {
     lines = [];
     for (const el of o.textBlocks()) {
       range.selectNodeContents(el);
-      const r = range.getBoundingClientRect();
-      if (!r.width) continue;
+      /* a Range reports all of a block's content, including what overflow clips (a row of chips that scrolls sideways, an answer that scrolls),
+         so a block never counts for more than its own box; otherwise hidden overflow stretches the "text area" and the brain is pushed out of its column */
+      const rr = range.getBoundingClientRect(), er = el.getBoundingClientRect();
+      const r = { left: Math.max(rr.left, er.left), right: Math.min(rr.right, er.right), top: Math.max(rr.top, er.top), bottom: Math.min(rr.bottom, er.bottom) };
+      if (r.right - r.left <= 0 || r.bottom - r.top <= 0) continue;
       const b = { l: r.left - s.left, t: r.top - s.top, r: r.right - s.left, b: r.bottom - s.top };
       box = box ? { l: Math.min(box.l, b.l), t: Math.min(box.t, b.t), r: Math.max(box.r, b.r), b: Math.max(box.b, b.b) } : b;
       /* buttons keep their whole surface; text keeps each line it actually draws */
@@ -227,7 +231,7 @@ export function createScene(o: SceneOptions) {
         const a = proj[e.from], b = proj[e.to], d = (a.s + b.s) / 2, boost = Math.max(a.inf, b.inf, a.ex, b.ex);
         const alpha = (0.05 + d * 0.2 + boost * 0.35) * Math.min(a.a, b.a);
         if (alpha < 0.01) continue;
-        ctx.strokeStyle = `rgba(34,211,238,${alpha})`;
+        ctx.strokeStyle = `rgba(95,179,161,${alpha})`;
         ctx.lineWidth = 0.5 + d * 1.1 + boost * 0.8;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
@@ -278,7 +282,7 @@ export function createScene(o: SceneOptions) {
         if (p.progress < 0) continue;
         const a = proj[p.from], b = proj[p.to], k = p.progress;
         ctx.globalAlpha = Math.min(a.a, b.a);
-        ctx.fillStyle = `rgba(248,250,252,${0.4 + p.strength * 0.45})`;
+        ctx.fillStyle = `rgba(239,234,223,${0.4 + p.strength * 0.45})`;
         ctx.beginPath(); ctx.arc(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k, 2 + (a.s + (b.s - a.s) * k) * 2.4 + p.strength * 1.4, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = 1;
       }
@@ -341,10 +345,10 @@ export function createScene(o: SceneOptions) {
       const r = (1.2 + p.s * 3.2 + glow * 3) * (near ? 1 : 0.8);
       const a = Math.min(1, 0.2 + p.s * 0.6 + glow * 0.4) * p.a;
       if (n.bright || n.label || glow > 0.2) {
-        ctx.fillStyle = `rgba(167,139,250,${(0.06 + glow * 0.14) * (near ? 1 : 0.6) * p.a})`;
+        ctx.fillStyle = `rgba(217,160,102,${(0.06 + glow * 0.14) * (near ? 1 : 0.6) * p.a})`;
         ctx.beginPath(); ctx.arc(p.x, p.y, r * (n.bright ? 3.2 : 2.4), 0, Math.PI * 2); ctx.fill();
       }
-      ctx.fillStyle = n.bright || n.label ? `rgba(248,250,252,${a})` : `rgba(34,211,238,${a})`;
+      ctx.fillStyle = n.bright || n.label ? `rgba(239,234,223,${a})` : `rgba(95,179,161,${a})`;
       ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
     }
   }
@@ -363,9 +367,9 @@ export function createScene(o: SceneOptions) {
       if (placed.some((b) => Math.abs(b.y - p.y) < 16 && x0 < b.x1 + 8 && x1 > b.x0 - 8)) return;
       placed.push({ x0, x1, y: p.y });
       ctx.textAlign = side > 0 ? "left" : "right";
-      ctx.strokeStyle = `rgba(34,211,238,${alpha * 0.5})`; ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(95,179,161,${alpha * 0.5})`; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(p.x + side * 4, p.y); ctx.lineTo(tx - side * 2, p.y); ctx.stroke();
-      ctx.fillStyle = lit > 0.25 ? `rgba(167,139,250,${alpha})` : `rgba(248,250,252,${alpha})`;
+      ctx.fillStyle = lit > 0.25 ? `rgba(217,160,102,${alpha})` : `rgba(239,234,223,${alpha})`;
       ctx.fillText(n.label!, tx, p.y);
     });
   }

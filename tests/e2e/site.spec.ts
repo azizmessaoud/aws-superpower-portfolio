@@ -239,14 +239,15 @@ test("the docked brain is actually drawn inside its socket", async ({ page }) =>
   await page.goto("/");
   await page.waitForTimeout(800);
   await scrollPage(page, (await runway(page)) + 400);
-  await page.waitForTimeout(1000);
-  const lit = await page.evaluate(() => {
+  /* poll for the same threshold instead of a fixed 1 s wait: the 3D hero's flight to the nav takes 1-3 s on software rendering, and the fixed wait
+     made this fail about 1 in 4 full runs */
+  const lit = () => page.evaluate(() => {
     const c = document.querySelector<HTMLCanvasElement>(".brain-canvas")!, r = document.querySelector(".nav-cta .dock-brain")!.getBoundingClientRect();
     const k = c.width / innerWidth, d = c.getContext("2d")!.getImageData(Math.round(r.left * k), Math.round(r.top * k), Math.round(r.width * k), Math.round(r.height * k)).data;
     let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 40) n++;
     return n;
   });
-  expect(lit).toBeGreaterThan(50);
+  await expect.poll(lit, { timeout: 10_000 }).toBeGreaterThan(50);
 });
 
 test("skip link is visible whenever it has focus, even after wrapping from the page end", async ({ page }) => {
@@ -346,10 +347,20 @@ test("2D hero: clicking on the hero text still sends a pulse through the network
   const before = await pulses();
   await page.locator(".hero-lead").click({ position: { x: 40, y: 20 } });
   expect(await pulses()).toBeGreaterThan(before);
-  /* a real control keeps its own click and sends no pulse */
-  const mid = await pulses();
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Skills" }).click();
-  expect(await pulses()).toBeLessThanOrEqual(mid);
+  /* A real control keeps its own click and sends no pulse. The click is dispatched and the count read in the same synchronous step, so the
+   * scene's own ambient pulses (and pulses expiring) cannot land in between: the old version read, clicked and read again, and failed 2 of 12
+   * runs on the original code. It also clicks a control inside the hero ("See selected work"), the only kind the hero's click handler sees;
+   * the nav link it used before is outside the hero and could never spawn a pulse. */
+  const spawned = (name: string, inHero: boolean) => page.evaluate(([n, hero]) => {
+    const link = [...document.querySelectorAll<HTMLAnchorElement>(hero ? ".hero a, .hero button" : "nav[aria-label=Main] a")].find((a) => a.textContent!.trim().startsWith(n))!;
+    const scene = (window as unknown as { __scene: { pulseCount: number } }).__scene, before = scene.pulseCount;
+    link.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    return scene.pulseCount - before;
+  }, [name, inHero] as const);
+  /* the same synchronous method on plain hero text must spawn one, or "no pulse" below would prove nothing */
+  expect(await page.evaluate(() => { const s = (window as unknown as { __scene: { pulseCount: number } }).__scene, b = s.pulseCount; document.querySelector(".hero-lead")!.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })); return s.pulseCount - b; }), "plain hero text sends a pulse").toBeGreaterThanOrEqual(1);
+  expect(await spawned("See selected work", true), "a control inside the hero sends no pulse").toBeLessThanOrEqual(0);
+  expect(await spawned("Skills", false), "a nav link sends no pulse").toBeLessThanOrEqual(0);
 });
 
 
@@ -672,7 +683,7 @@ test("Selected work: kicker, title, result, caveat and links line up across the 
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/#selected");
   await page.waitForTimeout(700);
-  for (const cls of ["selected-kind", "selected-title", "selected-result", "selected-caveat", "selected-links"]) {
+  for (const cls of ["selected-kind", "selected-title", "selected-result", "selected-compare", "selected-caveat", "selected-links"]) {
     const tops = await page.locator(`#selected .${cls}`).evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
     expect(tops, cls).toHaveLength(3);
     expect(Math.max(...tops) - Math.min(...tops), `${cls} tops ${tops}`).toBeLessThanOrEqual(1);
@@ -977,7 +988,7 @@ test("the small picture on each card matches the numbers in its case study, and 
   expect(counts).toEqual([{ hidden: "true", on: 6, all: 6 }, { hidden: "true", on: 47, all: 50 }, { hidden: "true", on: 7, all: 7 }]); /* 6 junctions; 47 hits of 50; 7 pipeline steps */
 });
 
-test("hover: a card lifts, its border lights, the glow follows the pointer, and a nav link underlines", async ({ page }, info) => {
+test("hover: a card lifts, its border lights, and a nav link underlines", async ({ page }, info) => {
   test.skip(info.project.name === "mobile", "hover is for pointer devices");
   await page.goto("/#selected");
   await page.waitForTimeout(800);
@@ -986,12 +997,8 @@ test("hover: a card lifts, its border lights, the glow follows the pointer, and 
   const box = (await card.boundingBox())!;
   await page.mouse.move(box.x + 60, box.y + 90);
   await expect.poll(() => card.evaluate((e) => new DOMMatrixReadOnly(getComputedStyle(e).transform).f), { timeout: 4000 }).toBeLessThanOrEqual(-3.5);
-  await expect.poll(() => card.evaluate((e) => Number(getComputedStyle(e, "::before").opacity)), { timeout: 4000 }).toBeGreaterThan(0.9);   /* the glow fades in over 300 ms */
-  const lit = await card.evaluate((e) => ({ border: getComputedStyle(e).borderTopColor, mx: e.style.getPropertyValue("--mx") }));
-  expect(lit.border).not.toBe(rest);
-  expect(lit.mx).toMatch(/^\d+px$/);
-  await page.mouse.move(box.x + 260, box.y + 90);
-  await expect.poll(() => card.evaluate((e) => parseInt(e.style.getPropertyValue("--mx")))).toBeGreaterThan(parseInt(lit.mx) + 100);
+  await expect.poll(() => card.evaluate((e) => getComputedStyle(e).borderTopColor), { timeout: 4000 }).not.toBe(rest);
+  expect(await card.evaluate((e) => getComputedStyle(e, "::before").content), "no pointer-following glow: it said nothing").toBe("none");
   const link = page.locator(".nav-links a", { hasText: "Skills" });
   const x = (el: Element) => getComputedStyle(el, "::after").transform;
   expect(await link.evaluate(x)).toMatch(/^matrix\(0,/);
@@ -999,7 +1006,7 @@ test("hover: a card lifts, its border lights, the glow follows the pointer, and 
   await expect.poll(() => link.evaluate(x)).toBe("matrix(1, 0, 0, 1, 0, 0)");
 });
 
-test("hover with reduced motion: the border and glow change, nothing moves, the pointer is not tracked", async ({ page }, info) => {
+test("hover with reduced motion: the border changes and nothing moves", async ({ page }, info) => {
   test.skip(info.project.name === "mobile", "hover is for pointer devices");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/#selected");
@@ -1011,7 +1018,6 @@ test("hover with reduced motion: the border and glow change, nothing moves, the 
   await expect.poll(() => card.evaluate((e) => getComputedStyle(e).borderTopColor), { timeout: 4000 }).not.toBe(rest);
   await page.waitForTimeout(500);
   expect(await card.evaluate((e) => getComputedStyle(e).transform)).toBe("none");
-  expect(await card.evaluate((e) => e.style.getPropertyValue("--mx"))).toBe("");
 });
 
 test("each opened case study passes axe and does not overflow, at 1280 and at 320 px", async ({ page }) => {
@@ -1151,4 +1157,62 @@ test("3D hero: switching reduced motion on while the page is open keeps the 3D h
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.waitForTimeout(6000);
   await expect(page.locator("html")).toHaveAttribute("data-brain", "webgl");   /* and back again */
+});
+
+/* ── motion that carries the data, and the palette (2 Nov) ─────────────────────────────────────────────────────── */
+test("data motion: the bars grow once when the card is reached, on a true zero baseline, in proportion to the real numbers", async ({ page }) => {
+  await page.goto("/?hero=canvas&gov=off");
+  await page.waitForTimeout(1200);
+  const scales = () => page.evaluate(() => [...document.querySelectorAll("#selected .cmp-track i")].map((i) => +new DOMMatrixReadOnly(getComputedStyle(i).transform).a.toFixed(2)));
+  expect(await scales(), "before the cards are reached the bars are at zero").toEqual([0, 0, 0, 0]);
+  /* reach each card in turn: side by side they arrive together, on a phone one at a time, and each plays only when it is reached */
+  const cards = page.locator("#selected .selected-card");
+  for (let i = 0; i < 3; i++) { await cards.nth(i).scrollIntoViewIfNeeded(); await cards.nth(i).evaluate((e) => e.scrollIntoView({ block: "center", behavior: "instant" })); await page.waitForTimeout(250); }
+  await expect.poll(scales, { timeout: 8000 }).toEqual([1, 1, 1, 1]);
+  const drawn = await page.evaluate(() => [...document.querySelectorAll("#selected .cmp-row")].map((r) => (r.querySelector("i") as HTMLElement).offsetWidth / (r.querySelector(".cmp-track") as HTMLElement).getBoundingClientRect().width));
+  const want = [1, 116.3 / 144.1, 0.76 / 0.94, 1];                          /* actuated vs TraffiX; baseline vs Random Forest, each against the larger value */
+  drawn.forEach((d, i) => expect(Math.abs(d - want[i]), `bar ${i}`).toBeLessThan(0.02));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => document.getElementById("selected")!.scrollIntoView({ behavior: "instant" }));
+  await page.waitForTimeout(300);
+  expect(await scales(), "it plays once: scrolling back does not reset the bars").toEqual([1, 1, 1, 1]);
+  await expect(page.locator("#selected .cmp").first()).toHaveAttribute("aria-label", /Pedestrian wait, morning peak: Actuated signals 144.1 s, TraffiX 116.3 s\. Lower is better\./);
+});
+
+test("data motion: with reduced motion the bars are drawn finished from the start", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?hero=canvas&gov=off");
+  await page.waitForTimeout(1200);
+  expect(await page.evaluate(() => [...document.querySelectorAll("#selected .cmp-track i")].map((i) => +new DOMMatrixReadOnly(getComputedStyle(i).transform).a))).toEqual([1, 1, 1, 1]);
+  expect(await page.evaluate(() => [...document.querySelectorAll("#selected .mini li.on")].every((li) => getComputedStyle(li).backgroundColor !== "rgba(0, 0, 0, 0)"))).toBe(true);
+});
+
+test("data motion: the FlyRank picture fills to its 47 hits when reached", async ({ page }) => {
+  await page.goto("/?hero=canvas&gov=off#projects");
+  await page.waitForTimeout(1500);
+  const filled = () => page.evaluate(() => [...document.querySelectorAll("#projects .pcard")[1].querySelectorAll(".mini li.on")].filter((li) => getComputedStyle(li).backgroundColor !== "rgba(0, 0, 0, 0)").length);
+  await expect.poll(filled, { timeout: 8000 }).toBe(47);
+});
+
+test("the brain stays beside the text, clear of the answer card, while an answer is on screen (a scrolling chip row once pushed it out of its column)", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "on a phone the brain sits below the text by design");
+  await page.goto("/?tier=full&gov=off");
+  await page.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
+  await ask(page, "Did TraffiX make ambulances faster?");
+  await expect(answerBox(page).locator(".ask-headline")).toBeVisible();
+  await page.waitForTimeout(2500);
+  const m = await page.evaluate(() => { const b = document.querySelector(".brain3d")!.getBoundingClientRect(), a = document.querySelector(".ask-answer")!.getBoundingClientRect(); return { cx: b.left + b.width / 2, cy: b.top + b.height / 2, w: b.width, cardRight: a.right }; });
+  expect(m.cx - m.w / 2.05, "the brain's left edge is clear of the card").toBeGreaterThan(m.cardRight - 30);
+  expect(m.cy, "and it is still in the hero, not pushed below it").toBeLessThan(700);
+});
+
+test("on a phone no section's content touches the screen edge (Selected work once did)", async ({ page }) => {
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 800 });
+    await page.goto("/?hero=canvas&gov=off");
+    await page.waitForTimeout(600);
+    const bad = await page.evaluate((vw) => [...document.querySelectorAll("main section .inner")].map((e) => { const r = e.getBoundingClientRect(); return { id: e.closest("section")!.id, left: Math.round(r.left), right: Math.round(vw - r.right) }; }).filter((m) => m.left < 12 || m.right < 12), w);
+    expect(bad, `sections whose content is within 12 px of the edge at ${w} px`).toEqual([]);
+  }
 });

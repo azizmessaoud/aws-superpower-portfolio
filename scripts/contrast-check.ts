@@ -20,21 +20,21 @@ const color = (name: string) => parse(tok[name]);
 const ground = (g: string): RGBA => (g.includes("/") ? over(color(g.split("/")[0]), color(g.split("/")[1])) : color(g));
 const PAIRS: [string, string, number][] = [
   ...["bg", "bg-deep", "surface", "surface-v", "glass5/bg", "glass5/surface", "glass5/surface-v"].flatMap((g) => [
-    ["fg", g, 4.5], ["fg-soft", g, 4.5], ["fg-muted", g, 4.5], ["violet-light", g, 4.5], ["cyan", g, 4.5],
+    ["fg", g, 4.5], ["fg-soft", g, 4.5], ["fg-muted", g, 4.5], ["accent-text", g, 4.5], ["accent-bright", g, 4.5], ["accent", g, 4.5], ["signal-amber", g, 4.5], ["signal-red", g, 4.5], ["signal-green", g, 4.5],
   ] as [string, string, number][]),
   ["fg-lead", "bg", 4.5],
-  ["on-primary", "primary", 4.5], ["on-primary", "blue-strong", 4.5],
-  ["violet-light", "violet-tint/bg", 4.5], ["signal-red", "glass5/surface", 4.5], ["signal-amber", "glass5/surface", 4.5], ["signal-green", "glass5/surface", 4.5],
+  ["on-primary", "primary", 4.5], ["on-primary", "accent-bright", 4.5], /* the main button turns verdigris-bright on hover */
+  ["accent-text", "accent-tint/bg", 4.5], ["signal-red", "glass5/surface", 4.5], ["signal-amber", "glass5/surface", 4.5], ["signal-green", "glass5/surface", 4.5],
   ["focus-ring", "bg", 3], ["focus-ring", "surface", 3], ["focus-ring", "bg-deep", 3],
 ];
 let fail = 0;
 for (const [fg, bg, min] of PAIRS) {
-  const f = fg === "focus-ring" ? color("violet-light") : color(fg);
+  const f = fg === "focus-ring" ? color("accent-bright") : color(fg);
   const r = ratio(over(f, ground(bg)), ground(bg));
   const ok = r >= min;
   if (!ok) fail++;
   console.log(`${ok ? "PASS" : "FAIL"}  ${fg.padEnd(13)} on ${bg.padEnd(18)} ${r.toFixed(2)}:1  (needs ${min}:1)`);
 }
-/* the brand violet is kept for non-text marks; show why it is not used for text */
-console.log(`info  violet        on bg                 ${ratio(color("violet"), color("bg")).toFixed(2)}:1  (non-text only, needs 3:1)`);
+/* the warm copper is for non-text marks only */
+console.log(`info  warm          on bg                 ${ratio(color("warm"), color("bg")).toFixed(2)}:1  (non-text only, needs 3:1)`);
 if (fail) { console.error(`${fail} pair(s) below threshold`); process.exit(1); }

@@ -9,7 +9,8 @@ import { mulberry32 } from "../scene/rng";
 import { childCounts, type FiberNetwork } from "./fibers";
 
 /* palette: the site's electric blue and violet, with a little ice-white */
-const BLUE = "vec3(0.231, 0.510, 0.965)", BLUE_LIGHT = "vec3(0.38, 0.65, 1.0)", VIOLET = "vec3(0.545, 0.361, 0.965)", ICE = "vec3(0.91, 0.96, 1.0)";
+/* verdigris (the one accent), bone, and copper where a fibre starts: warm at the root, cool at the tips, so colour shows the direction of flow */
+const COOL = "vec3(0.373, 0.702, 0.631)", COOL_LIGHT = "vec3(0.525, 0.812, 0.749)", WARM = "vec3(0.851, 0.627, 0.400)", BONE = "vec3(0.937, 0.918, 0.875)";
 
 /* Light adds to what is behind it. On a transparent canvas that means premultiplied output (colour, plus an alpha equal to its
  * brightest channel) and One/One blending, so the page shows through everywhere the network is dark and nothing paints black. */
@@ -142,16 +143,16 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
         }
         float t = clamp(vDist / uMaxDist, 0.0, 1.0);
         /* violet at the root, electric blue through the middle, a little ice towards the tips */
-        vec3 base = mix(${VIOLET}, ${BLUE_LIGHT}, smoothstep(0.0, 0.55, t));
-        base = mix(base, ${ICE}, smoothstep(0.65, 1.0, t) * 0.4);
+        vec3 base = mix(${WARM}, ${COOL_LIGHT}, smoothstep(0.0, 0.55, t));
+        base = mix(base, ${BONE}, smoothstep(0.65, 1.0, t) * 0.4);
         float edge = 0.55 + 0.95 * vFres;
         float a = (0.3 + 0.6 * strength) * (core * strands + halo * (0.5 + strength)) * edge * uGain;
         /* faint beads of light drifting outward along every strand, so the whole network is alive between pulses */
         float beads = pow(0.5 + 0.5 * sin(vDist * 17.0 - uTime * 1.35), 10.0) * (0.5 + 0.5 * sin(vDist * 2.3 + vMask * 0.37)) * uBeads;
         float p = pulseAt(vMask, vDist);
         float g = grown(vDist);
-        vec3 col = (base * a * (1.0 + 1.1 * beads) + mix(${BLUE}, ${ICE}, 0.7) * p * (core + 0.9 * halo * 3.0) * 1.7) * g;
-        col += ${ICE} * growFront(vDist) * (core + halo * 2.0) * 1.2; /* a bright head where the network is growing */
+        vec3 col = (base * a * (1.0 + 1.1 * beads) + mix(${COOL}, ${BONE}, 0.7) * p * (core + 0.9 * halo * 3.0) * 1.7) * g;
+        col += ${BONE} * growFront(vDist) * (core + halo * 2.0) * 1.2; /* a bright head where the network is growing */
         gl_FragColor = emit(col);
       }`,
   });
@@ -188,7 +189,7 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
         if (r > 1.0) discard;
         float glow = exp(-r * r * 3.2);
         float p = pulseAt(vMask, vDist);
-        vec3 col = mix(${BLUE_LIGHT}, ${ICE}, 0.35) * glow * (0.3 + 0.35 * pow(vFlow, 0.4)) + ${ICE} * p * glow;
+        vec3 col = mix(${COOL_LIGHT}, ${BONE}, 0.35) * glow * (0.3 + 0.35 * pow(vFlow, 0.4)) + ${BONE} * p * glow;
         gl_FragColor = emit(col * uNodeOn * grown(vDist));
       }`,
   });
@@ -227,7 +228,7 @@ export function createFiberLayers(f: FiberNetwork, o: LayerOptions = {}) {
         float twinkle = 0.55 + 0.45 * sin(uTime * (0.9 + vSeed) + vSeed * 60.0);
         float glow = exp(-r * r * 3.0);
         float p = pulseAt(vMask, vDist);
-        vec3 col = mix(${BLUE_LIGHT}, ${ICE}, 0.55) * glow * twinkle * (0.75 + 1.0 * vFres) + ${ICE} * p * glow * 1.8;
+        vec3 col = mix(${COOL_LIGHT}, ${BONE}, 0.55) * glow * twinkle * (0.75 + 1.0 * vFres) + ${BONE} * p * glow * 1.8;
         gl_FragColor = emit(col * uTipOn * grown(vDist));
       }`,
   });
@@ -303,7 +304,7 @@ export function createParticles(surface: Float32Array, normals: Float32Array, co
       void main() {
         float r = length(gl_PointCoord - 0.5) * 2.0;
         if (r > 1.0) discard;
-        vec3 col = mix(${BLUE_LIGHT}, mix(${VIOLET}, ${ICE}, step(0.8, vSeed)), step(0.45, vSeed));
+        vec3 col = mix(${COOL_LIGHT}, mix(${WARM}, ${BONE}, step(0.8, vSeed)), step(0.45, vSeed));
         gl_FragColor = emit(col * vA * exp(-r * r * 2.2) * uOn);
       }`,
   });
