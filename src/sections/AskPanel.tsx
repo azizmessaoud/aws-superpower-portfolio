@@ -3,6 +3,7 @@ import type { Corpus, Portfolio } from "../content/schema";
 import corpusJson from "../generated/corpus.json";
 import portfolioJson from "../generated/portfolio.json";
 import { createAssistant, MAX_QUESTION, type Answer } from "../assistant/answer";
+import { CONTRADICTION, presentAnswer, projectIdOf } from "../assistant/present";
 import { DWELL_MS, nextState, STATE_TEXT, stateForOutcome, type MindState } from "../mind/state";
 import Icon from "../ui/Icon";
 import { CASES } from "./projects/summary";
@@ -21,6 +22,8 @@ const REPO_OF: Record<(typeof CASES)[number]["id"], string> = { traffix: "/azizm
 export function projectOf(a: Answer) {
   return CASES.find((c) => a.evidence.some((e) => e.url.includes(REPO_OF[c.id])));
 }
+/* The icon beside the verdict: the verdict is also in words, so colour and icon are never the only signal. */
+const VERDICT_ICON: Record<Answer["outcome"], "check" | "alert" | "search" | "close"> = { supported: "check", contradicted: "alert", not_verified: "search", error: "close" };
 const OUTCOME: Record<Answer["outcome"], string> = {
   supported: "Answer",
   contradicted: "Answer · the evidence disagrees with the question",
@@ -38,8 +41,10 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
   const assistant = useMemo(() => createAssistant(corpusJson as Corpus, portfolioJson as Portfolio), []);
   const [value, setValue] = useState("");
   const [shown, setShown] = useState<Answer | null>(null);
+  const [answerNo, setAnswerNo] = useState(0); /* a new key per answer, so the card's entrance plays every time */
   const timers = useRef<number[]>([]);
   const lastAt = useRef(-Infinity);
+  const lastAsked = useRef("");
   const stateRef = useRef(mind);
   stateRef.current = mind;
 
@@ -53,7 +58,7 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
     if (!text) {
       /* an empty question gets the engine's own message, not silence */
       clear();
-      setShown(assistant.ask(""));
+      setShown(assistant.ask("")); setAnswerNo((n) => n + 1);
       const next = stateForOutcome("error");
       setMind(next);
       later(() => setMind(nextState(next, { type: "settle" })), reduced ? 1500 : DWELL_MS[next]);
@@ -62,13 +67,14 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
     const now = performance.now();
     if (now - lastAt.current < MIN_GAP_MS) return;
     lastAt.current = now;
+    lastAsked.current = text;
     clear();
     setShown(null);
     setMind(nextState(stateRef.current, { type: "submit" }));
     const answer = assistant.ask(text);
     const dwell = reduced ? 200 : DWELL_MS.retrieving;
     later(() => {
-      setShown(answer);
+      setShown(answer); setAnswerNo((n) => n + 1);
       const next = stateForOutcome(answer.outcome);
       setMind(next);
       later(() => setMind(nextState(next, { type: "settle" })), reduced ? 1500 : DWELL_MS[next]);
@@ -78,14 +84,17 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
   return (
     <div className="ask" id="ask">
       <form className="ask-form" role="search" onSubmit={(e) => { e.preventDefault(); submit(value); }}>
-        <label htmlFor="hero-ask" className="ask-label">Ask in plain English · the Terminal Explorer checks it against the evidence</label>
+        <label htmlFor="hero-ask" className="ask-label">Ask Aziz anything · answers come from checked evidence</label>
         <div className="ask-row">
           <input id="hero-ask" className="ask-input" type="search" value={value} maxLength={MAX_QUESTION} autoComplete="off"
             placeholder="e.g. Did TraffiX make ambulances faster?"
             onChange={(e) => { setValue(e.target.value); setMind(nextState(stateRef.current, { type: "type", empty: !e.target.value })); }}
             onFocus={() => setMind(nextState(stateRef.current, { type: "focus" }))}
             onBlur={() => setMind(nextState(stateRef.current, { type: "blur" }))} />
-          <button className="btn-primary ask-submit" type="submit"><Icon name="search" /> Ask</button>
+          <button className="btn-primary ask-submit" type="submit" aria-label="Ask" aria-busy={mind === "retrieving"} data-busy={mind === "retrieving"}>
+            <span className="ask-submit-icon" aria-hidden="true"><Icon name="search" /></span>
+            <span aria-hidden="true">{mind === "retrieving" ? "Searching" : "Ask"}</span>
+          </button>
         </div>
       </form>
       <p className="ask-status" role="status" aria-live="polite" data-state={mind}><span className="ask-dot" aria-hidden="true" /> {STATE_TEXT[mind]}</p>
@@ -94,11 +103,39 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
           <li key={s}><button type="button" className="suggest-q" onClick={() => { setValue(s); submit(s); }}>{s}</button></li>
         ))}
       </ul>
-      {shown && (
-        <section className={`ask-answer is-${shown.outcome}`} aria-label="Answer" tabIndex={0}>
-          <p className="ask-outcome">{OUTCOME[shown.outcome]}</p>
+      <p className="ask-how">Looked up in this site's checked evidence, not generated by a language model. Each answer links to its source; when nothing matches, it says so.</p>
+      {shown && (() => {
+        const pid = projectIdOf(shown);
+        const pr = presentAnswer(shown, pid);
+        const asked = lastAsked.current.toLowerCase();
+        const next = pr.followUps.filter((f) => f.toLowerCase() !== asked);
+        return (
+        <section key={answerNo} className={`ask-answer is-${shown.outcome}`} aria-label="Answer" tabIndex={0}>
+          <p className="ask-outcome"><Icon name={VERDICT_ICON[shown.outcome]} /> {OUTCOME[shown.outcome]}</p>
           <h2 className="ask-title">{shown.title}</h2>
-          <p className="ask-text">{shown.answer}</p>
+          {shown.outcome === "contradicted" && <p className="ask-premise"><Icon name="alert" /> {CONTRADICTION}</p>}
+          {pr.points
+            ? <ul className="ask-points">{pr.points.map((l) => <li key={l}>{l}</li>)}</ul>
+            : <p className="ask-headline">{pr.headline}</p>}
+          {shown.outcome !== "error" && (
+            <ul className="ask-trust" aria-label="What backs this answer">
+              <li><Icon name="check" /> {pr.sources} {pr.sources === 1 ? "source" : "sources"}</li>
+              <li className={pr.limits ? "is-warn" : ""}><Icon name="alert" /> {pr.limits} {pr.limits === 1 ? "limit" : "limits"} noted</li>
+              <li><Icon name="search" /> Looked up, not generated</li>
+            </ul>
+          )}
+          {pr.detail && !pr.points && (
+            <details className="ask-more">
+              <summary>{pr.detail === shown.answer ? "Show the full text" : "Show the rest"}</summary>
+              <p className="ask-text">{pr.detail}</p>
+            </details>
+          )}
+          {next.length > 0 && (
+            <>
+              <h3 className="ask-sub">Ask next</h3>
+              <ul className="ask-next">{next.map((f) => <li key={f}><button type="button" className="suggest-q" onClick={() => { setValue(f); submit(f); }}>{f}</button></li>)}</ul>
+            </>
+          )}
           {(() => { const p = projectOf(shown); return p && <p className="ask-open"><a href={`#project-${p.id}`}>Open the {p.title} case study <Icon name="arrow" /></a></p>; })()}
           {shown.evidence.length > 0 && (
             <>
@@ -113,7 +150,8 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
             </>
           )}
         </section>
-      )}
+        );
+      })()}
     </div>
   );
 }

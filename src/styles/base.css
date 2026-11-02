@@ -472,3 +472,65 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
   @keyframes panel-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 }
 @media (max-width: 520px) { .case-panel { padding: 0; border: 0; background: none; } }
+
+/* ── 2 Nov (2): the answer card reads in two seconds; the Ask button shows that it is working ── */
+.ask-how { max-width: 62ch; margin: var(--space-xs) 0 0; font-size: 12.5px; line-height: 1.5; color: var(--fg-muted); }
+.ask-submit { justify-content: center; min-width: 7.6rem; }
+.ask-submit-icon { display: inline-flex; }
+.ask-submit[data-busy="true"] { cursor: progress; }
+@media (prefers-reduced-motion: no-preference) {
+  .ask-submit[data-busy="true"] .ask-submit-icon { animation: ask-spin 0.9s linear infinite; }
+  @keyframes ask-spin { to { transform: rotate(360deg); } }
+}
+.ask-answer { max-height: 52vh; max-height: 52svh; }
+.ask-outcome { display: flex; align-items: center; gap: 0.4rem; }
+.ask-outcome .icon { color: var(--cyan-light); }
+.ask-answer.is-contradicted .ask-outcome .icon, .ask-answer.is-not_verified .ask-outcome .icon { color: var(--signal-amber); }
+.ask-headline { margin: var(--space-3xs) 0 var(--space-xs); font-size: 1.04rem; font-weight: 500; line-height: 1.5; color: var(--fg); text-wrap: pretty; }
+.ask-premise { display: flex; align-items: flex-start; gap: 0.45rem; margin: 0 0 var(--space-xs); padding: var(--space-2xs) var(--space-sm); border-radius: var(--radius-sm); background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--fg); font-size: var(--text-small); line-height: 1.45; }
+.ask-premise .icon { flex: none; margin-top: 0.18em; color: var(--signal-amber); }
+.ask-points { display: grid; gap: var(--space-2xs); margin: var(--space-3xs) 0 var(--space-xs); }
+.ask-points li { position: relative; padding-left: 1.1em; line-height: 1.5; color: var(--fg); }
+.ask-points li::before { content: ""; position: absolute; left: 0.1em; top: 0.62em; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
+.ask-more { margin: 0 0 var(--space-xs); }
+.ask-more summary { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 36px; padding: 0 var(--space-sm); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); color: var(--fg-muted); font-size: 13px; cursor: pointer; list-style: none; transition: color var(--dur-base), border-color var(--dur-base), background var(--dur-base); }
+.ask-more summary::-webkit-details-marker { display: none; }
+.ask-more summary::after { content: ""; width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-1px); transition: transform var(--dur-base) var(--ease-out); }
+.ask-more[open] summary::after { transform: rotate(-135deg) translateY(-1px); }
+.ask-more .ask-text { margin-top: var(--space-xs); }
+@media (hover: hover) { .ask-more summary:hover { color: var(--fg); border-color: var(--violet); background: var(--glass5); } }
+.ask-trust { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin: var(--space-2xs) 0 var(--space-3xs); }
+.ask-trust li { display: inline-flex; align-items: center; gap: 0.35rem; padding: 2px 0.65rem; border-radius: var(--radius-pill); background: var(--glass5); border: 1px solid var(--border); color: var(--fg-lead); font-size: 12.5px; }
+.ask-trust .icon { color: var(--cyan-light); }
+.ask-trust .is-warn .icon { color: var(--signal-amber); }
+.ask-next { display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-xs); margin-bottom: var(--space-2xs); }
+.ask-next .suggest-q { min-height: 40px; font-size: 14px; }
+@media (pointer: coarse), (max-width: 760px) { .ask-next .suggest-q { min-height: 44px; } }
+.ask-evidence { display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-xs); }
+.ask-evidence a { padding: 2px 0.7rem; border: 1px solid var(--violet-line); border-radius: var(--radius-pill); background: var(--violet-tint); text-decoration: none; transition: background var(--dur-base), border-color var(--dur-base); }
+@media (hover: hover) { .ask-evidence a:hover { background: var(--violet-hover); border-color: var(--violet); color: var(--fg); } }
+@media (prefers-reduced-motion: no-preference) {
+  .ask-answer { animation: ask-in 420ms var(--ease-out) both; }
+  .ask-answer > * { animation: ask-child 460ms var(--ease-out) both; }
+  .ask-answer > :nth-child(1) { animation-delay: 30ms; } .ask-answer > :nth-child(2) { animation-delay: 70ms; } .ask-answer > :nth-child(3) { animation-delay: 110ms; }
+  .ask-answer > :nth-child(4) { animation-delay: 150ms; } .ask-answer > :nth-child(5) { animation-delay: 190ms; } .ask-answer > :nth-child(6) { animation-delay: 230ms; }
+  .ask-answer > :nth-child(n + 7) { animation-delay: 270ms; }
+  @keyframes ask-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes ask-child { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+/* with an answer on screen, the starter questions become one scrolling row (the card offers the follow-ups) and the note moves into the card */
+@supports selector(:has(*)) {
+  .ask:has(.ask-answer) .ask-samples { flex: none; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; padding-bottom: 2px; -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent); mask-image: linear-gradient(90deg, #000 90%, transparent); }
+  .ask:has(.ask-answer) .ask-samples::-webkit-scrollbar { display: none; }
+  .ask:has(.ask-answer) .ask-samples li { flex: none; scroll-snap-align: start; }
+  .ask:has(.ask-answer) .ask-how { display: none; }
+}
+
+/* ── 2 Nov (3): every link answers the pointer. The audit (reports/logs/button-audit.txt) found the logo and ~20 plain text links with no hover response. ── */
+.nav-logo { transition: transform var(--dur-base) var(--ease-out), filter var(--dur-base); }
+:where(a:not([class])) { text-underline-offset: 3px; transition: color var(--dur-base), text-decoration-color var(--dur-base), text-decoration-thickness var(--dur-base); }
+@media (hover: hover) {
+  a:not([class]):hover { color: var(--cyan-light); text-decoration-thickness: 2px; }
+  .nav-logo:hover { filter: drop-shadow(0 0 10px rgba(66, 183, 255, 0.5)); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) { .nav-logo:hover { transform: translateY(-1px) scale(1.06); } }

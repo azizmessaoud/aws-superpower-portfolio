@@ -1,3 +1,5 @@
+import { PROOF } from "../../content/labels";
+
 /* One summary per flagship project, used by the "Selected work" strip near the hero and by the top of each case study,
  * so the two cannot disagree. Every line repeats a statement already on the project card (TR-*, FR-*, HR-* rows).
  * `myPart` is present only where the evidence records Aziz's own part; do not add one without a source. */
@@ -30,7 +32,7 @@ export const CASES: CaseSummary[] = [
     tags: ["Multi-agent", "SUMO", "TraCI"],
     caveatShort: "Ambulances were slower; no difference is significant with three seeds.",
     boundary: "Team of six; our team made the agent architecture together and roles rotate, so other pairs also touched these areas. Road demand is synthetic.",
-    proof: { label: "README @ d54b071", url: "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md#L1-L11" },
+    proof: PROOF.traffix,
   },
   {
     id: "flyrank",
@@ -43,7 +45,7 @@ export const CASES: CaseSummary[] = [
     tags: ["Random Forest", "Search Console", "Unseen-client test"],
     caveatShort: "The outcome is observational: it does not show that an edit raises traffic.",
     boundary: "Built during the FlyRank AI internship; the internship warehouse is gated, so the result cannot be fully reproduced in public.",
-    proof: { label: "Capstone report @ a220b9e", url: "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L55" },
+    proof: PROOF.flyrank,
   },
   {
     id: "hr",
@@ -56,6 +58,6 @@ export const CASES: CaseSummary[] = [
     tags: ["Docling", "RapidOCR", "FastAPI"],
     caveatShort: "Tested on synthetic documents only; no real-data accuracy is claimed.",
     boundary: "A person decides; nothing is written to an HR system automatically.",
-    proof: { label: "README @ 437a514", url: "https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L1-L16" },
+    proof: PROOF.hr,
   },
 ];

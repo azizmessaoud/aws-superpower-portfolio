@@ -45,3 +45,11 @@ export const LABELS: Record<LabelKey, ProjectLabel> = {
     ],
   },
 };
+
+/* The one source each project's label restates: the card's "proof" link. Kept next to the label so an answer built from the label cites it. */
+export const PROOF: Record<LabelKey, { label: string; url: string }> = {
+  traffix: { label: "README @ d54b071", url: "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md#L1-L11" },
+  flyrank: { label: "Capstone report @ a220b9e", url: "https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L55" },
+  hr: { label: "README @ 437a514", url: "https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L1-L16" },
+};
+export const PROJECT_NAME: Record<LabelKey, string> = { traffix: "TraffiX", flyrank: "FlyRank", hr: "HR prototype" };

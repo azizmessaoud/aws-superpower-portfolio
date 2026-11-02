@@ -8,7 +8,7 @@
  *  - Reduced motion: stills only, no loop (re-drawn on resize or when the question state changes).
  *  - If anything fails (no WebGL, the file, a lost context, or frames too slow even after stepping down), it calls onFail and
  *    the page keeps the 2D hero. The page is complete without it. */
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { BufferAttribute, BufferGeometry, Group, PerspectiveCamera, Scene as ThreeScene, WebGLRenderer } from "three";
 import type { Scene as HeroScene } from "../scene/scene";
 import type { MindState } from "../mind/state";
@@ -38,6 +38,11 @@ const MOODS: Record<MindState, { gain: number; pulseOn: number; speed: number; g
 
 export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null);
+  /* One canvas per run of the effect below: its teardown force-loses the GPU context, and a lost context stays lost on the same element, so a
+   * second run on it (the 2D scene is replaced right after reduced motion is switched) would find a dead renderer and drop to the 2D hero.
+   * The key changes exactly when the effect's inputs change, so every run gets a fresh element. */
+  const generation = useRef(0);
+  const canvasKey = useMemo(() => ++generation.current, [scene, reduced]); // eslint-disable-line react-hooks/exhaustive-deps
   const mindRef = useRef(mind);
   const flash = useRef(0);
   const refresh = useRef<(() => void) | null>(null);
@@ -97,25 +102,28 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
       let dpr = Math.min(window.devicePixelRatio || 1, tier === "mobile" ? 1.5 : 1.75);
       let curS = 0, clock = 0, last = 0, t0 = 0, frames = 0, level = 0, degraded = false, drawn = false;
       const dts: number[] = [];
-      const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+      /* the pointer, relative to the brain itself: where it is (x, y, -1..1), and how close (near, 0..1). Springs, so the motion is the same at any frame rate. */
+      const pointer = { x: 0, y: 0, tx: 0, ty: 0, near: 0, tnear: 0 };
       const governorOn = new URLSearchParams(location.search).get("gov") !== "off";
 
       const draw = (time: number, dt = 0.016, reveal = 1) => {
         const target = MOODS[mindRef.current], k = 1 - Math.exp(-dt * 4);
         flash.current *= Math.exp(-dt * 2.2);
-        mood.gain += (baseGain + target.gain + flash.current * 0.8 - mood.gain) * k;
+        mood.gain += (baseGain + target.gain + flash.current * 0.8 + pointer.near * 0.85 - mood.gain) * k;
         mood.pulseOn += (target.pulseOn - mood.pulseOn) * k;
-        mood.speed += (target.speed - mood.speed) * k;
+        mood.speed += (target.speed + pointer.near * 0.5 - mood.speed) * k;
         mood.gap += (target.gap - mood.gap) * k;
         clock += dt * mood.speed;
         fib.setMood({ gain: mood.gain, pulseOn: mood.pulseOn, pulseSpeed: mood.speed, pulseGap: mood.gap });
         fib.setPulseClock(reduced ? STILL_TIME * 0.7 : clock);
         fib.setReveal(reveal);
         if (!degraded) parts.setAmount(reveal);
-        /* slow sway and float, and a gentle pointer parallax: never a spin */
-        pointer.x += (pointer.tx - pointer.x) * 0.05; pointer.y += (pointer.ty - pointer.y) * 0.05;
-        group.rotation.y = reduced ? 0.08 : 0.14 * Math.sin(time * 0.17) + pointer.x * 0.07;
-        group.rotation.x = reduced ? 0 : pointer.y * 0.04;
+        /* slow sway and float; the brain turns a little toward the pointer (about 15 degrees at most) and leans in as it comes close: never a spin */
+        const kp = 1 - Math.exp(-dt * 5.5);
+        pointer.x += (pointer.tx - pointer.x) * kp; pointer.y += (pointer.ty - pointer.y) * kp; pointer.near += (pointer.tnear - pointer.near) * kp;
+        group.rotation.y = reduced ? 0.08 : 0.14 * Math.sin(time * 0.17) + pointer.x * 0.26;
+        group.rotation.x = reduced ? 0 : pointer.y * 0.13;
+        group.scale.setScalar(reduced ? 1 : 1 + pointer.near * 0.035);
         group.position.y = reduced ? 0 : 0.012 * Math.sin(time * 0.6);
         fib.update(time, curS, curS, FOV, renderer.getPixelRatio());
         parts.update(time, curS, FOV, renderer.getPixelRatio());
@@ -172,17 +180,32 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
       };
       const wake = () => { if (!alive) return; if (reduced) { still(); return; } if (!raf && !document.hidden) raf = requestAnimationFrame(tick); };
 
-      const onMove = (e: PointerEvent) => { if (e.pointerType === "touch") return; pointer.tx = (e.clientX / innerWidth - 0.5) * 2; pointer.ty = (e.clientY / innerHeight - 0.5) * 2; };
+      /* pointer position against the brain's own canvas (it moves and shrinks with the flight, so read it fresh) */
+      const rel = (e: PointerEvent) => { const r = el.getBoundingClientRect(), half = Math.max(r.width, 1) / 2; return { dx: (e.clientX - (r.left + half)) / half, dy: (e.clientY - (r.top + r.height / 2)) / half }; };
+      const onMove = (e: PointerEvent) => {
+        if (e.pointerType === "touch") return;
+        const { dx, dy } = rel(e), d = Math.hypot(dx, dy);
+        pointer.tx = clamp(dx / 2.2, -1, 1); pointer.ty = clamp(dy / 2.2, -1, 1);
+        const t = clamp((d - 0.35) / 1.1, 0, 1); pointer.tnear = 1 - t * t * (3 - 2 * t); /* 1 on the brain, easing to 0 about 1.5 radii away */
+      };
+      /* a press or tap on the brain makes it flash once; presses on links, buttons and fields are left alone */
+      const onDown = (e: PointerEvent) => {
+        if ((e.target as Element | null)?.closest?.("a, button, input, textarea, select, summary, label")) return;
+        const { dx, dy } = rel(e);
+        if (Math.hypot(dx, dy) < 0.95) { flash.current = 1.9; wake(); }
+      };
       window.addEventListener("scroll", wake, { passive: true });
       window.addEventListener("resize", wake);
       document.addEventListener("visibilitychange", wake);
-      if (!reduced) window.addEventListener("pointermove", onMove, { passive: true });
-      undo.push(() => { window.removeEventListener("scroll", wake); window.removeEventListener("resize", wake); document.removeEventListener("visibilitychange", wake); window.removeEventListener("pointermove", onMove); });
+      if (!reduced) { window.addEventListener("pointermove", onMove, { passive: true }); window.addEventListener("pointerdown", onDown, { passive: true }); }
+      undo.push(() => { window.removeEventListener("pointerdown", onDown); window.removeEventListener("scroll", wake); window.removeEventListener("resize", wake); document.removeEventListener("visibilitychange", wake); window.removeEventListener("pointermove", onMove); });
       refresh.current = wake;
 
       /* hooks for tests and for debugging: how many frames were drawn, and how much of the canvas is lit */
       (window as unknown as { __brain3d?: object }).__brain3d = {
         tier, get frames() { return frames; }, get level() { return level; }, get size() { return curS; },
+        /** the brain's turn toward the pointer (radians) and how close the pointer is (0..1), so a test can check the reaction exactly instead of comparing frames */
+        get pose() { return { yaw: group.rotation.y, pitch: group.rotation.x, near: pointer.near, scale: group.scale.x }; },
         litPixels() {
           draw(STILL_TIME, 0.016, 1);
           const gl = renderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, buf = new Uint8Array(w * h * 4);
@@ -198,5 +221,5 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
     return () => { teardown(); refresh.current = null; };
   }, [scene, reduced, onFail]);
 
-  return <canvas ref={canvas} className="brain3d" aria-hidden="true" />;
+  return <canvas key={canvasKey} ref={canvas} className="brain3d" aria-hidden="true" />;
 }

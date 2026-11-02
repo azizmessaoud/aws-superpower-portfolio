@@ -15,7 +15,8 @@
     "e2e": "playwright test",
     "bake:brain": "tsx scripts/bake-brain.ts",
     "check:fibers": "tsx scripts/check-fibers.ts",
-    "check:budget": "tsx scripts/check-budget.ts"
+    "check:budget": "tsx scripts/check-budget.ts",
+    "audit:controls": "node scripts/audit-controls.cjs"
   },
   "dependencies": {
     "react": "18.3.1",

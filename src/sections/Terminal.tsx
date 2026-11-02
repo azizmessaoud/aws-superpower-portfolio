@@ -55,12 +55,13 @@ export default function Terminal({ setMind, reduced }: { setMind: (s: MindState)
   return (
     <section id="terminal" className="section terminal-section" aria-labelledby="terminal-title">
       <div className="inner">
-        <p className="sec-label">Terminal Explorer</p>
-        <h2 id="terminal-title" className="sec-h2">The same answers, as commands</h2>
+        <p className="sec-label">Command line</p>
+        <h2 id="terminal-title" className="sec-h2">The same answers, as a command line</h2>
         <p className="sec-lead">
-          Ask about my projects with <code>ask</code> and your own words. It searches {corpusJson.passages.length} verified passages
-          and shows the evidence behind each match, or says nothing verified answers it. It doesn't write answers and it
-          doesn't judge anyone. Type <code>help</code> to see the other commands.
+          Prefer typing? This is the same engine as the question box at the top, as a command line: a second way into the same checked
+          evidence, not a different assistant. Plain questions work, or use <code>ask</code>, <code>projects</code>, <code>certs</code> or{" "}
+          <code>label flyrank</code>; <code>help</code> lists the rest. It searches {corpusJson.passages.length} verified passages and shows the
+          source behind each match, or says that nothing verified answers it. It does not write answers and it does not judge anyone.
         </p>
         <div className="term-win" onClick={(e) => { if (!String(getSelection()) && !(e.target as Element).closest("a")) input.current?.focus(); }}>
           <div className="term-bar" aria-hidden="true">

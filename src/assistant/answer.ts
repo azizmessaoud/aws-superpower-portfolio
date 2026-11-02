@@ -4,7 +4,7 @@
  * not_verified (no evidence either way) and error (the question could not be processed). */
 import { consoleRecordLine, endpointLine } from "../content/awsRecord";
 import type { Corpus, Portfolio } from "../content/schema";
-import { LABELS, LABEL_KEYS } from "../content/labels";
+import { LABELS, LABEL_KEYS, PROJECT_NAME, PROOF, type LabelKey } from "../content/labels";
 import { isNear } from "../retrieval/fuzzy";
 import { createRetriever } from "../retrieval/retriever";
 
@@ -160,6 +160,30 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     });
   }
 
+
+  /* A question that names one project and one aspect of it is answered from that project's own label, never from free retrieval:
+   * "Where does FlyRank fail?" must not return TraffiX's limits. Two projects in one question, or none, fall through to retrieval. */
+  const PROJECT_WORDS: Record<LabelKey, RegExp> = { traffix: /traffix|ambulance|pedestrian|sumo|junction/, flyrank: /flyrank|fly rank|capstone|precision|random forest/, hr: /\bhr\b|hr prototype|document check|\bocr\b|docling/ };
+  const ASPECTS: { key: "fails" | "data" | "evaluation" | "review"; re: RegExp; title: string }[] = [
+    { key: "fails", re: /\b(fail\w*|limit\w*|weak\w*|wrong|caveats?|problems?|downsides?|not work\w*|doesn't work|does not work|shortcomings?)\b/, title: "where it fails" },
+    { key: "review", re: /\b(review\w*|oversight|approv\w*|who decides|human in the loop)\b|who (checks|decides)/, title: "who reviews the output" },
+    { key: "evaluation", re: /\b(evaluat\w*|judged|measured|validat\w*|baseline|how (good|well|accurate)|tested)\b/, title: "how it was judged" },
+    { key: "data", re: /\b(data|dataset|data set|trained on|demand)\b/, title: "the data" },
+  ];
+  function projectAspect(q: string): Answer | null {
+    if (/\bleak/.test(q)) return null; /* "data leakage" is its own passage */
+    const hit = LABEL_KEYS.filter((k) => PROJECT_WORDS[k].test(q));
+    if (hit.length !== 1) return null;
+    const aspect = ASPECTS.find((x) => x.re.test(q));
+    if (!aspect) return null;
+    const key = hit[0]; const lines = LABELS[key][aspect.key];
+    return make({
+      outcome: "supported", intent: `project-${aspect.key}`, title: `${PROJECT_NAME[key]}: ${aspect.title}`,
+      answer: lines.join(" "), evidence: [PROOF[key]],
+      limitations: ["This restates the project's own label from its case study; open the case study for the figures behind it."],
+    });
+  }
+
   function ask(raw: string): Answer {
     const input = raw.trim().replace(/\s+/g, " ").replace(/^ask\s+/i, "");
     if (!input) return make({ outcome: "error", intent: "invalid", title: "No question", answer: "Type a question first." });
@@ -173,6 +197,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     if (/\b(why (should|would|do) (we|i) (hire|pick|choose)|hire (you|him|aziz)|strengths?|best at|salary|salaries|pay|paid|expectations?|rate|how much|rating|score)\b/.test(q)) return judgement();
     if (CERT_WORDS.test(q) || near(q, ["certification", "certificate", "credential", "certified"]) || /\b(oracle|microsoft|azure|databricks|nvidia|kaggle|ibm|google|gcp)\b/.test(q)) return certs(input);
     if (near(q, ["interview"])) return interviewQs();
+    { const pa = projectAspect(q); if (pa) return pa; }
     if (!project && near(q, ["limitation", "limitations", "weakness", "weaknesses", "caveat"])) return limitations();
     if (!project && (near(q, ["skills", "tools", "stack", "technologies", "technology"]) || /\bskill/.test(q))) return tools();
     if (near(q, ["contact", "email", "linkedin", "reach", "hiring"]) && !/(email|reach).*(traffix|project)/.test(q))

@@ -88,7 +88,7 @@ export default function App() {
       <footer className="footer">
         <p>© 2026 Aziz Messaoud · Built for the AWS Student Builder Challenge</p>
         <nav className="footer-links" aria-label="Footer">
-          <a href="#terminal">Terminal Explorer</a>
+          <a href="#terminal">Command line</a>
           <a href="https://github.com/azizmessaoud/aws-superpower-portfolio/blob/main/WRITEUP.md">Build write-up: what worked, what failed</a>
           <a href="https://github.com/azizmessaoud/aws-superpower-portfolio">Source code on GitHub</a>
         </nav>
