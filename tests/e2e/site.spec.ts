@@ -1216,3 +1216,73 @@ test("on a phone no section's content touches the screen edge (Selected work onc
     expect(bad, `sections whose content is within 12 px of the edge at ${w} px`).toEqual([]);
   }
 });
+
+/* ── the brain's flight follows the scroll; and you can grab and turn it (3 Nov) ───────────────────────────────── */
+test("3D hero: the flight to the nav follows the scroll, in small steps, and goes back along the same path", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "wheel-driven pinned scroll is checked on desktop");
+  test.setTimeout(180_000);
+  await page.goto("/?tier=full&gov=off");
+  await page.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
+  await page.waitForTimeout(3000);
+  const run = await page.evaluate(() => Math.round(innerHeight * 0.7));
+  const read = () => page.evaluate(() => { const m = new DOMMatrixReadOnly(getComputedStyle(document.querySelector(".brain3d")!).transform); return { x: m.e, y: m.f, s: m.a, y0: scrollY }; });
+  const apart = (a: { x: number; y: number; s: number }, b: { x: number; y: number; s: number }) => Math.hypot(a.x - b.x, a.y - b.y) + Math.abs(a.s - b.s) * 400;
+  const settle = async () => { let last = await read(), still = 0; for (let i = 0; i < 40 && still < 3; i++) { await page.waitForTimeout(250); const now = await read(); still = apart(now, last) < 0.4 ? still + 1 : 0; last = now; } return read(); };
+  /* 1. wheel down a step at a time, recording every frame: no jump, and the flight spreads over the scroll */
+  await page.evaluate(() => { const el = document.querySelector(".brain3d")!, rec: number[][] = []; (window as unknown as { __rec: number[][] }).__rec = rec;
+    const f = () => { const m = new DOMMatrixReadOnly(getComputedStyle(el).transform); rec.push([scrollY, m.e, m.f]); requestAnimationFrame(f); }; requestAnimationFrame(f); });
+  await page.mouse.move(900, 400);
+  const steps = 24, dy = Math.round((run * 1.1) / steps);
+  for (let i = 0; i < steps; i++) { await page.mouse.wheel(0, dy); await page.waitForTimeout(80); }
+  await settle();
+  const rec = await page.evaluate(() => (window as unknown as { __rec: number[][] }).__rec);
+  let jump = 0; const movedAt: number[] = [];
+  for (let i = 1; i < rec.length; i++) { const d = Math.hypot(rec[i][1] - rec[i - 1][1], rec[i][2] - rec[i - 1][2]); jump = Math.max(jump, d); if (d > 1.5) movedAt.push(rec[i][0]); }
+  expect(jump, "largest single-frame jump in px (it was 112 when a threshold launched a timed animation)").toBeLessThan(60);
+  expect((Math.max(...movedAt) - Math.min(...movedAt)) / run, "share of the pinned scroll over which the brain travels (it was 8%)").toBeGreaterThan(0.35);
+  /* 2. at rest, the same scroll position gives the same place going down and coming back */
+  const marks = [0.3, 0.5, 0.7].map((f) => Math.round(run * f));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" })); await settle();
+  const down: Array<{ x: number; y: number; s: number }> = [], back: typeof down = [];
+  for (const y of marks) { await page.evaluate((v) => window.scrollTo({ top: v, behavior: "instant" }), y); down.push(await settle()); }
+  await page.evaluate((v) => window.scrollTo({ top: v, behavior: "instant" }), Math.round(run * 1.05)); await settle();
+  for (const y of [...marks].reverse()) { await page.evaluate((v) => window.scrollTo({ top: v, behavior: "instant" }), y); back.unshift(await settle()); }
+  marks.forEach((y, i) => expect(apart(down[i], back[i]), `at scroll ${y}px: going down vs coming back`).toBeLessThan(10));
+  /* 3. stopping stops it */
+  const a = await read(); await page.waitForTimeout(700); expect(apart(a, await read()), "no motion once the scroll has stopped").toBeLessThan(0.5);
+});
+
+test("3D hero: you can grab and turn the brain; it keeps its momentum, comes back by itself, and does nothing with reduced motion", async ({ page, browser }, info) => {
+  test.skip(info.project.name === "mobile", "grab-and-turn is for a mouse; touch keeps vertical swipes for scrolling");
+  test.setTimeout(150_000);
+  await page.goto("/?tier=full&gov=off");
+  await page.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
+  await page.waitForTimeout(3000);
+  const R = await page.evaluate(() => { const r = document.querySelector(".brain3d")!.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 }; });
+  const pose = () => page.evaluate(() => (window as unknown as { __brain3d: { pose: { dragYaw: number; dragging: boolean } } }).__brain3d.pose);
+  const grab = () => page.evaluate(() => document.documentElement.dataset.brainGrab ?? "");
+  await page.mouse.move(R.cx, R.cy, { steps: 6 }); await page.waitForTimeout(400);
+  expect(await grab(), "an open hand over the brain").toBe("over");
+  expect(await page.evaluate(([x, y]) => getComputedStyle(document.elementFromPoint(x, y)!).cursor, [R.cx, R.cy])).toBe("grab");
+  await page.mouse.move(60, 560, { steps: 6 }); await page.waitForTimeout(300);
+  expect(await grab(), "and not over the text").toBe("");
+  await page.mouse.move(R.cx, R.cy, { steps: 4 }); await page.waitForTimeout(300);
+  await page.mouse.down();
+  for (let i = 1; i <= 12; i++) { await page.mouse.move(R.cx + i * 10, R.cy + i * 2); await page.waitForTimeout(40); }
+  expect(await grab(), "a closed hand while turning").toBe("drag");
+  const held = await pose();
+  expect(held.dragging).toBe(true);
+  expect(held.dragYaw, "turned about 58 degrees by 120 px").toBeGreaterThan(0.8);
+  await page.mouse.up();
+  await expect.poll(async () => Math.abs((await pose()).dragYaw), { timeout: 9000, message: "it eases back to rest by itself" }).toBeLessThan(0.15);
+  expect((await pose()).dragging).toBe(false);
+  /* with reduced motion the brain is not a control at all */
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 }, reducedMotion: "reduce" });
+  const q = await ctx.newPage();
+  await q.goto("/?tier=full&gov=off");
+  await q.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
+  await q.mouse.move(R.cx, R.cy, { steps: 6 }); await q.mouse.down(); await q.mouse.move(R.cx + 120, R.cy, { steps: 8 }); await q.waitForTimeout(300);
+  expect(await q.evaluate(() => (window as unknown as { __brain3d: { pose: { dragYaw: number } } }).__brain3d.pose.dragYaw)).toBe(0);
+  expect(await q.evaluate(() => document.documentElement.dataset.brainGrab ?? "")).toBe("");
+  await q.mouse.up(); await ctx.close();
+});

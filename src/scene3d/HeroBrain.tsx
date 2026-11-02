@@ -103,7 +103,10 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
       let curS = 0, clock = 0, last = 0, t0 = 0, frames = 0, level = 0, degraded = false, drawn = false;
       const dts: number[] = [];
       /* the pointer, relative to the brain itself: where it is (x, y, -1..1), and how close (near, 0..1). Springs, so the motion is the same at any frame rate. */
-      const pointer = { x: 0, y: 0, tx: 0, ty: 0, near: 0, tnear: 0 };
+      const pointer = { x: 0, y: 0, tx: 0, ty: 0, near: 0, tnear: 0, hold: 0 };
+      /* grab and turn: a press on the brain starts a drag that follows the hand, keeps its momentum when let go, and eases back to rest by itself */
+      const drag = { on: false, yaw: 0, pitch: 0, vy: 0, vp: 0, id: -1, lx: 0, ly: 0, lt: 0 };
+      const YAW_MAX = 1.15, PITCH_MAX = 0.5;
       const governorOn = new URLSearchParams(location.search).get("gov") !== "off";
 
       const draw = (time: number, dt = 0.016, reveal = 1) => {
@@ -121,8 +124,15 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
         /* slow sway and float; the brain turns a little toward the pointer (about 15 degrees at most) and leans in as it comes close: never a spin */
         const kp = 1 - Math.exp(-dt * 5.5);
         pointer.x += (pointer.tx - pointer.x) * kp; pointer.y += (pointer.ty - pointer.y) * kp; pointer.near += (pointer.tnear - pointer.near) * kp;
-        group.rotation.y = reduced ? 0.08 : 0.14 * Math.sin(time * 0.17) + pointer.x * 0.26;
-        group.rotation.x = reduced ? 0 : pointer.y * 0.13;
+        pointer.hold += ((drag.on ? 1 : 0) - pointer.hold) * kp;                  /* the pointer-follow steps aside while you hold the brain */
+        if (!drag.on) {
+          drag.yaw += drag.vy * dt; drag.pitch += drag.vp * dt;                     /* momentum after letting go */
+          const slow = Math.exp(-dt * 3.2); drag.vy *= slow; drag.vp *= slow;
+          const home = Math.exp(-dt * 1.25); drag.yaw *= home; drag.pitch *= home;  /* and an easy return to rest */
+        }
+        drag.yaw = clamp(drag.yaw, -YAW_MAX, YAW_MAX); drag.pitch = clamp(drag.pitch, -PITCH_MAX, PITCH_MAX);
+        group.rotation.y = reduced ? 0.08 : 0.14 * Math.sin(time * 0.17) + pointer.x * 0.26 * (1 - pointer.hold) + drag.yaw;
+        group.rotation.x = reduced ? 0 : pointer.y * 0.13 * (1 - pointer.hold) + drag.pitch;
         group.scale.setScalar(reduced ? 1 : 1 + pointer.near * 0.035);
         group.position.y = reduced ? 0 : 0.012 * Math.sin(time * 0.6);
         fib.update(time, curS, curS, FOV, renderer.getPixelRatio());
@@ -182,8 +192,19 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
 
       /* pointer position against the brain's own canvas (it moves and shrinks with the flight, so read it fresh) */
       const rel = (e: PointerEvent) => { const r = el.getBoundingClientRect(), half = Math.max(r.width, 1) / 2; return { dx: (e.clientX - (r.left + half)) / half, dy: (e.clientY - (r.top + r.height / 2)) / half }; };
+      const root = document.documentElement;
+      const grab = (v: "" | "over" | "drag") => { if ((root.dataset.brainGrab ?? "") !== v) { if (v) root.dataset.brainGrab = v; else delete root.dataset.brainGrab; } };
+      const isControl = (e: PointerEvent) => !!(e.target as Element | null)?.closest?.("a, button, input, textarea, select, summary, label");
+      /* on the brain, and not mid-flight (a drag only makes sense while it sits in the hero) */
+      const overBrain = (e: PointerEvent) => { const { dx, dy } = rel(e); return Math.hypot(dx, dy) < 0.9 && scene.getHeroState().travel < 0.02; };
       const onMove = (e: PointerEvent) => {
         if (e.pointerType === "touch") return;
+        if (drag.on && e.pointerId === drag.id) {
+          const dtm = Math.max(1, e.timeStamp - drag.lt) / 1000, ddx = (e.clientX - drag.lx) * 0.0085, ddy = (e.clientY - drag.ly) * 0.006;
+          drag.yaw += ddx; drag.pitch += ddy;
+          drag.vy = drag.vy * 0.6 + (ddx / dtm) * 0.4; drag.vp = drag.vp * 0.6 + (ddy / dtm) * 0.4;   /* a smoothed hand velocity, for the momentum */
+          drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = e.timeStamp; wake();
+        } else grab(!isControl(e) && overBrain(e) ? "over" : "");
         const { dx, dy } = rel(e), d = Math.hypot(dx, dy);
         pointer.tx = clamp(dx / 2.2, -1, 1); pointer.ty = clamp(dy / 2.2, -1, 1);
         const t = clamp((d - 0.35) / 1.1, 0, 1); pointer.tnear = 1 - t * t * (3 - 2 * t); /* 1 on the brain, easing to 0 about 1.5 radii away */
@@ -193,19 +214,24 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
         if ((e.target as Element | null)?.closest?.("a, button, input, textarea, select, summary, label")) return;
         const { dx, dy } = rel(e);
         if (Math.hypot(dx, dy) < 0.95) { flash.current = 1.9; wake(); }
+        if (e.pointerType !== "touch" && e.button === 0 && overBrain(e)) {          /* touch keeps vertical swipes for scrolling the page */
+          drag.on = true; drag.id = e.pointerId; drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = e.timeStamp; drag.vy = 0; drag.vp = 0; grab("drag");
+        }
       };
+      const onUp = (e: PointerEvent) => { if (!drag.on || e.pointerId !== drag.id) return; drag.on = false; grab(!isControl(e) && overBrain(e) ? "over" : ""); wake(); };
+      const onBlur = () => { if (drag.on) { drag.on = false; grab(""); } };
       window.addEventListener("scroll", wake, { passive: true });
       window.addEventListener("resize", wake);
       document.addEventListener("visibilitychange", wake);
-      if (!reduced) { window.addEventListener("pointermove", onMove, { passive: true }); window.addEventListener("pointerdown", onDown, { passive: true }); }
-      undo.push(() => { window.removeEventListener("pointerdown", onDown); window.removeEventListener("scroll", wake); window.removeEventListener("resize", wake); document.removeEventListener("visibilitychange", wake); window.removeEventListener("pointermove", onMove); });
+      if (!reduced) { window.addEventListener("pointermove", onMove, { passive: true }); window.addEventListener("pointerdown", onDown, { passive: true }); window.addEventListener("pointerup", onUp, { passive: true }); window.addEventListener("pointercancel", onUp, { passive: true }); window.addEventListener("blur", onBlur); }
+      undo.push(() => { window.removeEventListener("pointerup", onUp); window.removeEventListener("pointercancel", onUp); window.removeEventListener("blur", onBlur); grab(""); window.removeEventListener("pointerdown", onDown); window.removeEventListener("scroll", wake); window.removeEventListener("resize", wake); document.removeEventListener("visibilitychange", wake); window.removeEventListener("pointermove", onMove); });
       refresh.current = wake;
 
       /* hooks for tests and for debugging: how many frames were drawn, and how much of the canvas is lit */
       (window as unknown as { __brain3d?: object }).__brain3d = {
         tier, get frames() { return frames; }, get level() { return level; }, get size() { return curS; },
         /** the brain's turn toward the pointer (radians) and how close the pointer is (0..1), so a test can check the reaction exactly instead of comparing frames */
-        get pose() { return { yaw: group.rotation.y, pitch: group.rotation.x, near: pointer.near, scale: group.scale.x }; },
+        get pose() { return { yaw: group.rotation.y, pitch: group.rotation.x, near: pointer.near, scale: group.scale.x, dragYaw: drag.yaw, dragging: drag.on }; },
         litPixels() {
           draw(STILL_TIME, 0.016, 1);
           const gl = renderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, buf = new Uint8Array(w * h * 4);

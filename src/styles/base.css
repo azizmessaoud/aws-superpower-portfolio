@@ -548,3 +548,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 /* the note under the starter questions: the full wording where there is room, one line on a phone (two more lines pushed the text into the brain) */
 .ask-how-short { display: none; }
 @media (max-width: 760px) { .ask-how-long { display: none; } .ask-how-short { display: inline; } }
+
+/* grab and turn the brain (pointer devices): an open hand over it, a closed hand while turning, and no text selection while you do */
+html[data-brain-grab="over"] .hero { cursor: grab; }
+html[data-brain-grab="drag"], html[data-brain-grab="drag"] * { cursor: grabbing !important; -webkit-user-select: none !important; user-select: none !important; }

@@ -1,11 +1,13 @@
 /* One fixed canvas for the whole page. In the hero: a point-cloud brain inside a sphere of skill nodes
  * (soul of projectx0's NeuralField); the camera pulls back on open and dollies in with the pinned scroll.
- * At the end of the pin the brain shrinks and travels into the "Terminal Explorer" dock, where it stays for the
- * rest of the page; it moves there only while the dock is hovered or focused.
+ * Over most of the pinned scroll the brain shrinks and travels into the "Ask Aziz" dock, where it stays for the rest of the page.
+ * That flight is scroll-linked (geometry.ts: flightTarget, followFlight): its place is a function of the scroll position, smoothed by a
+ * spring, so it goes at the speed of your scroll, stops when you stop, and scrolling back retraces the same path. The docked brain moves
+ * only while the dock is hovered or focused.
  * Never draws inside the hero text or behind fixed controls. The loop runs only while something visible moves
  * and the visitor has not paused; reduced motion draws still frames that follow the scroll. No preventDefault on touch. */
 import type { MindState } from "../mind/state";
-import { buildEdges, cameraZoom, DOCK_AT, placeSphere, seedBrain, seedShell, travelAt, TRAVEL_MS, type Box, type Edge, type ShellNode } from "./geometry";
+import { buildEdges, cameraZoom, DOCK_AT, flightTarget, followFlight, placeSphere, seedBrain, seedShell, type Box, type Edge, type ShellNode } from "./geometry";
 import { mulberry32 } from "./rng";
 
 const SETTINGS = {
@@ -65,7 +67,8 @@ export function createScene(o: SceneOptions) {
   let heroMode: "canvas" | "webgl" = o.heroMode ?? "canvas";
   let webMix = heroMode === "webgl" ? 1 : 0;
   const webGoal = () => (heroMode === "webgl" ? 1 : 0);
-  let travelFrom = 0, travelTo = 0, travelStart = 0;
+  /* where the brain is along its flight (0 hero, 1 landed) and where the scroll says it should be; it follows the goal with a spring */
+  let travelValue = 0, travelGoal = 0, lastDrawAt = 0;
   const introStart = o.intro && !o.reducedMotion ? performance.now() : 0;
   const excitation = new Map<number, number>();
   const pointer = { tx: -999, ty: -999, x: -999, y: -999, active: false };
@@ -159,20 +162,15 @@ export function createScene(o: SceneOptions) {
     if (run) progress = clamp(-o.hero.getBoundingClientRect().top / run, 0, 1);
     else progress = 0;
     if (run) {
-      /* past DOCK_AT the brain flies to the nav by itself and always lands; above it, it flies back */
-      const to = progress >= DOCK_AT ? 1 : 0;
-      if (to !== travelTo) {
-        const t = performance.now();
-        /* paused, or the visitor jumped past the hero (e.g. a nav link): land instantly, nothing to watch */
-        travelFrom = paused || stageTop + stageH <= 0 ? to : travelNow(t);
-        travelTo = to; travelStart = t;
-        if (to === 0) setDocked(false);
-        sync();
-      }
+      /* the flight is scroll-linked: the goal is a function of the scroll position, so scrolling back retraces the path exactly */
+      travelGoal = o.reducedMotion ? 0 : flightTarget(progress);
+      /* paused, or the visitor jumped past the hero (e.g. a nav link): nothing to watch, so land at once */
+      if (paused || stageTop + stageH <= 0) travelValue = travelGoal;
+      if (travelGoal < 0.995) setDocked(false);
+      sync();
     } else setDocked(stageTop + stageH < H * 0.35); /* reduced motion: docked once the hero has mostly left */
   }
-  const travelNow = (t: number) => (travelStart ? travelAt(travelFrom, travelTo, t - travelStart) : travelTo);
-  const travelling = (t: number) => travelStart !== 0 && t - travelStart < TRAVEL_MS && travelFrom !== travelTo;
+  const travelling = () => travelValue !== travelGoal;
   function setDocked(d: boolean) { if (d !== docked) { docked = d; o.onDocked?.(docked); sync(); } }
 
   /* project a model point; (cx, cy, k) place and scale it on screen */
@@ -187,8 +185,11 @@ export function createScene(o: SceneOptions) {
     const still = o.reducedMotion, t = frame * 0.016;
     const intro = introStart ? clamp((now - introStart) / 1800, 0, 1) : 1;
     const zoom = cameraZoom(intro, progress);
-    const travel = o.reducedMotion ? 0 : travelNow(now);
-    if (!o.reducedMotion && travelTo === 1 && travel >= 1) setDocked(true);
+    /* one spring step per frame, by elapsed time (not by frame count), toward where the scroll says the brain should be */
+    const dt = lastDrawAt ? Math.min(0.25, (now - lastDrawAt) / 1000) : 0.016; lastDrawAt = now; /* the spring is exact for any step, so the cap only guards a long pause, not a slow frame */
+    travelValue = followFlight(travelValue, travelGoal, dt);
+    const travel = o.reducedMotion ? 0 : travelValue;
+    if (!o.reducedMotion && travelGoal >= 0.995 && travel >= 0.995) setDocked(true);
     const heroOn = stageTop + stageH > 0 && travel < 1;
     webMix += clamp(webGoal() - webMix, -0.07, 0.07);
     const hero = 1 - webMix; /* how much of the hero this scene still draws */
@@ -385,7 +386,7 @@ export function createScene(o: SceneOptions) {
   }
 
   /* the loop runs only while something visible moves: the hero on screen, or a hovered/focused dock */
-  const shouldRun = () => !paused && !document.hidden && !o.reducedMotion && !destroyed && ((heroVisible && !docked && webMix < 0.999) || Math.abs(webGoal() - webMix) > 0.001 || travelling(performance.now()) || (docked && (dockActive || mindLive()) && dockAllowed));
+  const shouldRun = () => !paused && !document.hidden && !o.reducedMotion && !destroyed && ((heroVisible && !docked && webMix < 0.999) || Math.abs(webGoal() - webMix) > 0.001 || travelling() || (docked && (dockActive || mindLive()) && dockAllowed));
   function loop(now: number) {
     raf = 0;
     if (!shouldRun()) { still(); return; }
@@ -431,7 +432,7 @@ export function createScene(o: SceneOptions) {
   draw(performance.now());
 
   return {
-    pause() { paused = true; if (travelStart) { travelFrom = travelTo; } sync(); still(); },
+    pause() { paused = true; travelValue = travelGoal; sync(); still(); },
     resume() { paused = false; sync(); },
     /** dock hovered or focused: the docked brain may move (if not paused) */
     /** The question lifecycle changed. Tints and paces the animation; maps to no model internals. */
@@ -455,7 +456,7 @@ export function createScene(o: SceneOptions) {
       const now = performance.now();
       return {
         W, H, progress, stageTop, stageH, docked, text,
-        travel: o.reducedMotion ? 0 : travelNow(now), /* 0 in the hero, 1 landed in the nav, eased exactly as the 2D brain flew */
+        travel: o.reducedMotion ? 0 : travelValue, /* 0 in the hero, 1 landed in the nav: scroll-linked and sprung, the same value the 2D brain flies by */
         intro: introStart ? clamp((now - introStart) / 1800, 0, 1) : 1,
         dock: { ...dock }, reduced: o.reducedMotion, dockAt: DOCK_AT,
       };

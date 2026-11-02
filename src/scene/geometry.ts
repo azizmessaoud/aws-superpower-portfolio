@@ -62,18 +62,27 @@ export function buildEdges(nodes: ShellNode[], neighbors: number): Edge[] {
 export const ZOOM_OPEN = 2.6;
 export const ZOOM_DEEP = 2.4;
 export const DOLLY_END = 0.75;
-/** Past this point of the pinned scroll the brain flies to the nav on its own (and back when scrolled above it). */
+/* The flight of the brain from the hero to the nav is scroll-linked, not a timed animation: its place along the path is a function of how far
+ * you have scrolled through the pinned hero. Between FLIGHT_FROM and DOCK_AT of that scroll it travels; before it, it is in the hero; after
+ * it, it has landed. The same scroll position always gives the same place, so scrolling back retraces the path exactly, stopping stops it, and
+ * the speed is the speed of your scroll. A spring (followFlight) gives it weight without lag that depends on the frame rate. */
 export const DOCK_AT = 0.85;
-export const TRAVEL_MS = 750;
+export const FLIGHT_FROM = 0.2;
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+
+/** where the brain should be (0 in the hero, 1 landed in the nav) for a scroll progress through the pinned hero; smoothstep-eased at both ends */
+export function flightTarget(progress: number) {
+  const t = clamp01((progress - FLIGHT_FROM) / (DOCK_AT - FLIGHT_FROM));
+  return t * t * (3 - 2 * t);
+}
+/** one step of a critically-damped follow toward the target: the result depends on elapsed time, not on how many frames it took */
+export function followFlight(current: number, target: number, dtSeconds: number, rate = 11) {
+  const next = current + (target - current) * (1 - Math.exp(-rate * Math.max(0, dtSeconds)));
+  return Math.abs(target - next) < 0.0004 ? target : next;
+}
 const ease3 = (p: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, p)), 3);
 export function cameraZoom(intro: number, scroll: number) {
   return ZOOM_OPEN + (1 - ZOOM_OPEN) * ease3(intro) + (ZOOM_DEEP - 1) * ease3((scroll - 0.05) / (DOLLY_END - 0.05));
-}
-
-/** Time-based flight between hero and dock: from → to over TRAVEL_MS, smoothstep-eased; always completes. */
-export function travelAt(from: number, to: number, elapsedMs: number) {
-  const t = Math.min(1, Math.max(0, elapsedMs / TRAVEL_MS));
-  return from + (to - from) * t * t * (3 - 2 * t);
 }
 
 export interface Box { l: number; t: number; r: number; b: number }
