@@ -333,8 +333,7 @@ test("stopping the scroll mid-way never leaves the brain hanging: it finishes th
   await scrollPage(page, Math.round(run * 0.87));         /* just past the threshold, then stop */
   /* the flight itself takes 0.75 s; the budget is generous because software-rendered WebGL on a shared CPU can starve the animation loop (measured: 1-7 s here, 3 s even for the plain 2D hero). The property is that it always lands. */
   await expect(page.locator(".nav-cta")).toHaveClass(/is-docked/, { timeout: 12000 });
-  await page.waitForTimeout(150);
-  expect(await running(page)).toBe(false);               /* landed, loop idle */
+  await expect.poll(() => running(page), { timeout: 5000, message: "landed: the loop goes idle" }).toBe(false);  /* polled, not a fixed 150 ms: under load the spring's last frames can arrive later */
   await scrollPage(page, Math.round(run * 0.5));          /* scroll back above it: the brain flies back out */
   await expect(page.locator(".nav-cta")).not.toHaveClass(/is-docked/);
 });
@@ -1288,72 +1287,87 @@ test("3D hero: you can grab and turn the brain; it keeps its momentum, comes bac
 });
 
 /* ── the hero's background video, and the brain's hover and click (3 Nov) ────────────────────────────────────── */
-test("hero background: a muted, seamless loop plays on its own layer, behind the 3D brain and the text", async ({ page }) => {
+test("page background: a muted, seamless loop plays on one fixed layer behind the whole page, the 3D brain and the text", async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto("/?tier=full&gov=off");
   await page.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
-  const v = page.locator(".hero-bg-video");
+  const v = page.locator(".page-bg-video");
   await expect.poll(() => v.evaluate((e: HTMLVideoElement) => !e.paused && e.currentTime > 0.3), { timeout: 20_000, message: "the video is playing" }).toBe(true);
   const m = await v.evaluate((e: HTMLVideoElement) => ({ muted: e.muted, loop: e.loop, playsInline: e.playsInline, dur: e.duration, same: new URL(e.currentSrc).origin === location.origin }));
   expect(m).toMatchObject({ muted: true, loop: true, playsInline: true, same: true });
   expect(m.dur, "the loop is the 4 s crossfaded cut, not the 5 s original with a visible jump").toBeGreaterThan(3.9);
   expect(m.dur).toBeLessThan(4.2);
-  const z = await page.evaluate(() => [".hero-bg", ".brain3d", ".hero-stage"].map((s) => getComputedStyle(document.querySelector(s)!).zIndex));
-  expect(z, "video 0, brain 1, text 2: the video can never cover either").toEqual(["0", "1", "2"]);
-  expect(await page.evaluate(() => getComputedStyle(document.querySelector(".hero-bg")!).pointerEvents)).toBe("none");
+  const z = await page.evaluate(() => [".page-bg", ".brain3d", ".hero-stage"].map((s) => getComputedStyle(document.querySelector(s)!).zIndex));
+  expect(z, "video -1, brain 1, hero text 2: the video can never cover any of them").toEqual(["-1", "1", "2"]);
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector(".page-bg")!).pointerEvents)).toBe("none");
+  /* one fixed layer: it covers the viewport at the top of the page and, unchanged, at the bottom of it */
+  const cover = () => page.evaluate(() => { const r = document.querySelector(".page-bg")!.getBoundingClientRect(); return { pos: getComputedStyle(document.querySelector(".page-bg")!).position, w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top), vw: innerWidth, vh: innerHeight }; });
+  const top = await cover();
+  expect(top).toMatchObject({ pos: "fixed", top: 0 }); expect(top.w).toBe(top.vw); expect(top.h).toBeGreaterThanOrEqual(top.vh);
+  await page.evaluate(() => document.getElementById("contact")!.scrollIntoView({ behavior: "instant" }));
+  await page.waitForTimeout(300);
+  expect(await cover(), "still covering the viewport at the Contact section").toEqual(top);
 });
 
 test("hero background: with reduced motion or Save-Data it is the still poster, and no video bytes are fetched", async ({ browser }) => {
-  const fetched = (p: import("@playwright/test").Page) => { const r: string[] = []; p.on("request", (q) => /hero-bg\.(mp4|webm)/.test(q.url()) && r.push(q.url())); return r; };
+  const fetched = (p: import("@playwright/test").Page) => { const r: string[] = []; p.on("request", (q) => /page-bg\.(mp4|webm)/.test(q.url()) && r.push(q.url())); return r; };
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
   const a = await ctx.newPage(); const ra = fetched(a);
   await a.goto("/?hero=canvas&gov=off"); await a.waitForTimeout(2000);
-  expect(await a.locator(".hero-bg-video").count(), "no video element with reduced motion").toBe(0);
-  await expect(a.locator(".hero-bg-still")).toBeAttached();
+  expect(await a.locator(".page-bg-video").count(), "no video element with reduced motion").toBe(0);
+  await expect(a.locator(".page-bg-still")).toBeAttached();
   expect(ra, "and nothing downloaded").toEqual([]);
   await ctx.close();
   const b = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const q = await b.newPage(); const rb = fetched(q);
   await q.addInitScript(() => Object.defineProperty(navigator, "connection", { value: { saveData: true }, configurable: true }));
   await q.goto("/?hero=canvas&gov=off"); await q.waitForTimeout(2000);
-  expect(await q.locator(".hero-bg-video").count(), "no video element with Save-Data").toBe(0);
+  expect(await q.locator(".page-bg-video").count(), "no video element with Save-Data").toBe(0);
   expect(rb).toEqual([]);
   await b.close();
 });
 
-test("hero background: text stays readable over every part of the loop (the dimmest hero text keeps 4.5:1 over the brightest fibre behind it)", async ({ page }) => {
-  test.setTimeout(150_000);
+test("page background: text stays readable over every section and every part of the loop (the dimmest text keeps 4.5:1 over the brightest fibre behind it)", async ({ page }) => {
+  test.setTimeout(240_000);
   await page.goto("/?hero=canvas&gov=off");
-  const v = page.locator(".hero-bg-video");
+  const v = page.locator(".page-bg-video");
   await expect.poll(() => v.evaluate((e: HTMLVideoElement) => e.readyState >= 3), { timeout: 20_000 }).toBe(true);
-  const boxes = await page.evaluate(() => [...document.querySelectorAll(".hero-inner h1, .hero-inner .hero-lead, .hero-inner .eyebrow, .hero-inner .hero-avail, .hero-inner .ask-label, .hero-inner .ask-how, .hero-inner .ask-status, .hero-inner .ask-samples")]
-    .map((e) => { const r = e.getBoundingClientRect(); return { x: Math.max(0, r.left), y: Math.max(0, r.top), w: Math.min(r.width, innerWidth - r.left), h: r.height }; }).filter((r) => r.w > 20 && r.h > 8));
-  await page.addStyleTag({ content: ".hero-inner, .nav, .brain-canvas, .brain3d { visibility: hidden !important; }" });   /* look at the background alone */
-  await page.evaluate(() => (window as unknown as { __scene?: { pause?: () => void } }).__scene?.pause?.());                  /* and stop the 2D scene drawing */
+  await page.addStyleTag({ content: ".inner, .hero-inner, .nav, .footer > *, .brain-canvas, .brain3d { visibility: hidden !important; }" });   /* the backgrounds alone */
+  await page.evaluate(() => (window as unknown as { __scene?: { pause?: () => void } }).__scene?.pause?.());                                        /* and a still 2D scene */
   const dur = await v.evaluate((e: HTMLVideoElement) => { e.pause(); return e.duration; });
-  /* only the region the text occupies is captured (cheaper), and every box below is measured relative to it */
-  const x0 = Math.floor(Math.min(...boxes.map((b) => b.x))), y0 = Math.floor(Math.min(...boxes.map((b) => b.y)));
-  const x1 = Math.ceil(Math.max(...boxes.map((b) => b.x + b.w))), y1 = Math.ceil(Math.max(...boxes.map((b) => b.y + b.h)));
-  const rel = boxes.map((b) => ({ x: b.x - x0, y: b.y - y0, w: b.w, h: b.h }));
-  const shots: string[] = [];
-  for (let t = 0.1; t < dur; t += 0.5) {
-    await v.evaluate((e: HTMLVideoElement, at: number) => new Promise<void>((res) => { e.addEventListener("seeked", () => res(), { once: true }); e.currentTime = at; }), t);
-    await page.waitForTimeout(120);
-    shots.push((await page.screenshot({ clip: { x: x0, y: y0, width: x1 - x0, height: y1 - y0 }, timeout: 30_000 })).toString("base64"));
-  }
-  const worst = await page.evaluate(async ([imgs, bx]) => {
-    const f = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
-    let w = 0;
-    for (const s of imgs as string[]) {
-      const img = await createImageBitmap(await (await fetch("data:image/png;base64," + s)).blob()); const cv = new OffscreenCanvas(img.width, img.height), cx = cv.getContext("2d")!; cx.drawImage(img, 0, 0);
-      for (const b of bx as { x: number; y: number; w: number; h: number }[]) { const d = cx.getImageData(Math.round(b.x), Math.round(b.y), Math.max(1, Math.round(b.w)), Math.max(1, Math.round(b.h))).data; for (let i = 0; i < d.length; i += 4) w = Math.max(w, 0.2126 * f(d[i]) + 0.7152 * f(d[i + 1]) + 0.0722 * f(d[i + 2])); }
-    }
-    return w;
-  }, [shots, rel] as const);
+  /* where text can be: the hero's text blocks (its right side is deliberately open behind the brain), and each section's whole content box */
+  const targets: [string, string][] = [["hero", "#top .hero-inner h1, #top .hero-lead, #top .eyebrow, #top .hero-avail, #top .ask-label, #top .ask-how, #top .ask-status, #top .ask-samples"],
+    ["selected", "#selected .inner"], ["about", "#about .inner"], ["skills", "#skills .inner"], ["projects", "#projects .inner"], ["aws", "#aws .inner"], ["terminal", "#terminal .inner"], ["certifications", "#certifications .inner"], ["contact", "#contact .inner"], ["footer", ".footer"]];
   const f = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
-  const stone = 0.2126 * f(0xa3) + 0.7152 * f(0x9d) + 0.0722 * f(0x90);          /* --fg-muted, the dimmest text colour in the hero */
-  expect(shots.length, "frames checked across the loop").toBeGreaterThanOrEqual(8);
-  expect((stone + 0.05) / (worst + 0.05), `contrast of the dimmest text over the brightest background pixel (luminance ${worst.toFixed(4)})`).toBeGreaterThanOrEqual(4.5);
+  const stone = 0.2126 * f(0xa3) + 0.7152 * f(0x9d) + 0.0722 * f(0x90);              /* --fg-muted, the dimmest text colour on the page */
+  const worstBySection: Record<string, number> = {};
+  for (const [name, sel] of targets) {
+    const box = await page.evaluate(([s, n]) => {
+      const els = [...document.querySelectorAll(s)]; if (n !== "hero") { els.length = Math.min(els.length, 1); }
+      const target = els[0]; if (!target) return null;
+      const top = target.getBoundingClientRect().top + scrollY - (n === "hero" ? 0 : 80); window.scrollTo({ top, behavior: "instant" });
+      const rs = els.map((e) => e.getBoundingClientRect());
+      const x = Math.max(0, Math.min(...rs.map((r) => r.left))), y = Math.max(0, Math.min(...rs.map((r) => r.top))), x2 = Math.min(innerWidth, Math.max(...rs.map((r) => r.right))), y2 = Math.min(innerHeight, Math.max(...rs.map((r) => r.bottom)));
+      return { x, y, w: x2 - x, h: y2 - y };
+    }, [sel, name] as const);
+    await page.waitForTimeout(120);
+    if (!box || box.w < 10 || box.h < 10) continue;
+    let worst = 0;
+    for (let t = 0.1; t < dur; t += 0.8) {
+      await v.evaluate((e: HTMLVideoElement, at: number) => new Promise<void>((res) => { e.addEventListener("seeked", () => res(), { once: true }); e.currentTime = at; }), t);
+      await page.waitForTimeout(100);
+      const shot = (await page.screenshot({ type: "jpeg", quality: 92, clip: { x: box.x, y: box.y, width: box.w, height: box.h }, timeout: 30_000 })).toString("base64");
+      worst = Math.max(worst, await page.evaluate(async (s) => {
+        const g = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+        const img = await createImageBitmap(await (await fetch("data:image/jpeg;base64," + s)).blob()); const cv = new OffscreenCanvas(img.width, img.height), cx = cv.getContext("2d")!; cx.drawImage(img, 0, 0);
+        const d = cx.getImageData(0, 0, img.width, img.height).data; let m = 0; for (let i = 0; i < d.length; i += 4) m = Math.max(m, 0.2126 * g(d[i]) + 0.7152 * g(d[i + 1]) + 0.0722 * g(d[i + 2])); return m;
+      }, shot));
+    }
+    worstBySection[name] = worst;
+  }
+  expect(Object.keys(worstBySection).length, "sections measured").toBeGreaterThanOrEqual(9);
+  const report = Object.entries(worstBySection).map(([k, w]) => `${k} ${((stone + 0.05) / (w + 0.05)).toFixed(2)}:1`).join(", ");
+  for (const [k, w] of Object.entries(worstBySection)) expect((stone + 0.05) / (w + 0.05), `${k}: contrast of the dimmest text over the brightest background pixel (luminance ${w.toFixed(4)}). All: ${report}`).toBeGreaterThanOrEqual(4.5);
 });
 
 test("3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click", async ({ page }, info) => {
@@ -1415,4 +1429,21 @@ test("3D hero: with reduced motion the brain is not a control (no label, no clic
   expect(await q.evaluate(() => (window as unknown as { __brain3d: { pose: { clicks: number } } }).__brain3d.pose.clicks)).toBe(0);
   expect(await q.evaluate(() => document.activeElement?.id)).not.toBe("hero-ask");
   await ctx.close();
+});
+
+test("page background: every section's ground is translucent so the video shows through; cards stay opaque", async ({ page }) => {
+  await page.goto("/?hero=canvas&gov=off");
+  await page.waitForTimeout(800);
+  const alphas = (str: string) => [...str.matchAll(/rgba?\(([^)]+)\)/g)].map((m) => { const p = m[1].split(",").map((x) => parseFloat(x)); return p.length > 3 ? p[3] : 1; });
+  const sections = await page.evaluate(() => ["selected", "about", "skills", "projects", "aws", "terminal", "certifications", "contact"].map((id) => { const cs = getComputedStyle(document.getElementById(id)!); return { id, bg: cs.backgroundColor + " " + cs.backgroundImage }; }));
+  for (const sec of sections) {
+    const a = alphas(sec.bg).filter((x) => x > 0);                               /* ignore a fully transparent background-color */
+    expect(a.length, `${sec.id} has a background`).toBeGreaterThan(0);
+    for (const v of a) { expect(v, `${sec.id} ground alpha`).toBeLessThan(0.95); expect(v, `${sec.id} ground alpha (enough to keep text readable)`).toBeGreaterThan(0.8); }
+  }
+  const footer = await page.evaluate(() => getComputedStyle(document.querySelector(".footer")!).backgroundColor);
+  expect(Math.max(...alphas(footer)), "footer ground").toBeLessThan(0.95);
+  /* cards are solid: the video never shows through a card, so card text is as readable as before */
+  const cards = await page.evaluate(() => [".selected-card", ".skill-card", ".pcard", ".cert-card"].map((sel) => { const e = document.querySelector(sel); return e ? { sel, bg: getComputedStyle(e).backgroundColor } : null; }).filter(Boolean));
+  for (const c of cards as { sel: string; bg: string }[]) expect(Math.min(...alphas(c.bg)), `${c.sel} is opaque`).toBe(1);
 });

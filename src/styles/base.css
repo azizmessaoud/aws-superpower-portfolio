@@ -117,7 +117,7 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .sec-label { font-family: var(--font-m); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-text); margin-bottom: var(--space-xs); }
 .sec-h2 { font-family: var(--font-h); font-size: var(--text-h2); font-weight: 700; line-height: 1.1; text-wrap: balance; margin-bottom: var(--space-md); max-width: 30ch; }
 .sec-lead { font-size: 17px; line-height: 1.75; color: var(--fg-muted); max-width: var(--measure); margin-bottom: var(--space-3xl); }
-.about { background: linear-gradient(180deg, var(--bg), var(--surface)); }
+.about { background: linear-gradient(180deg, var(--bg-a), var(--surface-a)); }
 .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-3xl); align-items: start; }
 .about-text p { color: var(--fg-muted); line-height: 1.8; margin-bottom: var(--space-md); max-width: 62ch; }
 .about-side { display: grid; gap: var(--space-xl); }
@@ -126,7 +126,7 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .timeline div { position: relative; }
 .timeline div::before { content: ""; position: absolute; left: calc(-1 * var(--space-xl) - 4px); top: 0.55em; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 .timeline dt { font-weight: 600; } .timeline dd { color: var(--fg-muted); font-size: var(--text-small); }
-.skills { background: var(--surface-v); }
+.skills { background: var(--surface-v-a); }
 /* Tech Superpowers: the prototype's glass card view */
 .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg); }
 .skill-card { display: flex; flex-direction: column; padding: var(--space-xl); border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--border); transition: border-color var(--dur-base); }
@@ -147,7 +147,7 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 @media (max-width: 760px) { .about-grid { grid-template-columns: 1fr; } }
 
 /* ── project cases: three different layouts ── */
-.projects { background: linear-gradient(180deg, var(--surface), var(--bg)); }
+.projects { background: linear-gradient(180deg, var(--surface-a), var(--bg-a)); }
 .case { padding: var(--space-3xl) 0; border-top: 1px solid var(--border); }
 .case-kind { font-family: var(--font-m); font-size: 12px; color: var(--accent-text); margin-bottom: var(--space-xs); }
 .case-title { font-family: var(--font-h); font-size: clamp(1.5rem, 2.6vw, 2rem); line-height: 1.15; margin-bottom: var(--space-sm); }
@@ -204,7 +204,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .suggest-label { color: var(--fg-muted); font-size: var(--text-small); }
 
 /* ── terminal explorer: the prototype's window, wired to the verified corpus ── */
-.terminal-section { background: linear-gradient(180deg, var(--surface-v), var(--bg)); }
+.terminal-section { background: linear-gradient(180deg, var(--surface-v-a), var(--bg-a)); }
 .terminal-section code { font-family: var(--font-m); color: var(--accent-text); }
 .term-win { max-width: 54rem; border-radius: var(--radius-xl); overflow: hidden; background: var(--term-bg); border: 1px solid var(--border); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); cursor: text; }
 .term-bar { display: flex; align-items: center; gap: 0.45rem; padding: 0.7rem var(--space-md); background: #100f0d; border-bottom: 1px solid var(--border); }
@@ -272,7 +272,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .hero-inner:has(.ask-answer) .hero-lead, .hero-inner:has(.ask-answer) .hero-avail, .hero-inner:has(.ask-answer) .hero-actions { display: none; }
 
 /* ── aws status ── */
-.aws { background: var(--surface); }
+.aws { background: var(--surface-a); }
 .aws-status { max-width: 62ch; padding: var(--space-md) var(--space-lg); margin-bottom: var(--space-xl); border: 1px dashed var(--signal-amber); border-radius: var(--radius-md); color: var(--fg-lead); }
 .aws-status.is-live { border-style: solid; border-color: var(--signal-green); }
 .aws-status p + p { margin-top: var(--space-xs); }
@@ -290,7 +290,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .aws-cost { max-width: 62ch; }
 
 /* ── certifications, volunteering, smaller projects ── */
-.certs { background: var(--surface); }
+.certs { background: var(--surface-a); }
 .cert-sub { font-family: var(--font-h); font-size: var(--text-h3); margin: var(--space-2xl) 0 var(--space-md); }
 .cert-note { color: var(--fg-muted); font-size: var(--text-small); margin-top: var(--space-xs); }
 .cert-issuer { font-family: var(--font-m); font-size: 12px; color: var(--accent-text); margin-bottom: var(--space-3xs); }
@@ -308,7 +308,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .small-grid .chips { margin-bottom: var(--space-sm); }
 
 /* ── selected work (under the hero) and the case-study glance ── */
-.selected { padding: var(--space-3xl) max(var(--space-md), env(safe-area-inset-left)) var(--space-2xl); background: var(--bg-deep); border-top: 1px solid var(--border); } /* side padding like every .section: without it the cards touch the screen edge on a phone */
+.selected { padding: var(--space-3xl) max(var(--space-md), env(safe-area-inset-left)) var(--space-2xl); background: var(--bg-deep-a); border-top: 1px solid var(--border); } /* side padding like every .section: without it the cards touch the screen edge on a phone */
 .selected-h2 { font-family: var(--font-h); font-size: var(--text-h3, 1.5rem); margin-bottom: var(--space-lg); }
 .selected-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: var(--space-lg); list-style: none; padding: 0; }
 .selected-card { display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-lg); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
@@ -377,7 +377,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 }
 
 /* ── contact + footer ── */
-.contact { background: var(--bg-deep); }
+.contact { background: var(--bg-deep-a); }
 .contact-grid { max-width: 40rem; }
 .email-row { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); flex-wrap: wrap; }
 .email-addr { font-family: var(--font-m); color: var(--accent-text); flex: 1; min-width: 12rem; }
@@ -386,7 +386,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .copy-status { min-height: 1.5em; margin: var(--space-xs) 0 var(--space-lg); font-family: var(--font-m); font-size: 12px; color: var(--accent); }
 .contact-links { display: flex; flex-wrap: wrap; gap: var(--space-lg); }
 .contact-links a { color: var(--fg); text-underline-offset: 4px; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; }
-.footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-md); padding: var(--space-xl) max(var(--space-md), env(safe-area-inset-left)); border-top: 1px solid var(--border); background: var(--bg-deep); color: var(--fg-muted); font-size: 13px; }
+.footer { background: var(--bg-deep-a); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-md); padding: var(--space-xl) max(var(--space-md), env(safe-area-inset-left)); border-top: 1px solid var(--border); color: var(--fg-muted); font-size: 13px; }
 .footer-links { display: flex; flex-wrap: wrap; column-gap: var(--space-lg); }
 .footer a { color: var(--accent-text); display: inline-flex; align-items: center; min-height: 44px; }
 
@@ -553,21 +553,20 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 html[data-brain-grab="over"] .hero { cursor: grab; }
 html[data-brain-grab="drag"], html[data-brain-grab="drag"] * { cursor: grabbing !important; -webkit-user-select: none !important; user-select: none !important; }
 
-/* ── 3 Nov: the hero's background video. Its own layer (z-index 0) behind the 3D brain (1) and the text (2), pinned with the hero and gone when the
-   hero is. Screen-blended on the ground so its blacks vanish and only the fibres show; a ground-coloured fade keeps the text column legible. ── */
-.hero-bg { position: sticky; top: 0; z-index: 0; height: 100vh; height: 100svh; margin-bottom: -100vh; margin-bottom: -100svh; overflow: hidden; pointer-events: none; background: var(--bg); }
-.hero-bg-still, .hero-bg-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; mix-blend-mode: screen; }
-.hero-bg-still { opacity: 0.8; }
-.hero-bg-video { opacity: 0; transition: opacity 900ms var(--ease-out); }
-.hero-bg-video.is-playing { opacity: 0.95; }
-/* the text column is kept dark enough that the brightest fibre behind any line of text still gives the dimmest text colour 4.5:1 (measured, see the e2e test) */
-.hero-bg::after { content: ""; position: absolute; inset: 0; background:
+/* ── 3 Nov (2): the background video is the whole page's. One fixed layer behind everything (z-index -1: below the 3D brain 1, the hero text 2, and every
+   section's content), screen-blended on the ground so its blacks vanish and only the fibres show. Sections have translucent graphite grounds
+   (--bg-a and friends) that let it through at about 14% and keep text readable; cards stay opaque. The hero adds its own stronger darkening on the
+   left, where its text is, and leaves the right open behind the brain. ── */
+.page-bg { position: fixed; inset: 0; z-index: -1; height: 100vh; height: 100lvh; overflow: hidden; pointer-events: none; background: var(--bg); }
+.page-bg-still, .page-bg-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; mix-blend-mode: screen; }
+.page-bg-still { opacity: 0.8; }
+.page-bg-video { opacity: 0; transition: opacity 900ms var(--ease-out); }
+.page-bg-video.is-playing { opacity: 0.95; }
+@media (max-width: 760px) { .page-bg-video.is-playing { opacity: 0.7; } }
+.hero-scrim { position: sticky; top: 0; z-index: 0; height: 100vh; height: 100svh; margin-bottom: -100vh; margin-bottom: -100svh; pointer-events: none; background:
   linear-gradient(90deg, rgba(19, 18, 16, 0.97) 0%, rgba(19, 18, 16, 0.93) 52%, rgba(19, 18, 16, 0.5) 74%, rgba(19, 18, 16, 0.08) 100%),
-  linear-gradient(180deg, rgba(19, 18, 16, 0.75) 0%, rgba(19, 18, 16, 0) 22%, rgba(19, 18, 16, 0) 72%, var(--bg) 100%); }
-@media (max-width: 760px) {
-  .hero-bg-video.is-playing { opacity: 0.62; }
-  .hero-bg::after { background: linear-gradient(180deg, rgba(19, 18, 16, 0.9) 0%, rgba(19, 18, 16, 0.84) 45%, rgba(19, 18, 16, 0.86) 80%, var(--bg) 100%); }
-}
+  linear-gradient(180deg, rgba(19, 18, 16, 0.75) 0%, rgba(19, 18, 16, 0) 22%, rgba(19, 18, 16, 0) 72%, rgba(19, 18, 16, 0.5) 100%); }
+@media (max-width: 760px) { .hero-scrim { background: linear-gradient(180deg, rgba(19, 18, 16, 0.9) 0%, rgba(19, 18, 16, 0.84) 45%, rgba(19, 18, 16, 0.86) 80%, rgba(19, 18, 16, 0.5) 100%); } }
 
 /* the label that follows the pointer over the brain (pointer devices only: it is shown by the same state as the grab cursor) */
 .brain-tip { position: fixed; left: 0; top: 0; z-index: 4; pointer-events: none; opacity: 0; transition: opacity var(--dur-fast); white-space: nowrap; padding: 0.3rem 0.7rem; border: 1px solid var(--accent-line); border-radius: var(--radius-pill); background: var(--surface); color: var(--fg-lead); font-family: var(--font-m); font-size: 12px; letter-spacing: 0.02em; }

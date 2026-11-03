@@ -13,6 +13,12 @@
   --term-bg: #0a0908;
   --nav-scrim: rgba(19, 18, 16, 0.9);
 
+  /* the same grounds, translucent: sections use these so the page's background video shows through (about 14%), while cards stay opaque */
+  --bg-a: rgba(19, 18, 16, 0.86);
+  --bg-deep-a: rgba(12, 11, 10, 0.88);
+  --surface-a: rgba(27, 26, 23, 0.88);
+  --surface-v-a: rgba(24, 22, 17, 0.88);
+
   /* text: bone */
   --fg: #efeadf;
   --fg-lead: rgba(239, 234, 223, 0.8);

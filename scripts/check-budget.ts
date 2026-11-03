@@ -26,9 +26,9 @@ rows.push(
  * (the browser takes the first it can play), plus the poster, and with reduced motion or Save-Data only the poster. */
 const pub = (n: string) => statSync(new URL(`../dist/${n}`, import.meta.url)).size;
 rows.push(
-  { name: "hero-bg.mp4", bytes: pub("hero-bg.mp4"), limit: 320_000, what: "hero background video, MP4 (a visitor loads one of the two)" },
-  { name: "hero-bg.webm", bytes: pub("hero-bg.webm"), limit: 320_000, what: "hero background video, WebM (a visitor loads one of the two)" },
-  { name: "hero-bg-poster.jpg", bytes: pub("hero-bg-poster.jpg"), limit: 30_000, what: "hero background poster (the still used with reduced motion or Save-Data)" },
+  { name: "page-bg.mp4", bytes: pub("page-bg.mp4"), limit: 320_000, what: "page background video, MP4 (a visitor loads one of the two)" },
+  { name: "page-bg.webm", bytes: pub("page-bg.webm"), limit: 320_000, what: "page background video, WebM (a visitor loads one of the two)" },
+  { name: "page-bg-poster.jpg", bytes: pub("page-bg-poster.jpg"), limit: 30_000, what: "page background poster (the still used with reduced motion or Save-Data)" },
 );
 let bad = 0;
 for (const r of rows) {

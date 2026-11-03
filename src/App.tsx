@@ -12,6 +12,7 @@ import Certifications from "./sections/Certifications";
 import Contact from "./sections/Contact";
 import Terminal from "./sections/Terminal";
 import { canUseWebglHero } from "./scene3d/capability";
+import PageBackdrop from "./ui/PageBackdrop";
 
 const NeuralScene = lazy(() => import("./scene/NeuralScene"));
 /* the 3D hero is a separate, lazily loaded chunk (Three.js and the renderer); the page is complete without it */
@@ -58,6 +59,7 @@ export default function App() {
 
   return (
     <>
+      <PageBackdrop reduced={reduced} />
       <a className="skip" href="#main">Skip to content</a>
       <Nav scene={scene} docked={docked} />
       <SceneBoundary onFail={() => { setScene(null); setDocked(false); }}>
