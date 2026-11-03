@@ -104,7 +104,7 @@ export function createTerminal(corpus: Corpus, portfolio: Portfolio) {
           { kind: "heading", text: "Tools, by where I used them" },
           { kind: "text", text: "  Machine learning   scikit-learn · Random Forest · grouped holdout  (FlyRank)" },
           { kind: "text", text: "  Multi-agent        SUMO · TraCI · controllers · reason codes       (TraffiX)" },
-          { kind: "text", text: "  Document AI        Docling · RapidOCR · anomaly detection          (HR prototype)" },
+          { kind: "text", text: "  NLP                Docling · RapidOCR · anomaly detection          (HR prototype)" },
           { kind: "text", text: "  Retrieval          BM25 · hit@k · MRR                              (this site)" },
           { kind: "text", text: "  Data               DuckDB · Parquet · SQL                          (FlyRank)" },
           { kind: "text", text: "  APIs and tests     FastAPI · Docker · pytest                       (HR prototype)" },

@@ -1,0 +1,15 @@
+Portfolio passage ID: pr-volunteering
+
+Project: Across the three projects
+
+Passage: Volunteering and clubs
+
+Context: From my earlier portfolio's volunteering data.
+
+Verified notes: Researcher for Tunis in the 2026 Happy City Index; member of DeepFlow since October 2025 (workshops on RAG, vector search and LLM applications); member of the Learning Department of ATIA Club ESB since December 2024; member of IEEE chapters (PES, IAS, Computer Society) from October 2022 to December 2023.
+
+Limitations:
+- My own account; the club and organisation pages are linked where they exist.
+
+Evidence:
+- Live portfolio source · portfolioData.ts @ projectx0: https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts

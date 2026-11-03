@@ -1,0 +1,16 @@
+Portfolio passage ID: tr-limits
+
+Project: TraffiX
+
+Passage: Known limitations
+
+Context: Validation report §5.5 and README.
+
+Verified notes: Demand is synthetic, 18 of 21 junction roads use unverified lane counts, it is a course project until December 2026, and the models must be retrained when the road network changes.
+
+Limitations:
+- None stated.
+
+Evidence:
+- Report · prototype-validation.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md
+- README · README.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md

@@ -1,0 +1,15 @@
+Portfolio passage ID: tr-ambulance
+
+Project: TraffiX
+
+Passage: Ambulances are slower, and that is not explained yet
+
+Context: Emergency scenario, mean of 3 seeds, 20 October 2026 run.
+
+Verified notes: Emergency-vehicle trips were slower with TraffiX: 240.0 s against 213.2 s with actuated signals and 197.0 s with fixed-time signals. The objective was not met, and the cause is not yet known.
+
+Limitations:
+- Possible causes named in the report (preparation horizon, extra car wait, routes) are untested.
+
+Evidence:
+- Report · prototype-validation.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md

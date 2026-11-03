@@ -48,7 +48,7 @@
 - { id: HR-03, projectId: hr-docs, status: unresolved, sources: [hr-readme], limitations: ["No evaluation artifact."] }
 # Profile claims (the recruiter-style questions). Source: my earlier portfolio's data file and its rendered page.
 - { id: PR-01, projectId: portfolio, status: supported, sources: [live-site-data], limitations: ["No start or end dates for the target internship are stated."] }
-- { id: PR-02, projectId: portfolio, status: caveated, sources: [live-site-data], limitations: ["FlyRank dates are not shown until I settle which of my sources is right.", "Job titles and dates are my own account, copied from my earlier portfolio."] }
+- { id: PR-02, projectId: portfolio, status: caveated, sources: [live-site-data], limitations: ["Job titles and dates are based on Aziz's account; the FlyRank and Sopra HR Software internship entries both list Jul–Sep 2026."] }
 - { id: PR-03, projectId: portfolio, status: supported, sources: [live-site-data], limitations: ["My own account; the club and organisation pages are linked where they exist."] }
 - { id: PR-04, projectId: portfolio, status: supported, sources: [live-site-page], limitations: ["Working languages as I state them; no test score or level is claimed."] }
 - { id: PR-05, projectId: portfolio, status: caveated, sources: [live-site-page], limitations: ["Only the country is stated; the city differs between my sources."] }

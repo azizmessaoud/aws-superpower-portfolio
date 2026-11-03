@@ -1,0 +1,16 @@
+Portfolio passage ID: hr-accuracy
+
+Project: HR document checks
+
+Passage: OCR accuracy has not been measured
+
+Context: Live portfolio HR card; system record line 34.
+
+Verified notes: OCR accuracy on real HR documents has not been measured. The prototype's checks run on synthetic PDFs and images with deterministic local tests, and one extractor's confidence is fixed at 0.6 until measured confidence is implemented.
+
+Limitations:
+- No accuracy figure exists for this project.
+
+Evidence:
+- Live portfolio source · portfolioData.ts @ projectx0: https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts#L196-L204
+- README · system-record.md @ 437a514: https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/docs/system-record.md#L34

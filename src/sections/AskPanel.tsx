@@ -1,160 +1,204 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { Corpus, Portfolio } from "../content/schema";
 import corpusJson from "../generated/corpus.json";
 import portfolioJson from "../generated/portfolio.json";
-import { createAssistant, MAX_QUESTION, type Answer } from "../assistant/answer";
-import { CONTRADICTION, presentAnswer, projectIdOf } from "../assistant/present";
-import { DWELL_MS, nextState, STATE_TEXT, stateForOutcome, type MindState } from "../mind/state";
+import { createAssistant, MAX_QUESTION } from "../assistant/answer";
+import { presentAnswer, projectIdOf } from "../assistant/present";
+import { stateForOutcome, type MindState } from "../mind/state";
 import Icon from "../ui/Icon";
-import { CASES } from "./projects/summary";
 
-/* The sample that shows a weaker result is deliberately third-from-last: judges should find it. */
-const SAMPLES = [
-  "What did Aziz personally build in TraffiX?",
-  "Did TraffiX make ambulances faster?",
-  "What is the AWS hosting status?",
-  "Does Aziz use Bedrock?",
-  "What should I ask Aziz in an interview?",
-  "Where did Aziz do internships?",
+const QUESTIONS = [
+  "What role is Aziz looking for?",
+  "What did he build in TraffiX?",
+  "How did he evaluate FlyRank?",
 ];
-/* Which flagship project an answer is about, read from the sources it cites. No match: no link. */
-const REPO_OF: Record<(typeof CASES)[number]["id"], string> = { traffix: "/azizmessaoud/traffix/", flyrank: "/azizmessaoud/flyrank/", hr: "/azizmessaoud/hr-anomaly-detection/" };
-export function projectOf(a: Answer) {
-  return CASES.find((c) => a.evidence.some((e) => e.url.includes(REPO_OF[c.id])));
-}
-/* The icon beside the verdict: the verdict is also in words, so colour and icon are never the only signal. */
-const VERDICT_ICON: Record<Answer["outcome"], "check" | "alert" | "search" | "close"> = { supported: "check", contradicted: "alert", not_verified: "search", error: "close" };
-const OUTCOME: Record<Answer["outcome"], string> = {
-  supported: "Answer",
-  contradicted: "Answer · the evidence disagrees with the question",
-  not_verified: "Not verified",
-  error: "Could not answer",
+const ASK_API_URL = import.meta.env.VITE_ASK_API_URL?.trim();
+
+type EvidenceLink = { label: string; url: string };
+type Turn = {
+  id: number;
+  role: "visitor" | "guide";
+  text: string;
+  evidence?: EvidenceLink[];
+  limitations?: string[];
 };
-/* One question per interval: the same limit an API Gateway throttle would impose if a backend is added later. */
-const MIN_GAP_MS = 600;
+type ApiReply = {
+  answer?: string;
+  error?: string;
+  citations?: Array<{ sourceId?: string; excerpt?: string }>;
+};
 
-interface Props { mind: MindState; setMind: (s: MindState) => void; reduced: boolean; onLayout: () => void }
+interface Props { mind: MindState; setMind: (s: MindState) => void; reduced: boolean }
 
-/* The question box. The mind's state follows the question lifecycle (listening, retrieving, then answering or
- * uncertain) and is also written out as text, so the state is never conveyed by animation alone. */
-export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
+const STATUS: Record<MindState, string> = {
+  idle: "Ready when you are.",
+  listening: "Your question is ready.",
+  retrieving: "Checking the project notes…",
+  answering: "Answer ready. You can open the cited sources below.",
+  uncertain: "I couldn’t verify that from the published notes.",
+  error: "I couldn’t complete that search. Try again in a moment.",
+};
+
+function uniqueLinks(links: EvidenceLink[]) {
+  return [...new Map(links.map((link) => [link.url, link])).values()];
+}
+
+export default function AskPanel({ mind, setMind, reduced }: Props) {
   const assistant = useMemo(() => createAssistant(corpusJson as Corpus, portfolioJson as Portfolio), []);
   const [value, setValue] = useState("");
-  const [shown, setShown] = useState<Answer | null>(null);
-  const [answerNo, setAnswerNo] = useState(0); /* a new key per answer, so the card's entrance plays every time */
-  const timers = useRef<number[]>([]);
-  const lastAt = useRef(-Infinity);
-  const lastAsked = useRef("");
-  const stateRef = useRef(mind);
-  stateRef.current = mind;
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const nextId = useRef(0);
+  const transcript = useRef<HTMLOListElement>(null);
+  const aborter = useRef<AbortController | null>(null);
+  const busy = mind === "retrieving";
 
-  const clear = () => { timers.current.forEach(clearTimeout); timers.current = []; };
-  useEffect(() => clear, []);
-  useEffect(() => { onLayout(); }, [shown, onLayout]);
-  const later = (fn: () => void, ms: number) => { timers.current.push(window.setTimeout(fn, ms)); };
+  useEffect(() => () => aborter.current?.abort(), []);
+  useEffect(() => {
+    if (transcript.current) transcript.current.scrollTo({ top: transcript.current.scrollHeight, behavior: reduced ? "instant" : "smooth" });
+  }, [turns, busy, reduced]);
 
-  function submit(q: string) {
-    const text = q.trim();
-    if (!text) {
-      /* an empty question gets the engine's own message, not silence */
-      clear();
-      setShown(assistant.ask("")); setAnswerNo((n) => n + 1);
-      const next = stateForOutcome("error");
-      setMind(next);
-      later(() => setMind(nextState(next, { type: "settle" })), reduced ? 1500 : DWELL_MS[next]);
+  function addGuideTurn(turn: Omit<Turn, "id" | "role">) {
+    setTurns((current) => [...current, { ...turn, id: nextId.current++, role: "guide" }]);
+  }
+
+  function reset() {
+    aborter.current?.abort();
+    aborter.current = null;
+    setTurns([]);
+    nextId.current = 0;
+    setValue("");
+    setMind("idle");
+  }
+
+  async function submit(raw: string) {
+    const question = raw.trim();
+    if (!question || busy) return;
+    setValue("");
+    setTurns((current) => [...current, { id: nextId.current++, role: "visitor", text: question }]);
+    setMind("retrieving");
+
+    if (ASK_API_URL) {
+      const controller = new AbortController();
+      aborter.current = controller;
+      let timedOut = false;
+      const timeout = window.setTimeout(() => { timedOut = true; controller.abort(); }, 27_000);
+      try {
+        const response = await fetch(ASK_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question }),
+          signal: controller.signal,
+        });
+        const data = await response.json() as ApiReply;
+        if (!response.ok) throw new Error(typeof data.error === "string" ? data.error.slice(0, 180) : "The portfolio guide is temporarily unavailable.");
+        const passages = (data.citations ?? [])
+          .map((citation) => corpusJson.passages.find((passage) => passage.id === citation.sourceId))
+          .filter((passage): passage is (typeof corpusJson.passages)[number] => !!passage);
+        const evidence = uniqueLinks(passages.flatMap((passage) => passage.evidence));
+        const limitations = [...new Set(passages.flatMap((passage) => passage.limitations))];
+        if (!evidence.length) {
+          addGuideTurn({ text: "I couldn’t verify that from the published portfolio notes. Try asking about a project, a role, or a tool—or contact Aziz directly." });
+          setMind("uncertain");
+        } else {
+          addGuideTurn({
+            text: typeof data.answer === "string" && data.answer.trim() ? data.answer.trim() : "Here are the checked notes that relate to your question.",
+            evidence,
+            limitations,
+          });
+          setMind("answering");
+        }
+      } catch (error) {
+        if (controller.signal.aborted && !timedOut) return;
+        const message = error instanceof Error && error.message.length <= 180
+          ? error.message
+          : "I couldn’t reach the hosted portfolio guide. Please try again, or contact Aziz directly.";
+        addGuideTurn({ text: message });
+        setMind("error");
+      } finally {
+        clearTimeout(timeout);
+        aborter.current = null;
+      }
       return;
     }
-    const now = performance.now();
-    if (now - lastAt.current < MIN_GAP_MS) return;
-    lastAt.current = now;
-    lastAsked.current = text;
-    clear();
-    setShown(null);
-    setMind(nextState(stateRef.current, { type: "submit" }));
-    const answer = assistant.ask(text);
-    const dwell = reduced ? 200 : DWELL_MS.retrieving;
-    later(() => {
-      setShown(answer); setAnswerNo((n) => n + 1);
-      const next = stateForOutcome(answer.outcome);
-      setMind(next);
-      later(() => setMind(nextState(next, { type: "settle" })), reduced ? 1500 : DWELL_MS[next]);
-    }, dwell);
+
+    /* The public site stays useful before the AWS endpoint is connected: this local path searches the same checked passages. */
+    if (!reduced) await new Promise((resolve) => window.setTimeout(resolve, 240));
+    const answer = assistant.ask(question);
+    const view = presentAnswer(answer, projectIdOf(answer));
+    const text = answer.outcome === "not_verified"
+      ? "I couldn’t verify that from the published portfolio notes. Try asking about a project, a role, or a tool—or contact Aziz directly."
+      : answer.outcome === "error"
+        ? answer.answer
+        : [view.headline, view.detail, ...(view.points ?? [])].filter(Boolean).join(" ");
+    addGuideTurn({
+      text,
+      evidence: uniqueLinks(answer.evidence),
+      limitations: answer.limitations,
+    });
+    setMind(stateForOutcome(answer.outcome));
+  }
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void submit(value);
   }
 
   return (
-    <div className="ask" id="ask">
-      <form className="ask-form" role="search" onSubmit={(e) => { e.preventDefault(); submit(value); }}>
-        <label htmlFor="hero-ask" className="ask-label">Ask Aziz anything · answers come from checked evidence</label>
+    <section className="ask" id="ask" aria-labelledby="ask-title">
+      <div className="ask-heading">
+        <div>
+          <h2 id="ask-title">Questions about my work?</h2>
+          <p>Ask about my projects, experience or what I could bring to a team. Replies link to the notes behind them.</p>
+        </div>
+        {turns.length > 0 && <button className="ask-reset" type="button" onClick={reset} disabled={busy}>New conversation</button>}
+      </div>
+
+      {turns.length > 0 && (
+        <ol className="ask-transcript" ref={transcript} role="log" aria-live="polite" aria-label="Conversation">
+          {turns.map((turn) => (
+            <li key={turn.id} className={`ask-turn is-${turn.role}`}>
+              <p className="ask-turn-label">{turn.role === "visitor" ? "You" : "Portfolio guide"}</p>
+              <p className="ask-turn-text">{turn.text}</p>
+              {turn.evidence && turn.evidence.length > 0 && (
+                <div className="ask-turn-sources">
+                  <p>Sources</p>
+                  <ul>{turn.evidence.map((link) => <li key={link.url}><a href={link.url} target="_blank" rel="noreferrer">{link.label}<Icon name="external" /></a></li>)}</ul>
+                </div>
+              )}
+              {turn.limitations && turn.limitations.length > 0 && (
+                <details className="ask-turn-limits">
+                  <summary>Read the project limits</summary>
+                  <ul>{turn.limitations.map((limit) => <li key={limit}>{limit}</li>)}</ul>
+                </details>
+              )}
+            </li>
+          ))}
+          {busy && <li className="ask-turn is-guide is-pending"><p className="ask-turn-label">Portfolio guide</p><p className="ask-turn-text">Checking the notes and preparing a reply…</p></li>}
+        </ol>
+      )}
+
+      <form className="ask-form" onSubmit={onSubmit}>
+        <label htmlFor="hero-ask" className="sr-only">Ask about Aziz’s work</label>
         <div className="ask-row">
-          <input id="hero-ask" className="ask-input" type="search" value={value} maxLength={MAX_QUESTION} autoComplete="off"
-            placeholder="e.g. Did TraffiX make ambulances faster?"
-            onChange={(e) => { setValue(e.target.value); setMind(nextState(stateRef.current, { type: "type", empty: !e.target.value })); }}
-            onFocus={() => setMind(nextState(stateRef.current, { type: "focus" }))}
-            onBlur={() => setMind(nextState(stateRef.current, { type: "blur" }))} />
-          <button className="btn-primary ask-submit" type="submit" aria-label="Ask" aria-busy={mind === "retrieving"} data-busy={mind === "retrieving"}>
-            <span className="ask-submit-icon" aria-hidden="true"><Icon name="search" /></span>
-            <span aria-hidden="true">{mind === "retrieving" ? "Searching" : "Ask"}</span>
+          <input id="hero-ask" className="ask-input" type="text" value={value} maxLength={MAX_QUESTION} autoComplete="off"
+            placeholder="e.g. What could I contribute to your team?"
+            onChange={(event) => { setValue(event.target.value); setMind(event.target.value ? "listening" : "idle"); }}
+            onFocus={() => { if (!value && mind === "idle") setMind("listening"); }}
+            onBlur={() => { if (!value && mind === "listening") setMind("idle"); }}
+            disabled={busy} enterKeyHint="send" />
+          <button className="btn-primary ask-submit" type="submit" aria-label="Send question" disabled={busy || !value.trim()} aria-busy={busy}>
+            <span>{busy ? "Checking" : "Ask"}</span><Icon name="arrow" />
           </button>
         </div>
       </form>
-      <p className="ask-status" role="status" aria-live="polite" data-state={mind}><span className="ask-dot" aria-hidden="true" /> {STATE_TEXT[mind]}</p>
-      <ul className="ask-samples" aria-label="Sample questions">
-        {SAMPLES.map((s) => (
-          <li key={s}><button type="button" className="suggest-q" onClick={() => { setValue(s); submit(s); }}>{s}</button></li>
-        ))}
-      </ul>
-      <p className="ask-how">
-        <span className="ask-how-long">Looked up in this site's checked evidence, not generated by a language model. Each answer links to its source; when nothing matches, it says so.</span>
-        <span className="ask-how-short">Looked up, not generated by a language model.</span>
-      </p>
-      {shown && (() => {
-        const pid = projectIdOf(shown);
-        const pr = presentAnswer(shown, pid);
-        const asked = lastAsked.current.toLowerCase();
-        const next = pr.followUps.filter((f) => f.toLowerCase() !== asked);
-        return (
-        <section key={answerNo} className={`ask-answer is-${shown.outcome}`} aria-label="Answer" tabIndex={0}>
-          <p className="ask-outcome"><Icon name={VERDICT_ICON[shown.outcome]} /> {OUTCOME[shown.outcome]}</p>
-          <h2 className="ask-title">{shown.title}</h2>
-          {shown.outcome === "contradicted" && <p className="ask-premise"><Icon name="alert" /> {CONTRADICTION}</p>}
-          {pr.points
-            ? <ul className="ask-points">{pr.points.map((l) => <li key={l}>{l}</li>)}</ul>
-            : <p className="ask-headline">{pr.headline}</p>}
-          {shown.outcome !== "error" && (
-            <ul className="ask-trust" aria-label="What backs this answer">
-              <li><Icon name="check" /> {pr.sources} {pr.sources === 1 ? "source" : "sources"}</li>
-              <li className={pr.limits ? "is-warn" : ""}><Icon name="alert" /> {pr.limits} {pr.limits === 1 ? "limit" : "limits"} noted</li>
-              <li><Icon name="search" /> Looked up, not generated</li>
-            </ul>
-          )}
-          {pr.detail && !pr.points && (
-            <details className="ask-more">
-              <summary>{pr.detail === shown.answer ? "Show the full text" : "Show the rest"}</summary>
-              <p className="ask-text">{pr.detail}</p>
-            </details>
-          )}
-          {next.length > 0 && (
-            <>
-              <h3 className="ask-sub">Ask next</h3>
-              <ul className="ask-next">{next.map((f) => <li key={f}><button type="button" className="suggest-q" onClick={() => { setValue(f); submit(f); }}>{f}</button></li>)}</ul>
-            </>
-          )}
-          {(() => { const p = projectOf(shown); return p && <p className="ask-open"><a href={`#project-${p.id}`}>Open the {p.title} case study <Icon name="arrow" /></a></p>; })()}
-          {shown.evidence.length > 0 && (
-            <>
-              <h3 className="ask-sub">Evidence</h3>
-              <ul className="ask-evidence">{shown.evidence.map((e) => <li key={e.url + e.label}><a href={e.url}>{e.label} <Icon name="external" /></a></li>)}</ul>
-            </>
-          )}
-          {shown.limitations.length > 0 && (
-            <>
-              <h3 className="ask-sub ask-sub-limits"><Icon name="alert" /> Limitations</h3>
-              <ul className="ask-limits">{shown.limitations.map((l) => <li key={l}>{l}</li>)}</ul>
-            </>
-          )}
-        </section>
-        );
-      })()}
-    </div>
+
+      <p className="ask-status" role="status" aria-live="polite"><span className="ask-dot" aria-hidden="true" />{busy ? "Checking the project notes…" : STATUS[mind]}</p>
+      {turns.length === 0 && (
+        <ul className="ask-samples" aria-label="Suggested questions">
+          {QUESTIONS.map((question) => <li key={question}><button type="button" className="suggest-q" onClick={() => { setValue(question); void submit(question); }}>{question}</button></li>)}
+        </ul>
+      )}
+      <p className="ask-how">Every answer is grounded in checked portfolio notes. If a detail isn’t supported, the guide says so.</p>
+    </section>
   );
 }

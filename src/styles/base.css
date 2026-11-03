@@ -35,10 +35,8 @@ button { font: inherit; color: inherit; }
 .nav-toggle { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--glass5); border: 1px solid var(--border-strong); font-size: 20px; cursor: pointer; }
 @media (max-width: 760px) {
   .nav-toggle { display: inline-flex; }
-  /* phones: icon buttons, names stay available to assistive tech */
-  .cta-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .nav-cta { padding: 0; width: 44px; justify-content: center; }
-  .dock-brain { margin-left: 0; }
+  .cta-label { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: nowrap; }
+  .nav-cta { padding-inline: var(--space-sm); width: auto; justify-content: center; }
   .nav-links {
     position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; padding: var(--space-2xs) var(--space-md) var(--space-md);
     background: rgba(19, 18, 16, 0.97); border-bottom: 1px solid var(--border);
@@ -57,32 +55,22 @@ button { font: inherit; color: inherit; }
 @media (hover: hover) { .btn-primary:hover { transform: translateY(-1px); background: var(--accent-bright); } .btn-ghost:hover { background: var(--glass10); } }
 .btn-primary:active, .btn-ghost:active, .nav-cta:active, .copy-btn:active, .suggest-q:active, .hint-q:active { transform: scale(0.97); transition-duration: var(--dur-press); }
 
-/* ── hero (pinned while scroll drives the camera) ── */
-.hero { position: relative; }
-.hero-stage { position: sticky; top: 0; z-index: 2; height: 100vh; height: 100svh; display: flex; align-items: center; overflow: hidden; }
-.hero-runway { height: 0; }
-@media (prefers-reduced-motion: no-preference) { html.js .hero-runway { height: 70vh; height: 70svh; } }
-/* one decorative canvas for the whole page, above everything so the brain can dock into the nav; it never
- * draws over text or controls (the scene keeps out of them) and never takes pointer events */
-.brain-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100lvh; display: block; z-index: 210; pointer-events: none; }
-/* the 3D brain: a fixed square canvas, moved and scaled by script along the flight to the nav. Its z-index is below the hero stage
- * (which holds all the text), so the words are always drawn on top of the light, and above the page background. Light adds to the page
- * where the browser supports plus-lighter; elsewhere it composites normally and still reads as light. */
-.brain3d { position: fixed; left: 0; top: 0; z-index: 1; display: block; pointer-events: none; opacity: 0; visibility: hidden; transform-origin: 50% 50%; will-change: transform, opacity; mix-blend-mode: plus-lighter; }
-.hero-inner { position: relative; z-index: 2; width: 100%; max-width: var(--container); margin: 0 auto; padding: 5.5rem max(var(--space-md), env(safe-area-inset-left)) 2rem; display: flex; flex-direction: column; justify-content: center; max-height: 100vh; max-height: 100svh; }
-.hero-inner > * { flex: none; }
-.hero-inner > .ask { flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; }
-.hero-inner > * { max-width: 40rem; transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out); }
-.hero-inner > :nth-child(2) { transition-delay: 80ms; } .hero-inner > :nth-child(3) { transition-delay: 160ms; }
-.hero-inner > :nth-child(4) { transition-delay: 240ms; } .hero-inner > :nth-child(5) { transition-delay: 320ms; }
-html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition: none; }
+/* ── hero: portrait first, work proof next, with the inquiry feature in normal page flow ── */
+.hero { position: relative; background: var(--bg); border-bottom: 1px solid var(--border); }
+.hero-inner { width: 100%; max-width: var(--container); margin: 0 auto; padding: 7rem max(var(--space-xl), env(safe-area-inset-left)) var(--space-3xl); display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(15rem, 0.68fr); grid-template-areas: "copy portrait" "ask portrait"; align-items: center; gap: var(--space-xl) clamp(var(--space-2xl), 6vw, 5rem); }
+.hero-copy { grid-area: copy; max-width: 47rem; }
+.hero-portrait { grid-area: portrait; justify-self: end; width: min(100%, 22rem); align-self: center; }
+.hero-portrait img { display: block; width: 100%; aspect-ratio: 0.9; object-fit: cover; object-position: center 36%; border: 1px solid var(--border-strong); border-radius: var(--radius-xl); background: var(--surface); }
+.hero-portrait figcaption { display: grid; gap: 2px; padding-top: var(--space-sm); color: var(--fg-muted); font-size: 13px; }
+.hero-portrait figcaption span:first-child { color: var(--fg); font-weight: 600; }
+.hero-inner > .ask { grid-area: ask; min-height: 0; display: flex; flex-direction: column; width: 100%; max-width: 48rem; }
 .eyebrow { display: flex; align-items: center; gap: var(--space-xs); margin-bottom: var(--space-lg); font-family: var(--font-m); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-text); }
 .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--accent); }
 /* the name is the first thing a visitor should read: brighter, larger and heavier than the role line beside it */
 .eyebrow { flex-wrap: wrap; row-gap: var(--space-2xs); }
 .eyebrow-name { white-space: nowrap; font-size: 14px; font-weight: 600; letter-spacing: 0.14em; color: var(--fg); }
 .eyebrow-role { white-space: pre-wrap; }
-/* touch targets: the sample questions are 44 px tall wherever a finger is the likely pointer, and on narrow screens */
+/* touch targets: sample questions stay easy to tap wherever a finger is the likely pointer */
 @media (pointer: coarse), (max-width: 760px) { .hero-inner .ask-samples .suggest-q { min-height: 44px; } }
 .hero-h1 { font-family: var(--font-h); font-size: clamp(2.1rem, 4.4vw, 3.5rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; text-wrap: balance; margin-bottom: var(--space-lg); }
 .hl { color: var(--accent); }
@@ -90,25 +78,26 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .avail-dot { flex: none; width: 8px; height: 8px; margin-top: 0.4em; border-radius: 50%; background: var(--signal-green); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-bottom: var(--space-lg); }
 .hero-actions .btn-primary, .hero-actions .btn-ghost { padding: 0.5rem var(--space-xl); text-decoration: none; }
-/* Dragging or double-clicking on the animation must not highlight the headline. The question box and the answer stay selectable. */
-.hero-stage { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-.hero-stage .ask-input, .hero-stage .ask-answer { -webkit-user-select: text; user-select: text; }
 .hero-lead { font-size: 16px; line-height: 1.65; color: var(--fg-lead); margin-bottom: var(--space-xl); }
 .ctas { display: flex; flex-wrap: wrap; gap: var(--space-md); }
 .hint { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); margin-top: var(--space-xl); font-size: var(--text-small); }
 .hint-label { font-family: var(--font-m); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-muted); }
 .hint-q, .suggest-q { min-height: 44px; padding: var(--space-3xs) var(--space-sm); border-radius: var(--radius-pill); border: 1px dashed var(--accent-line); background: transparent; color: var(--accent); cursor: pointer; text-align: left; transition: border-color var(--dur-base), background var(--dur-base); }
 .hint-q:hover, .suggest-q:hover { border-style: solid; background: var(--glass5); }
-/* nav control: the "Terminal Explorer" link the brain docks into */
-.nav-cta[aria-current="true"] { border-color: var(--accent-hover); background: var(--accent-tint); }
-.dock-brain { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px dashed var(--accent-line); background: radial-gradient(circle, rgba(12, 11, 10, 0.4), rgba(12, 11, 10, 0.9)); transition: border-color var(--dur-slow); }
-.nav-cta.is-docked .dock-brain { border-style: solid; }
-.nav-cta:hover .dock-brain { border-color: var(--accent); }
 .scroll-hint { position: absolute; left: 50%; bottom: var(--space-xl); transform: translateX(-50%); z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-family: var(--font-m); font-size: 11px; letter-spacing: 0.08em; color: var(--fg-muted); pointer-events: none; }
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "portrait" "ask"; gap: var(--space-xl); padding: 6rem max(var(--space-md), env(safe-area-inset-left)) var(--space-2xl); }
+  .hero-portrait { justify-self: start; width: min(100%, 18rem); }
+}
 @media (max-width: 640px) {
-  .hero-stage { align-items: flex-start; }
-  .hero-inner { padding-top: 4.5rem; padding-bottom: 1rem; }
-  .scroll-hint { display: none; }
+  .hero-inner { gap: var(--space-lg); padding-top: 5.25rem; padding-bottom: var(--space-xl); }
+  .hero-portrait { width: 100%; display: flex; align-items: center; gap: var(--space-md); }
+  .hero-portrait img { width: 6.5rem; aspect-ratio: 1; flex: none; border-radius: var(--radius-md); }
+  .hero-portrait figcaption { padding-top: 0; }
+  .hero-h1 { font-size: clamp(2.2rem, 10vw, 3.2rem); }
+  .hero-lead { margin-bottom: var(--space-md); }
+  .hero-actions { gap: var(--space-xs); }
+  .hero-actions .btn-primary, .hero-actions .btn-ghost { flex: 1 1 9rem; justify-content: center; padding-inline: var(--space-sm); }
 }
 
 /* ── sections ── */
@@ -117,7 +106,7 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .sec-label { font-family: var(--font-m); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-text); margin-bottom: var(--space-xs); }
 .sec-h2 { font-family: var(--font-h); font-size: var(--text-h2); font-weight: 700; line-height: 1.1; text-wrap: balance; margin-bottom: var(--space-md); max-width: 30ch; }
 .sec-lead { font-size: 17px; line-height: 1.75; color: var(--fg-muted); max-width: var(--measure); margin-bottom: var(--space-3xl); }
-.about { background: linear-gradient(180deg, var(--bg-a), var(--surface-a)); }
+.about { background: var(--bg); }
 .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-3xl); align-items: start; }
 .about-text p { color: var(--fg-muted); line-height: 1.8; margin-bottom: var(--space-md); max-width: 62ch; }
 .about-side { display: grid; gap: var(--space-xl); }
@@ -147,7 +136,7 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 @media (max-width: 760px) { .about-grid { grid-template-columns: 1fr; } }
 
 /* ── project cases: three different layouts ── */
-.projects { background: linear-gradient(180deg, var(--surface-a), var(--bg-a)); }
+.projects { background: var(--bg); }
 .case { padding: var(--space-3xl) 0; border-top: 1px solid var(--border); }
 .case-kind { font-family: var(--font-m); font-size: 12px; color: var(--accent-text); margin-bottom: var(--space-xs); }
 .case-title { font-family: var(--font-h); font-size: clamp(1.5rem, 2.6vw, 2rem); line-height: 1.15; margin-bottom: var(--space-sm); }
@@ -264,15 +253,41 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 @media (max-width: 640px) {
   .ask-row { flex-direction: column; }
   .ask-samples li:nth-child(n + 4) { display: none; }
-  .hero-lead { display: none; }
 }
 
-@media (max-height: 700px) { .ask-samples li:nth-child(n + 3) { display: none; } .hero-inner .eyebrow-role, .hero-inner .hero-avail { display: none; } } /* the name always shows; only the secondary line yields on short screens */
-/* once an answer is on screen the intro paragraph makes room for it */
-.hero-inner:has(.ask-answer) .hero-lead, .hero-inner:has(.ask-answer) .hero-avail, .hero-inner:has(.ask-answer) .hero-actions { display: none; }
+@media (max-height: 700px) { .ask-samples li:nth-child(n + 3) { display: none; } }
+/* Portfolio guide: a compact conversation that stays legible on narrow screens. */
+.ask { min-width: 0; padding: var(--space-lg); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: var(--surface); }
+.ask-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-md); }
+.ask-heading h2 { font: 600 1.15rem/1.25 var(--font-h); margin-bottom: var(--space-2xs); }
+.ask-heading p { max-width: 55ch; color: var(--fg-muted); font-size: var(--text-small); line-height: 1.5; }
+.ask-reset { flex: none; min-height: 44px; padding: 0 var(--space-sm); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: transparent; color: var(--fg-lead); cursor: pointer; }
+.ask-reset:disabled { opacity: .5; cursor: wait; }
+.ask-transcript { display: grid; gap: var(--space-sm); max-height: 22rem; overflow: auto; margin-bottom: var(--space-md); padding-right: var(--space-2xs); overscroll-behavior: contain; }
+.ask-turn { max-width: 90%; padding: var(--space-sm) var(--space-md); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-deep); overflow-wrap: anywhere; }
+.ask-turn.is-visitor { justify-self: end; background: var(--accent-tint); border-color: var(--accent-line); }
+.ask-turn-label, .ask-turn-sources > p { margin-bottom: var(--space-3xs); color: var(--accent-text); font: 500 11px var(--font-m); letter-spacing: .04em; text-transform: uppercase; }
+.ask-turn-text { color: var(--fg-lead); line-height: 1.6; white-space: pre-wrap; }
+.ask-turn-sources { margin-top: var(--space-xs); }
+.ask-turn-sources ul { display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-sm); }
+.ask-turn-sources a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; color: var(--accent-text); font-size: 13px; text-underline-offset: 3px; }
+.ask-turn-sources .icon { width: 12px; height: 12px; }
+.ask-turn-limits { margin-top: var(--space-xs); color: var(--fg-muted); font-size: 13px; }
+.ask-turn-limits summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+.ask-turn-limits li { padding-left: 1rem; position: relative; }
+.ask-turn-limits li::before { content: "–"; position: absolute; left: 0; }
+.is-pending .ask-turn-text { color: var(--fg-muted); }
+@media (max-width: 560px) {
+  .ask { padding: var(--space-md); }
+  .ask-heading { flex-direction: column; }
+  .ask-reset { align-self: flex-start; }
+  .ask-turn { max-width: 100%; }
+  .ask-row { flex-direction: column; }
+  .ask-submit { width: 100%; min-height: 48px; }
+}
 
 /* ── aws status ── */
-.aws { background: var(--surface-a); }
+.aws { background: var(--surface); }
 .aws-status { max-width: 62ch; padding: var(--space-md) var(--space-lg); margin-bottom: var(--space-xl); border: 1px dashed var(--signal-amber); border-radius: var(--radius-md); color: var(--fg-lead); }
 .aws-status.is-live { border-style: solid; border-color: var(--signal-green); }
 .aws-status p + p { margin-top: var(--space-xs); }
@@ -545,31 +560,11 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
   .js .mini-cells:not([data-in]) li.on { transform: none; border: 1px solid var(--border-strong); }
 }
 
-/* the note under the starter questions: the full wording where there is room, one line on a phone (two more lines pushed the text into the brain) */
+/* The shorter note variant is used on compact viewports. */
 .ask-how-short { display: none; }
 @media (max-width: 760px) { .ask-how-long { display: none; } .ask-how-short { display: inline; } }
-
-/* grab and turn the brain (pointer devices): an open hand over it, a closed hand while turning, and no text selection while you do */
-html[data-brain-grab="over"] .hero { cursor: grab; }
-html[data-brain-grab="drag"], html[data-brain-grab="drag"] * { cursor: grabbing !important; -webkit-user-select: none !important; user-select: none !important; }
 
 /* ── 3 Nov (2): the background video is the whole page's. One fixed layer behind everything (z-index -1: below the 3D brain 1, the hero text 2, and every
    section's content), screen-blended on the ground so its blacks vanish and only the fibres show. Sections have translucent graphite grounds
    (--bg-a and friends) that let it through at about 14% and keep text readable; cards stay opaque. The hero adds its own stronger darkening on the
    left, where its text is, and leaves the right open behind the brain. ── */
-.page-bg { position: fixed; inset: 0; z-index: -1; height: 100vh; height: 100lvh; overflow: hidden; pointer-events: none; background: var(--bg); }
-.page-bg-still, .page-bg-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; mix-blend-mode: screen; }
-.page-bg-still { opacity: 0.8; }
-.page-bg-video { opacity: 0; transition: opacity 900ms var(--ease-out); }
-.page-bg-video.is-playing { opacity: 0.95; }
-@media (max-width: 760px) { .page-bg-video.is-playing { opacity: 0.7; } }
-.hero-scrim { position: sticky; top: 0; z-index: 0; height: 100vh; height: 100svh; margin-bottom: -100vh; margin-bottom: -100svh; pointer-events: none; background:
-  linear-gradient(90deg, rgba(19, 18, 16, 0.97) 0%, rgba(19, 18, 16, 0.93) 52%, rgba(19, 18, 16, 0.5) 74%, rgba(19, 18, 16, 0.08) 100%),
-  linear-gradient(180deg, rgba(19, 18, 16, 0.75) 0%, rgba(19, 18, 16, 0) 22%, rgba(19, 18, 16, 0) 72%, rgba(19, 18, 16, 0.5) 100%); }
-@media (max-width: 760px) { .hero-scrim { background: linear-gradient(180deg, rgba(19, 18, 16, 0.9) 0%, rgba(19, 18, 16, 0.84) 45%, rgba(19, 18, 16, 0.86) 80%, rgba(19, 18, 16, 0.5) 100%); } }
-
-/* the label that follows the pointer over the brain (pointer devices only: it is shown by the same state as the grab cursor) */
-.brain-tip { position: fixed; left: 0; top: 0; z-index: 4; pointer-events: none; opacity: 0; transition: opacity var(--dur-fast); white-space: nowrap; padding: 0.3rem 0.7rem; border: 1px solid var(--accent-line); border-radius: var(--radius-pill); background: var(--surface); color: var(--fg-lead); font-family: var(--font-m); font-size: 12px; letter-spacing: 0.02em; }
-.brain-tip b { font-weight: 500; color: var(--accent-bright); }
-.brain-tip i { font-style: normal; color: var(--fg-muted); }
-html[data-brain-grab="over"] .brain-tip { opacity: 1; }

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "content": "tsx scripts/build-corpus.ts",
+    "rag:export": "npm run content && tsx scripts/export-rag.ts",
     "validate": "tsx scripts/validate-content.ts",
     "dev": "npm run content && vite",
     "build": "npm run validate && npm run content && tsc --noEmit && vite build",

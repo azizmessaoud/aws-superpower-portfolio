@@ -1,36 +1,31 @@
-import { useEffect } from "react";
 import type { MindState } from "../mind/state";
 import AskPanel from "./AskPanel";
 
-interface Props { mind: MindState; setMind: (s: MindState) => void; reduced: boolean; onLayout: () => void }
+interface Props { mind: MindState; setMind: (s: MindState) => void; reduced: boolean }
 
-export default function Hero({ mind, setMind, reduced, onLayout }: Props) {
-  /* Start the one-time text reveal as soon as the hero is on screen (boot.js's timer is only a fallback). */
-  useEffect(() => {
-    const id = requestAnimationFrame(() => document.documentElement.classList.remove("intro"));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
+export default function Hero({ mind, setMind, reduced }: Props) {
   return (
     <section id="top" className="hero" aria-labelledby="hero-title">
-      <div className="hero-scrim" aria-hidden="true" />
-      <div className="hero-stage">
-        <div className="hero-inner">
+      <div className="hero-inner">
+        <div className="hero-copy">
           <p className="eyebrow"><span className="eyebrow-name">Aziz Messaoud</span><span className="eyebrow-role"> · Data Science Engineering, ESPRIT</span></p>
-          <h1 id="hero-title" className="hero-h1">I build <span className="hl">practical AI systems.</span></h1>
+          <h1 id="hero-title" className="hero-h1">I turn data into <span className="hl">useful work.</span></h1>
           <p className="hero-lead">
-            Applied ML, document AI, ranking and multi-agent simulation. Every project links to its repo, report or
-            notebook, including what didn't work. Below, you can check any of it against the evidence.
+            I build and evaluate data science projects across ranking, document processing and multi-agent simulation.
+            I make my contribution, the results and the limitations easy to check.
           </p>
           <p className="hero-avail"><span className="avail-dot" aria-hidden="true" />Open to a 2027 final-year internship (PFE) · AI/ML engineering, applied data science, AI research</p>
           <div className="hero-actions">
-            <a className="btn-primary" href="#selected">See selected work</a>
-            <a className="btn-ghost" href="#contact">Contact Aziz</a>
+            <a className="btn-primary" href="#selected">View selected work</a>
+            <a className="btn-ghost" href="#contact">Talk about a role</a>
           </div>
-          <AskPanel mind={mind} setMind={setMind} reduced={reduced} onLayout={onLayout} />
         </div>
+        <figure className="hero-portrait">
+          <img src="/portrait.jpg" width="480" height="480" alt="Portrait of Aziz Messaoud" fetchPriority="high" decoding="async" />
+          <figcaption><span>Aziz Messaoud</span><span>Data Science Engineering · ESPRIT, Tunisia</span></figcaption>
+        </figure>
+        <AskPanel mind={mind} setMind={setMind} reduced={reduced} />
       </div>
-      <div className="hero-runway" aria-hidden="true" />
     </section>
   );
 }

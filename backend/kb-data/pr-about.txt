@@ -1,0 +1,15 @@
+Portfolio passage ID: pr-about
+
+Project: Across the three projects
+
+Passage: Who I am and what I am looking for
+
+Context: From my earlier portfolio's profile data.
+
+Verified notes: I am a Data Science Engineering student at ESPRIT in Tunisia, expecting to graduate in 2027. I am seeking a 2027 final-year (PFE) internship in AI/ML engineering, applied data science or AI research.
+
+Limitations:
+- No start or end dates for the internship are stated.
+
+Evidence:
+- Live portfolio source · portfolioData.ts @ projectx0: https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts

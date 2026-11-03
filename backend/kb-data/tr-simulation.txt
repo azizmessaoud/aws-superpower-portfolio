@@ -1,0 +1,15 @@
+Portfolio passage ID: tr-simulation
+
+Project: TraffiX
+
+Passage: A simulation, not a deployment
+
+Context: ESPRIT 4DS course project, Intelligent Multi-Agent Traffic Management (team of six).
+
+Verified notes: TraffiX is a multi-agent traffic-control simulation of six signalised junctions (J1–J6) on the real OpenStreetMap streets of central Tunis, built on Eclipse SUMO and driven through TraCI. It is not deployed on any street: road demand is synthetic and nothing in the project is deployment evidence.
+
+Limitations:
+- Simulation only. Road demand is synthetic; emissions are proxies, not measured air quality.
+
+Evidence:
+- README · README.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md#L1-L11

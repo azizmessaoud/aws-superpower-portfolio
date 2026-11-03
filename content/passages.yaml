@@ -256,12 +256,11 @@
   title: Internships so far
   text: >-
     AI intern at Sopra HR Software in Tunis (July to September 2026), where I built the HR document-check
-    prototype; machine-learning intern at FlyRank AI, remote, which ended in the ranking research paper; AI intern
+    prototype; machine-learning intern at FlyRank AI, remote (July to September 2026), which ended in the ranking research paper; AI intern
     at Sopra HR Software in Tunis (July to August 2025), a first HR document-processing pipeline with Python,
     spaCy and pdfplumber; IT support intern at Banque de Tunisie (June to July 2023).
-  context: From my earlier portfolio's experience data; the FlyRank dates are left out on purpose.
+  context: Experience details as confirmed by Aziz.
   limitations:
-    - FlyRank dates are not shown until I settle which of my sources is right.
     - Titles and dates are my own account, copied from my earlier portfolio.
   sources: [live-site-data]
   anchors: [""]

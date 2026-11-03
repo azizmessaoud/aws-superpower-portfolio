@@ -1,0 +1,15 @@
+Portfolio passage ID: hr-runtime
+
+Project: HR document checks
+
+Passage: What actually runs today
+
+Context: README, runtime modes.
+
+Verified notes: The current runtime is a synchronous FastAPI demo with in-memory jobs. Celery, Redis and PostgreSQL appear only in the planned full-stack mode. CSV and Excel files are outside the current OCR contract.
+
+Limitations:
+- Planned services are not built.
+
+Evidence:
+- README · README.md @ 437a514: https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L36-L40

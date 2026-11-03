@@ -1,0 +1,16 @@
+Portfolio passage ID: tr-pedestrian
+
+Project: TraffiX
+
+Passage: Fewer car greens while people cross
+
+Context: Tunis map, mean of seeds 1–3, three scenarios, models and network of 20 October 2026.
+
+Verified notes: With the trained models, about 18 car green phases per run started while pedestrians were crossing, against 331–405 with SUMO's actuated signals (−95%). The number is not zero.
+
+Limitations:
+- Three seeds and three scenarios; no difference is significant at p < 0.05.
+- Simulated with synthetic demand; not a safety result for real streets.
+
+Evidence:
+- Report · prototype-validation.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md

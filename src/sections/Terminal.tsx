@@ -56,10 +56,9 @@ export default function Terminal({ setMind, reduced }: { setMind: (s: MindState)
     <section id="terminal" className="section terminal-section" aria-labelledby="terminal-title">
       <div className="inner">
         <p className="sec-label">Command line</p>
-        <h2 id="terminal-title" className="sec-h2">The same answers, as a command line</h2>
+        <h2 id="terminal-title" className="sec-h2">Explore the evidence directly</h2>
         <p className="sec-lead">
-          Prefer typing? This is the same engine as the question box at the top, as a command line: a second way into the same checked
-          evidence, not a different assistant. Plain questions work, or use <code>ask</code>, <code>projects</code>, <code>certs</code> or{" "}
+          Prefer typing? This local explorer searches the published portfolio notes directly. Plain questions work, or use <code>ask</code>, <code>projects</code>, <code>certs</code> or{" "}
           <code>label flyrank</code>; <code>help</code> lists the rest. It searches {corpusJson.passages.length} verified passages and shows the
           source behind each match, or says that nothing verified answers it. It does not write answers and it does not judge anyone.
         </p>

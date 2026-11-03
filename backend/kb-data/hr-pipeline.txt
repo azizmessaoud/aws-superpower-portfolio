@@ -1,0 +1,15 @@
+Portfolio passage ID: hr-pipeline
+
+Project: HR document checks
+
+Passage: Every flag is explained, a person decides
+
+Context: Local, self-hosted prototype; README architecture section.
+
+Verified notes: Uploaded PDFs and scans pass pre-flight checks, then Docling extraction with a RapidOCR fallback when confidence is low, schema and business validation, and cohort anomaly detection. Each flag carries a rule, severity, explanation and remediation, with sensitive values masked. The system never writes to an HR information system on its own.
+
+Limitations:
+- Prototype tested on synthetic sample documents only.
+
+Evidence:
+- README · README.md @ 437a514: https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L1-L16

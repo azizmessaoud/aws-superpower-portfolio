@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import type { Scene } from "../scene/scene";
 import Icon from "./Icon";
 
 const LINKS = [
@@ -11,8 +10,6 @@ const LINKS = [
   ["contact", "Contact"],
 ] as const;
 
-interface Props { scene: Scene | null; docked: boolean }
-
 /* Move keyboard focus to where an in-page link lands, so Tab continues from there. */
 function landOn(id: string) {
   const el = id === "top" ? document.getElementById("hero-ask") : document.getElementById(id);
@@ -22,7 +19,7 @@ function landOn(id: string) {
   setTimeout(() => el.focus({ preventScroll: true }), 0);
 }
 
-export default function Nav({ scene, docked }: Props) {
+export default function Nav() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -45,11 +42,6 @@ export default function Nav({ scene, docked }: Props) {
     document.addEventListener("click", onDoc);
     return () => { window.removeEventListener("scroll", onScroll); io.disconnect(); document.removeEventListener("keydown", onKey); document.removeEventListener("click", onDoc); };
   }, []);
-  /* the scene keeps out of the open menu panel */
-  useEffect(() => { const id = setTimeout(() => scene?.remeasure(), 220); return () => clearTimeout(id); }, [open, scene]);
-
-  const wake = (on: boolean) => () => scene?.setDockActive(on);
-
   return (
     <nav ref={nav} className={`nav${scrolled ? " is-scrolled" : ""}${open ? " is-open" : ""}`} aria-label="Main">
       <a className="nav-logo" href="#top" aria-label="Aziz Messaoud, back to top">AM</a>
@@ -61,11 +53,8 @@ export default function Nav({ scene, docked }: Props) {
         ))}
       </ul>
       <div className="nav-end">
-        {/* The brain docks here at the end of the hero; the link is the hint to the creative feature on every screen. */}
-        <a className={`nav-cta${docked ? " is-docked" : ""}`} href="#top" aria-current={current === "top" ? "true" : undefined} onClick={() => { setOpen(false); landOn("top"); }}
-          onMouseEnter={wake(true)} onMouseLeave={wake(false)} onFocus={wake(true)} onBlur={wake(false)}>
-          <span className="dock-brain" aria-hidden="true" />
-          <span className="cta-label">Ask Aziz</span>
+        <a className="nav-cta" href="#ask" onClick={() => { setOpen(false); landOn("ask"); }}>
+          <span className="cta-label">Ask about my work</span>
         </a>
         <button ref={toggle} className="nav-toggle" type="button" aria-expanded={open} aria-controls="nav-links"
           aria-label={open ? "Close menu" : "Menu"} onClick={() => setOpen((o) => !o)}>

@@ -1,0 +1,15 @@
+Portfolio passage ID: pr-experience
+
+Project: Across the three projects
+
+Passage: Internships so far
+
+Context: Experience details as confirmed by Aziz.
+
+Verified notes: AI intern at Sopra HR Software in Tunis (July to September 2026), where I built the HR document-check prototype; machine-learning intern at FlyRank AI, remote (July to September 2026), which ended in the ranking research paper; AI intern at Sopra HR Software in Tunis (July to August 2025), a first HR document-processing pipeline with Python, spaCy and pdfplumber; IT support intern at Banque de Tunisie (June to July 2023).
+
+Limitations:
+- Titles and dates are my own account, copied from my earlier portfolio.
+
+Evidence:
+- Live portfolio source · portfolioData.ts @ projectx0: https://github.com/azizmessaoud/projectx0/blob/bd6e84df36f1cf3acb093c5a0f77544012fbc104/client/src/lib/portfolioData.ts

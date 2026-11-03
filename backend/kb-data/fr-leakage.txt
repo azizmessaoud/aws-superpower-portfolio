@@ -1,0 +1,15 @@
+Portfolio passage ID: fr-leakage
+
+Project: FlyRank capstone
+
+Passage: A deliberate leakage test
+
+Context: Capstone report, method section.
+
+Verified notes: Leakage checks confirm that April data appears only in the label, every feature row is from 31 March and no identifier is a predictor. A deliberately leaked label feature produced an inflated score and was removed before the honest run.
+
+Limitations:
+- The leaked feature was a planted test, not an accidental leak found in production.
+
+Evidence:
+- Report · capstone_report.md @ a220b9e: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L44

@@ -12,7 +12,7 @@
   where: "TraffiX (my pair: control)"
   href: "https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md#L635-L648"
 - icon: document
-  title: "Document AI"
+  title: "NLP"
   chips: ["Docling", "RapidOCR", "Validation", "Anomaly detection"]
   hi: ["Docling"]
   where: "HR prototype"

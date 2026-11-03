@@ -1,0 +1,15 @@
+Portfolio passage ID: tr-role
+
+Project: TraffiX
+
+Passage: My part of the team
+
+Context: Team of six ESPRIT 4DS students; README section 11.
+
+Verified notes: I worked in the Control pair with Fares Ben Kacem, covering SUMO, observations, the A1 agent, safety and the controllers. Pairs build, test and demo each work item, and roles rotate.
+
+Limitations:
+- Team project of six students; I did not build it alone, and roles rotate, so other pairs also touched these areas.
+
+Evidence:
+- README · README.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md#L635-L648

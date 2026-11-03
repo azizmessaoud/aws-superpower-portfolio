@@ -1,0 +1,15 @@
+Portfolio passage ID: pr-location
+
+Project: Across the three projects
+
+Passage: Where I am based
+
+Context: From the contact section of my earlier portfolio.
+
+Verified notes: I am based in Tunisia and open to hybrid or remote work.
+
+Limitations:
+- Only the country is stated; the city differs between my sources.
+
+Evidence:
+- Live portfolio source ·  @ the: https://azizmessaoud.github.io/projectx0/
