@@ -45,6 +45,7 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
   const canvasKey = useMemo(() => ++generation.current, [scene, reduced]); // eslint-disable-line react-hooks/exhaustive-deps
   const mindRef = useRef(mind);
   const flash = useRef(0);
+  const tip = useRef<HTMLDivElement>(null);
   const refresh = useRef<(() => void) | null>(null);
   useEffect(() => {
     if (mind === "answering" && mindRef.current !== "answering") flash.current = 1; /* one soft bloom when an answer arrives */
@@ -105,17 +106,20 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
       /* the pointer, relative to the brain itself: where it is (x, y, -1..1), and how close (near, 0..1). Springs, so the motion is the same at any frame rate. */
       const pointer = { x: 0, y: 0, tx: 0, ty: 0, near: 0, tnear: 0, hold: 0 };
       /* grab and turn: a press on the brain starts a drag that follows the hand, keeps its momentum when let go, and eases back to rest by itself */
-      const drag = { on: false, yaw: 0, pitch: 0, vy: 0, vp: 0, id: -1, lx: 0, ly: 0, lt: 0 };
+      const drag = { on: false, yaw: 0, pitch: 0, vy: 0, vp: 0, id: -1, lx: 0, ly: 0, lt: 0, moved: 0, t0: 0 };
+      /* a click on the brain makes it fire: many pulses racing along the fibres, easing off over about two seconds */
+      const burst = { v: 0, count: 0 }; const tap = { id: -1, x: 0, y: 0, t: 0 };
       const YAW_MAX = 1.15, PITCH_MAX = 0.5;
       const governorOn = new URLSearchParams(location.search).get("gov") !== "off";
 
       const draw = (time: number, dt = 0.016, reveal = 1) => {
         const target = MOODS[mindRef.current], k = 1 - Math.exp(-dt * 4);
         flash.current *= Math.exp(-dt * 2.2);
-        mood.gain += (baseGain + target.gain + flash.current * 0.8 + pointer.near * 0.85 - mood.gain) * k;
+        burst.v *= Math.exp(-dt * 1.5);
+        mood.gain += (baseGain + target.gain + flash.current * 0.8 + pointer.near * 1.2 + burst.v * 1.1 - mood.gain) * k;
         mood.pulseOn += (target.pulseOn - mood.pulseOn) * k;
-        mood.speed += (target.speed + pointer.near * 0.5 - mood.speed) * k;
-        mood.gap += (target.gap - mood.gap) * k;
+        mood.speed += (target.speed + pointer.near * 0.7 + burst.v * 2.2 - mood.speed) * k;
+        mood.gap += (target.gap * (1 - 0.82 * burst.v) - mood.gap) * k;
         clock += dt * mood.speed;
         fib.setMood({ gain: mood.gain, pulseOn: mood.pulseOn, pulseSpeed: mood.speed, pulseGap: mood.gap });
         fib.setPulseClock(reduced ? STILL_TIME * 0.7 : clock);
@@ -133,7 +137,7 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
         drag.yaw = clamp(drag.yaw, -YAW_MAX, YAW_MAX); drag.pitch = clamp(drag.pitch, -PITCH_MAX, PITCH_MAX);
         group.rotation.y = reduced ? 0.08 : 0.14 * Math.sin(time * 0.17) + pointer.x * 0.26 * (1 - pointer.hold) + drag.yaw;
         group.rotation.x = reduced ? 0 : pointer.y * 0.13 * (1 - pointer.hold) + drag.pitch;
-        group.scale.setScalar(reduced ? 1 : 1 + pointer.near * 0.035);
+        group.scale.setScalar(reduced ? 1 : 1 + pointer.near * 0.05 + burst.v * 0.03);
         group.position.y = reduced ? 0 : 0.012 * Math.sin(time * 0.6);
         fib.update(time, curS, curS, FOV, renderer.getPixelRatio());
         parts.update(time, curS, FOV, renderer.getPixelRatio());
@@ -197,9 +201,24 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
       const isControl = (e: PointerEvent) => !!(e.target as Element | null)?.closest?.("a, button, input, textarea, select, summary, label");
       /* on the brain, and not mid-flight (a drag only makes sense while it sits in the hero) */
       const overBrain = (e: PointerEvent) => { const { dx, dy } = rel(e); return Math.hypot(dx, dy) < 0.9 && scene.getHeroState().travel < 0.02; };
+      /* what a click on the brain does: it fires, and the question box takes focus (on a phone it scrolls into view without raising the keyboard) */
+      const activate = (touch: boolean) => {
+        burst.v = 1; burst.count++; flash.current = 1.6; wake();
+        const ask = document.getElementById("hero-ask") as HTMLInputElement | null;
+        if (!ask) return;
+        if (touch) ask.scrollIntoView({ block: "center", behavior: "smooth" });
+        else ask.focus({ preventScroll: true });
+      };
+      const moveTip = (e: PointerEvent) => {
+        const t = tip.current; if (!t) return;
+        const w = t.offsetWidth || 160;
+        t.style.transform = `translate3d(${Math.min(e.clientX + 16, innerWidth - w - 12).toFixed(0)}px, ${(e.clientY + 20).toFixed(0)}px, 0)`;
+      };
       const onMove = (e: PointerEvent) => {
         if (e.pointerType === "touch") return;
+        moveTip(e);
         if (drag.on && e.pointerId === drag.id) {
+          drag.moved += Math.hypot(e.clientX - drag.lx, e.clientY - drag.ly);
           const dtm = Math.max(1, e.timeStamp - drag.lt) / 1000, ddx = (e.clientX - drag.lx) * 0.0085, ddy = (e.clientY - drag.ly) * 0.006;
           drag.yaw += ddx; drag.pitch += ddy;
           drag.vy = drag.vy * 0.6 + (ddx / dtm) * 0.4; drag.vp = drag.vp * 0.6 + (ddy / dtm) * 0.4;   /* a smoothed hand velocity, for the momentum */
@@ -215,10 +234,18 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
         const { dx, dy } = rel(e);
         if (Math.hypot(dx, dy) < 0.95) { flash.current = 1.9; wake(); }
         if (e.pointerType !== "touch" && e.button === 0 && overBrain(e)) {          /* touch keeps vertical swipes for scrolling the page */
-          drag.on = true; drag.id = e.pointerId; drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = e.timeStamp; drag.vy = 0; drag.vp = 0; grab("drag");
-        }
+          drag.on = true; drag.id = e.pointerId; drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = e.timeStamp; drag.t0 = e.timeStamp; drag.moved = 0; drag.vy = 0; drag.vp = 0; grab("drag");
+        } else if (e.pointerType === "touch" && Math.hypot(dx, dy) < 0.95) { tap.id = e.pointerId; tap.x = e.clientX; tap.y = e.clientY; tap.t = e.timeStamp; }
       };
-      const onUp = (e: PointerEvent) => { if (!drag.on || e.pointerId !== drag.id) return; drag.on = false; grab(!isControl(e) && overBrain(e) ? "over" : ""); wake(); };
+      const onUp = (e: PointerEvent) => {
+        if (tap.id === e.pointerId) {                                                /* a tap: a short press that did not travel */
+          const isTap = e.type === "pointerup" && e.timeStamp - tap.t < 350 && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 10; tap.id = -1;
+          if (isTap && !isControl(e)) activate(true);
+        }
+        if (!drag.on || e.pointerId !== drag.id) return;
+        const wasClick = e.type === "pointerup" && drag.moved < 5 && e.timeStamp - drag.t0 < 450;   /* a click, not a drag */
+        drag.on = false; grab(!isControl(e) && overBrain(e) ? "over" : ""); if (wasClick) activate(false); wake();
+      };
       const onBlur = () => { if (drag.on) { drag.on = false; grab(""); } };
       window.addEventListener("scroll", wake, { passive: true });
       window.addEventListener("resize", wake);
@@ -231,7 +258,7 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
       (window as unknown as { __brain3d?: object }).__brain3d = {
         tier, get frames() { return frames; }, get level() { return level; }, get size() { return curS; },
         /** the brain's turn toward the pointer (radians) and how close the pointer is (0..1), so a test can check the reaction exactly instead of comparing frames */
-        get pose() { return { yaw: group.rotation.y, pitch: group.rotation.x, near: pointer.near, scale: group.scale.x, dragYaw: drag.yaw, dragging: drag.on }; },
+        get pose() { return { yaw: group.rotation.y, pitch: group.rotation.x, near: pointer.near, scale: group.scale.x, dragYaw: drag.yaw, dragging: drag.on, burst: burst.v, clicks: burst.count }; },
         litPixels() {
           draw(STILL_TIME, 0.016, 1);
           const gl = renderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, buf = new Uint8Array(w * h * 4);
@@ -247,5 +274,11 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
     return () => { teardown(); refresh.current = null; };
   }, [scene, reduced, onFail]);
 
-  return <canvas key={canvasKey} ref={canvas} className="brain3d" aria-hidden="true" />;
+  return (
+    <>
+      <canvas key={canvasKey} ref={canvas} className="brain3d" aria-hidden="true" />
+      {/* a label that follows the pointer while it is over the brain, so the two things you can do with it are discoverable */}
+      <div className="brain-tip" ref={tip} aria-hidden="true"><b>Click</b> to ask <i>·</i> <b>drag</b> to turn</div>
+    </>
+  );
 }

@@ -552,3 +552,25 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 /* grab and turn the brain (pointer devices): an open hand over it, a closed hand while turning, and no text selection while you do */
 html[data-brain-grab="over"] .hero { cursor: grab; }
 html[data-brain-grab="drag"], html[data-brain-grab="drag"] * { cursor: grabbing !important; -webkit-user-select: none !important; user-select: none !important; }
+
+/* ── 3 Nov: the hero's background video. Its own layer (z-index 0) behind the 3D brain (1) and the text (2), pinned with the hero and gone when the
+   hero is. Screen-blended on the ground so its blacks vanish and only the fibres show; a ground-coloured fade keeps the text column legible. ── */
+.hero-bg { position: sticky; top: 0; z-index: 0; height: 100vh; height: 100svh; margin-bottom: -100vh; margin-bottom: -100svh; overflow: hidden; pointer-events: none; background: var(--bg); }
+.hero-bg-still, .hero-bg-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; mix-blend-mode: screen; }
+.hero-bg-still { opacity: 0.8; }
+.hero-bg-video { opacity: 0; transition: opacity 900ms var(--ease-out); }
+.hero-bg-video.is-playing { opacity: 0.95; }
+/* the text column is kept dark enough that the brightest fibre behind any line of text still gives the dimmest text colour 4.5:1 (measured, see the e2e test) */
+.hero-bg::after { content: ""; position: absolute; inset: 0; background:
+  linear-gradient(90deg, rgba(19, 18, 16, 0.97) 0%, rgba(19, 18, 16, 0.93) 52%, rgba(19, 18, 16, 0.5) 74%, rgba(19, 18, 16, 0.08) 100%),
+  linear-gradient(180deg, rgba(19, 18, 16, 0.75) 0%, rgba(19, 18, 16, 0) 22%, rgba(19, 18, 16, 0) 72%, var(--bg) 100%); }
+@media (max-width: 760px) {
+  .hero-bg-video.is-playing { opacity: 0.62; }
+  .hero-bg::after { background: linear-gradient(180deg, rgba(19, 18, 16, 0.9) 0%, rgba(19, 18, 16, 0.84) 45%, rgba(19, 18, 16, 0.86) 80%, var(--bg) 100%); }
+}
+
+/* the label that follows the pointer over the brain (pointer devices only: it is shown by the same state as the grab cursor) */
+.brain-tip { position: fixed; left: 0; top: 0; z-index: 4; pointer-events: none; opacity: 0; transition: opacity var(--dur-fast); white-space: nowrap; padding: 0.3rem 0.7rem; border: 1px solid var(--accent-line); border-radius: var(--radius-pill); background: var(--surface); color: var(--fg-lead); font-family: var(--font-m); font-size: 12px; letter-spacing: 0.02em; }
+.brain-tip b { font-weight: 500; color: var(--accent-bright); }
+.brain-tip i { font-style: normal; color: var(--fg-muted); }
+html[data-brain-grab="over"] .brain-tip { opacity: 1; }

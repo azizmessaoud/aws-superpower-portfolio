@@ -64,6 +64,10 @@ npm run check:fibers   # 14 structural criteria on the baked fibre networks
 npm run check:budget   # fails if the 3D chunk exceeds 180 kB gzip, or the assets exceed their budgets
 ```
 
+## Background video
+
+The hero's background is a 5 s clip (supplied by Aziz, `reference/inputs/cosmos_123539191.mp4`) graded to the site's palette and looped seamlessly by `scripts/make-hero-video.sh` into `public/hero-bg.mp4`, `.webm` and a poster. It sits behind the 3D brain and the text, plays only while the hero is on screen, and is a still poster with reduced motion or Save-Data. Text over it keeps at least 4.5:1 contrast in every frame (an e2e test checks). Confirm you have the right to publish the clip before the judging window.
+
 ## Demo flow (run on the live URL)
 
 1. Open the site in a private window; the hero loads.

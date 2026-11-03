@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { MindState } from "../mind/state";
 import AskPanel from "./AskPanel";
+import HeroBackdrop from "./HeroBackdrop";
 
 interface Props { mind: MindState; setMind: (s: MindState) => void; reduced: boolean; onLayout: () => void }
 
@@ -13,6 +14,7 @@ export default function Hero({ mind, setMind, reduced, onLayout }: Props) {
 
   return (
     <section id="top" className="hero" aria-labelledby="hero-title">
+      <HeroBackdrop reduced={reduced} />
       <div className="hero-stage">
         <div className="hero-inner">
           <p className="eyebrow"><span className="eyebrow-name">Aziz Messaoud</span><span className="eyebrow-role"> · Data Science Engineering, ESPRIT</span></p>

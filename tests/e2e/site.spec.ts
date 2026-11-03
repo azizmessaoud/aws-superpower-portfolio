@@ -1286,3 +1286,133 @@ test("3D hero: you can grab and turn the brain; it keeps its momentum, comes bac
   expect(await q.evaluate(() => document.documentElement.dataset.brainGrab ?? "")).toBe("");
   await q.mouse.up(); await ctx.close();
 });
+
+/* ── the hero's background video, and the brain's hover and click (3 Nov) ────────────────────────────────────── */
+test("hero background: a muted, seamless loop plays on its own layer, behind the 3D brain and the text", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/?tier=full&gov=off");
+  await page.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
+  const v = page.locator(".hero-bg-video");
+  await expect.poll(() => v.evaluate((e: HTMLVideoElement) => !e.paused && e.currentTime > 0.3), { timeout: 20_000, message: "the video is playing" }).toBe(true);
+  const m = await v.evaluate((e: HTMLVideoElement) => ({ muted: e.muted, loop: e.loop, playsInline: e.playsInline, dur: e.duration, same: new URL(e.currentSrc).origin === location.origin }));
+  expect(m).toMatchObject({ muted: true, loop: true, playsInline: true, same: true });
+  expect(m.dur, "the loop is the 4 s crossfaded cut, not the 5 s original with a visible jump").toBeGreaterThan(3.9);
+  expect(m.dur).toBeLessThan(4.2);
+  const z = await page.evaluate(() => [".hero-bg", ".brain3d", ".hero-stage"].map((s) => getComputedStyle(document.querySelector(s)!).zIndex));
+  expect(z, "video 0, brain 1, text 2: the video can never cover either").toEqual(["0", "1", "2"]);
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector(".hero-bg")!).pointerEvents)).toBe("none");
+});
+
+test("hero background: with reduced motion or Save-Data it is the still poster, and no video bytes are fetched", async ({ browser }) => {
+  const fetched = (p: import("@playwright/test").Page) => { const r: string[] = []; p.on("request", (q) => /hero-bg\.(mp4|webm)/.test(q.url()) && r.push(q.url())); return r; };
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
+  const a = await ctx.newPage(); const ra = fetched(a);
+  await a.goto("/?hero=canvas&gov=off"); await a.waitForTimeout(2000);
+  expect(await a.locator(".hero-bg-video").count(), "no video element with reduced motion").toBe(0);
+  await expect(a.locator(".hero-bg-still")).toBeAttached();
+  expect(ra, "and nothing downloaded").toEqual([]);
+  await ctx.close();
+  const b = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const q = await b.newPage(); const rb = fetched(q);
+  await q.addInitScript(() => Object.defineProperty(navigator, "connection", { value: { saveData: true }, configurable: true }));
+  await q.goto("/?hero=canvas&gov=off"); await q.waitForTimeout(2000);
+  expect(await q.locator(".hero-bg-video").count(), "no video element with Save-Data").toBe(0);
+  expect(rb).toEqual([]);
+  await b.close();
+});
+
+test("hero background: text stays readable over every part of the loop (the dimmest hero text keeps 4.5:1 over the brightest fibre behind it)", async ({ page }) => {
+  test.setTimeout(150_000);
+  await page.goto("/?hero=canvas&gov=off");
+  const v = page.locator(".hero-bg-video");
+  await expect.poll(() => v.evaluate((e: HTMLVideoElement) => e.readyState >= 3), { timeout: 20_000 }).toBe(true);
+  const boxes = await page.evaluate(() => [...document.querySelectorAll(".hero-inner h1, .hero-inner .hero-lead, .hero-inner .eyebrow, .hero-inner .hero-avail, .hero-inner .ask-label, .hero-inner .ask-how, .hero-inner .ask-status, .hero-inner .ask-samples")]
+    .map((e) => { const r = e.getBoundingClientRect(); return { x: Math.max(0, r.left), y: Math.max(0, r.top), w: Math.min(r.width, innerWidth - r.left), h: r.height }; }).filter((r) => r.w > 20 && r.h > 8));
+  await page.addStyleTag({ content: ".hero-inner, .nav, .brain-canvas, .brain3d { visibility: hidden !important; }" });   /* look at the background alone */
+  await page.evaluate(() => (window as unknown as { __scene?: { pause?: () => void } }).__scene?.pause?.());                  /* and stop the 2D scene drawing */
+  const dur = await v.evaluate((e: HTMLVideoElement) => { e.pause(); return e.duration; });
+  /* only the region the text occupies is captured (cheaper), and every box below is measured relative to it */
+  const x0 = Math.floor(Math.min(...boxes.map((b) => b.x))), y0 = Math.floor(Math.min(...boxes.map((b) => b.y)));
+  const x1 = Math.ceil(Math.max(...boxes.map((b) => b.x + b.w))), y1 = Math.ceil(Math.max(...boxes.map((b) => b.y + b.h)));
+  const rel = boxes.map((b) => ({ x: b.x - x0, y: b.y - y0, w: b.w, h: b.h }));
+  const shots: string[] = [];
+  for (let t = 0.1; t < dur; t += 0.5) {
+    await v.evaluate((e: HTMLVideoElement, at: number) => new Promise<void>((res) => { e.addEventListener("seeked", () => res(), { once: true }); e.currentTime = at; }), t);
+    await page.waitForTimeout(120);
+    shots.push((await page.screenshot({ clip: { x: x0, y: y0, width: x1 - x0, height: y1 - y0 }, timeout: 30_000 })).toString("base64"));
+  }
+  const worst = await page.evaluate(async ([imgs, bx]) => {
+    const f = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+    let w = 0;
+    for (const s of imgs as string[]) {
+      const img = await createImageBitmap(await (await fetch("data:image/png;base64," + s)).blob()); const cv = new OffscreenCanvas(img.width, img.height), cx = cv.getContext("2d")!; cx.drawImage(img, 0, 0);
+      for (const b of bx as { x: number; y: number; w: number; h: number }[]) { const d = cx.getImageData(Math.round(b.x), Math.round(b.y), Math.max(1, Math.round(b.w)), Math.max(1, Math.round(b.h))).data; for (let i = 0; i < d.length; i += 4) w = Math.max(w, 0.2126 * f(d[i]) + 0.7152 * f(d[i + 1]) + 0.0722 * f(d[i + 2])); }
+    }
+    return w;
+  }, [shots, rel] as const);
+  const f = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const stone = 0.2126 * f(0xa3) + 0.7152 * f(0x9d) + 0.0722 * f(0x90);          /* --fg-muted, the dimmest text colour in the hero */
+  expect(shots.length, "frames checked across the loop").toBeGreaterThanOrEqual(8);
+  expect((stone + 0.05) / (worst + 0.05), `contrast of the dimmest text over the brightest background pixel (luminance ${worst.toFixed(4)})`).toBeGreaterThanOrEqual(4.5);
+});
+
+test("3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "mouse behaviour; the tap is tested separately");
+  test.setTimeout(150_000);
+  await page.goto("/?tier=full&gov=off");
+  await page.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
+  await page.waitForTimeout(3000);
+  const R = await page.evaluate(() => { const r = document.querySelector(".brain3d")!.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 }; });
+  const pose = () => page.evaluate(() => (window as unknown as { __brain3d: { pose: { clicks: number; burst: number; dragYaw: number } } }).__brain3d.pose);
+  const tip = page.locator(".brain-tip");
+  await expect(tip).toHaveCSS("opacity", "0");
+  await page.mouse.move(R.cx, R.cy, { steps: 6 });
+  await expect(tip, "the label appears over the brain").toHaveCSS("opacity", "1");
+  await expect(tip).toContainText("Click to ask");
+  await expect(tip).toContainText("drag to turn");
+  await page.mouse.move(60, 560, { steps: 6 });
+  await expect(tip, "and goes away over the text").toHaveCSS("opacity", "0");
+  await page.mouse.move(R.cx, R.cy, { steps: 4 }); await page.waitForTimeout(300);
+  await page.mouse.down(); await page.waitForTimeout(60); await page.mouse.up();
+  await expect.poll(async () => (await pose()).clicks, { timeout: 5000 }).toBe(1);
+  expect((await pose()).burst, "it fires").toBeGreaterThan(0.3);
+  expect(await page.evaluate(() => document.activeElement?.id), "the question box has the cursor").toBe("hero-ask");
+  await expect(page.locator(".ask-status")).toContainText("Listening");
+  await expect.poll(async () => (await pose()).burst, { timeout: 9000, message: "and settles again" }).toBeLessThan(0.05);
+  const before = (await pose()).clicks;
+  await page.mouse.move(R.cx, R.cy, { steps: 3 }); await page.mouse.down();
+  for (let i = 1; i <= 8; i++) { await page.mouse.move(R.cx + i * 12, R.cy); await page.waitForTimeout(30); }
+  await page.mouse.up(); await page.waitForTimeout(200);
+  expect((await pose()).clicks, "a drag is not a click").toBe(before);
+  expect((await pose()).dragYaw, "it turned instead").toBeGreaterThan(0.5);
+});
+
+test("3D hero: tapping the brain on a phone fires it, without raising the keyboard", async ({ page }, info) => {
+  test.skip(info.project.name !== "mobile", "touch");
+  test.setTimeout(120_000);
+  await page.goto("/?gov=off");
+  await page.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
+  await page.waitForTimeout(3000);
+  const R = await page.evaluate(() => { const r = document.querySelector(".brain3d")!.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 }; });
+  const pose = () => page.evaluate(() => (window as unknown as { __brain3d: { pose: { clicks: number; burst: number } } }).__brain3d.pose);
+  await page.touchscreen.tap(R.cx, R.cy);
+  await expect.poll(async () => (await pose()).clicks, { timeout: 5000 }).toBe(1);
+  expect((await pose()).burst).toBeGreaterThan(0.3);
+  expect(await page.evaluate(() => document.activeElement?.id), "no keyboard pop-up").not.toBe("hero-ask");
+});
+
+test("3D hero: with reduced motion the brain is not a control (no label, no click, no focus)", async ({ browser }, info) => {
+  test.skip(info.project.name === "mobile", "pointer");
+  test.setTimeout(120_000);
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 }, reducedMotion: "reduce" });
+  const q = await ctx.newPage();
+  await q.goto("/?tier=full&gov=off");
+  await q.waitForFunction(() => document.documentElement.dataset.brain === "webgl", null, { timeout: 90_000 });
+  const R = await q.evaluate(() => { const r = document.querySelector(".brain3d")!.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 }; });
+  await q.mouse.move(R.cx, R.cy, { steps: 6 }); await q.waitForTimeout(400);
+  await expect(q.locator(".brain-tip")).toHaveCSS("opacity", "0");
+  await q.mouse.down(); await q.waitForTimeout(60); await q.mouse.up(); await q.waitForTimeout(300);
+  expect(await q.evaluate(() => (window as unknown as { __brain3d: { pose: { clicks: number } } }).__brain3d.pose.clicks)).toBe(0);
+  expect(await q.evaluate(() => document.activeElement?.id)).not.toBe("hero-ask");
+  await ctx.close();
+});
