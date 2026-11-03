@@ -30,7 +30,7 @@ export default function Contact() {
       <div className="inner">
         <p className="sec-label">Contact</p>
         <h2 id="contact-title" className="sec-h2">Ask me directly.</h2>
-        <p className="sec-lead">For a 2027 PFE internship in AI/ML engineering, applied data science or AI research, email is best.</p>
+        <p className="sec-lead">For a 2027 PFE internship in AI/ML engineering, applied data science or AI research, email is best, or book a call.</p>
         <div className="contact-grid">
           <div className="email-row glass">
             <Icon name="mail" />
@@ -42,6 +42,7 @@ export default function Contact() {
           <p id="copy-status" className="copy-status" role="status" aria-live="polite">{msg}</p>
           <ul className="contact-links">
             <li><a href={`mailto:${EMAIL}`}>Email</a></li>
+            <li><a href="https://calendly.com/aziz-messaoud">Book a call</a></li>
             <li><a href="https://github.com/azizmessaoud">GitHub</a></li>
             <li><a href="https://www.linkedin.com/in/azizmessaoud/">LinkedIn</a></li>
             <li><a href="https://azizmessaoud.github.io/projectx0/">Main portfolio</a></li>

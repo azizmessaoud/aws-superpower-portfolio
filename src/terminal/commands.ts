@@ -155,6 +155,7 @@ export function createTerminal(corpus: Corpus, portfolio: Portfolio) {
         return [
           { kind: "heading", text: "Contact" },
           { kind: "link", text: "  aziz.messaoud@esprit.tn", href: "mailto:aziz.messaoud@esprit.tn" },
+          { kind: "link", text: "  calendly.com/aziz-messaoud (book a call)", href: "https://calendly.com/aziz-messaoud" },
           { kind: "link", text: "  github.com/azizmessaoud", href: "https://github.com/azizmessaoud" },
           { kind: "link", text: "  linkedin.com/in/azizmessaoud", href: "https://www.linkedin.com/in/azizmessaoud/" },
         ];

@@ -201,8 +201,8 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     if (!project && near(q, ["limitation", "limitations", "weakness", "weaknesses", "caveat"])) return limitations();
     if (!project && (near(q, ["skills", "tools", "stack", "technologies", "technology"]) || /\bskill/.test(q))) return tools();
     if (near(q, ["contact", "email", "linkedin", "reach", "hiring"]) && !/(email|reach).*(traffix|project)/.test(q))
-      return simple("contact", "Contact", "aziz.messaoud@esprit.tn · github.com/azizmessaoud · linkedin.com/in/azizmessaoud", [
-        { label: "Email", url: "mailto:aziz.messaoud@esprit.tn" }, { label: "GitHub", url: "https://github.com/azizmessaoud" }, { label: "LinkedIn", url: "https://www.linkedin.com/in/azizmessaoud/" }]);
+      return simple("contact", "Contact", "aziz.messaoud@esprit.tn · calendly.com/aziz-messaoud · github.com/azizmessaoud · linkedin.com/in/azizmessaoud", [
+        { label: "Email", url: "mailto:aziz.messaoud@esprit.tn" }, { label: "Book a call", url: "https://calendly.com/aziz-messaoud" }, { label: "GitHub", url: "https://github.com/azizmessaoud" }, { label: "LinkedIn", url: "https://www.linkedin.com/in/azizmessaoud/" }]);
     if (!project && /\b(who (is|are)|about (you|aziz|yourself|him)|tell me about|introduce|describe (you|aziz|yourself))\b/.test(q)) return fromPassage("pr-about", "about");
     if (!project && /\bprojects?\b/.test(q) && !/\b(worst|weakest|best|performed|bad|poor|fail)/.test(q)) return projectsOverview();
 
