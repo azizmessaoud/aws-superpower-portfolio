@@ -1,0 +1,15 @@
+Portfolio passage ID: fr-question
+
+Project: FlyRank capstone
+
+Passage: Which pages should a person review first
+
+Context: FlyRank ML internship capstone (ML-11 research paper), pseudonymised internship warehouse.
+
+Verified notes: The FlyRank capstone asks whether same-day performance and content signals can rank webpages for a more useful next-seven-day editorial review queue than a transparent age-plus-visibility rule. It is a prioritisation signal for human review, not a causal estimate of what a refresh does.
+
+Limitations:
+- Observational, not causal. It does not show that editing a page increases traffic.
+
+Evidence:
+- Report · capstone_report.md @ a220b9e: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L1-L18

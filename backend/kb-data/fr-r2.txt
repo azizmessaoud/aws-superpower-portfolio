@@ -1,0 +1,15 @@
+Portfolio passage ID: fr-r2
+
+Project: FlyRank capstone
+
+Passage: Error on the count of clicks
+
+Context: Capstone report, results table; held-out mean outcome 3.42 clicks.
+
+Verified notes: On the same held-out rows the Random Forest reached R² 0.50 and MAE 2.51 clicks, against R² 0.26 for the calibrated baseline. A separate validation-audit rerun reports R² 0.52, kept apart.
+
+Limitations:
+- A one-day snapshot misses later demand spikes; clicks are not revenue.
+
+Evidence:
+- Report · capstone_report.md @ a220b9e: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L47-L61

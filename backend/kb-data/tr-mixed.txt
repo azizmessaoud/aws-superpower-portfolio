@@ -1,0 +1,15 @@
+Portfolio passage ID: tr-mixed
+
+Project: TraffiX
+
+Passage: Mixed results, none significant
+
+Context: Validation report §5.3–5.4.
+
+Verified notes: Against actuated signals, mean car wait fell 11% in the morning peak and 24% in the incident scenario but rose 20% in the emergency scenario; pedestrian wait rose 11% in the incident scenario. None of the paired t-tests is significant at p < 0.05 with three seeds.
+
+Limitations:
+- Three seeds; synthetic demand; 18 of 21 junction roads use unverified lane counts.
+
+Evidence:
+- Report · prototype-validation.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md

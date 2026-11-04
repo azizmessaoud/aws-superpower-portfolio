@@ -1,0 +1,18 @@
+Portfolio passage ID: portfolio-weakest
+
+Project: Across the three projects
+
+Passage: The weakest measured results
+
+Context: Restates the TraffiX validation report, the HR README and the FlyRank notebook output.
+
+Verified notes: No project is ranked worst, because the three are measured in different ways. The weakest measured result is TraffiX in the emergency scenario: ambulance trips took 240.0 s against 213.2 s with actuated signals. The HR prototype has no accuracy figure at all, so nothing can be said about it either way. FlyRank beat its baseline on clients the model never saw (Precision@50 0.94 against 0.76), on one decision date.
+
+Limitations:
+- The three projects use different metrics and conditions, so the numbers are not comparable.
+- None of the TraffiX differences is significant at p < 0.05 with three seeds.
+
+Evidence:
+- Report · prototype-validation.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md
+- README · README.md @ 437a514: https://github.com/azizmessaoud/hr-anomaly-detection/blob/437a5142df8bed783a5b30ee6f02710a05c45a52/README.md#L1-L16
+- Notebook · w05_model.ipynb @ a220b9e: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/notebooks/w05_model.ipynb

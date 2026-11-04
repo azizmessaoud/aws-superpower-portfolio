@@ -1,0 +1,17 @@
+Portfolio passage ID: fr-p50
+
+Project: FlyRank capstone
+
+Passage: Precision@50 of 0.94 against 0.76
+
+Context: Features from 31 March 2026; outcome = Google Search Console clicks 1–7 April 2026.
+
+Verified notes: On 1,583 held-out pages from 8 clients the model never saw, a Random Forest put higher-traffic pages in its top 50 with Precision@50 of 0.94, against 0.76 for the fixed baseline. A hit is a page with at least 8 clicks in the following week, the 75th percentile of the training rows.
+
+Limitations:
+- One decision date and one outcome week; observational, not causal.
+- The internship warehouse is gated, so the result cannot be fully reproduced in public.
+
+Evidence:
+- Notebook · w05_model.ipynb @ a220b9e: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/notebooks/w05_model.ipynb
+- Report · capstone_report.md @ a220b9e: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L55

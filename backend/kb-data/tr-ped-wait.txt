@@ -1,0 +1,15 @@
+Portfolio passage ID: tr-ped-wait
+
+Project: TraffiX
+
+Passage: Pedestrian wait in the morning peak
+
+Context: One scenario, mean of 3 seeds, 20 October 2026 run.
+
+Verified notes: In the morning-peak scenario, mean pedestrian wait was 116.3 s with the trained models against 144.1 s with actuated signals (−19%).
+
+Limitations:
+- One scenario and three seeds; not statistically significant.
+
+Evidence:
+- Report · prototype-validation.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md

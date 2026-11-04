@@ -1,0 +1,15 @@
+Portfolio passage ID: fr-method
+
+Project: FlyRank capstone
+
+Passage: Clients kept apart, baseline fixed first
+
+Context: Capstone report, method section.
+
+Verified notes: The baseline was fixed before the label was used. GroupShuffleSplit kept whole clients on one side: 11,802 training rows from 21 clients and 1,583 test rows from 8 unseen clients, with no overlap. The model is a Random Forest with 150 trees, depth 14, minimum leaf 3 and seed 42.
+
+Limitations:
+- A grouped split tests transfer to new clients, not performance over time.
+
+Evidence:
+- Report · capstone_report.md @ a220b9e: https://github.com/azizmessaoud/flyrank/blob/a220b9ef1d20e5bb042562346f4c8ba84b8ca204/work/capstone_report.md#L38-L42

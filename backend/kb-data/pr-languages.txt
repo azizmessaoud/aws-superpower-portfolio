@@ -1,0 +1,15 @@
+Portfolio passage ID: pr-languages
+
+Project: Across the three projects
+
+Passage: Languages I work in
+
+Context: From the About section of my earlier portfolio.
+
+Verified notes: I work in Arabic, French and English. This portfolio and its answers are written in English.
+
+Limitations:
+- Working languages as I state them; no test score or level is claimed.
+
+Evidence:
+- Live portfolio source ·  @ the: https://azizmessaoud.github.io/projectx0/

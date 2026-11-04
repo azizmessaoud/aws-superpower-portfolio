@@ -1,0 +1,16 @@
+Portfolio passage ID: tr-control
+
+Project: TraffiX
+
+Passage: One writer per light, a reason for every decision
+
+Context: Architecture made by our team of six.
+
+Verified notes: Only one controller per traffic light may change it, a supermaster coordinates the junctions, and every decision is logged with a reason code. A language layer, Synapse, explains decisions from that log and never acts on the simulation.
+
+Limitations:
+- The agent architecture was made by our team of six, not by me alone.
+
+Evidence:
+- README · README.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/README.md#L6-L8
+- Report · prototype-validation.md @ d54b071: https://github.com/azizmessaoud/traffix/blob/d54b0710854c13966e8eca652d6e01513a47059a/docs/presentation/prototype-validation.md
