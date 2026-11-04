@@ -23,7 +23,7 @@ const PAIRS: [string, string, number][] = [
     ["fg", g, 4.5], ["fg-soft", g, 4.5], ["fg-muted", g, 4.5], ["accent-text", g, 4.5], ["accent-bright", g, 4.5], ["accent", g, 4.5], ["signal-amber", g, 4.5], ["signal-red", g, 4.5], ["signal-green", g, 4.5],
   ] as [string, string, number][]),
   ["fg-lead", "bg", 4.5],
-  ["on-primary", "primary", 4.5], ["on-primary", "accent-bright", 4.5], /* the main button turns verdigris-bright on hover */
+  ["on-primary", "primary", 4.5], ["on-primary", "accent-bright", 4.5], /* the main button turns accent-bright on hover */
   ["accent-text", "accent-tint/bg", 4.5], ["signal-red", "glass5/surface", 4.5], ["signal-amber", "glass5/surface", 4.5], ["signal-green", "glass5/surface", 4.5],
   ["focus-ring", "bg", 3], ["focus-ring", "surface", 3], ["focus-ring", "bg-deep", 3],
 ];
@@ -35,6 +35,6 @@ for (const [fg, bg, min] of PAIRS) {
   if (!ok) fail++;
   console.log(`${ok ? "PASS" : "FAIL"}  ${fg.padEnd(13)} on ${bg.padEnd(18)} ${r.toFixed(2)}:1  (needs ${min}:1)`);
 }
-/* the warm copper is for non-text marks only */
+/* the indigo second hue is for non-text marks only */
 console.log(`info  warm          on bg                 ${ratio(color("warm"), color("bg")).toFixed(2)}:1  (non-text only, needs 3:1)`);
 if (fail) { console.error(`${fail} pair(s) below threshold`); process.exit(1); }

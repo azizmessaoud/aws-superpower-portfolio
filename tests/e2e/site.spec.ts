@@ -1339,7 +1339,9 @@ test("page background: text stays readable over every section and every part of 
   const targets: [string, string][] = [["hero", "#top .hero-inner h1, #top .hero-lead, #top .eyebrow, #top .hero-avail, #top .ask-label, #top .ask-how, #top .ask-status, #top .ask-samples"],
     ["selected", "#selected .inner"], ["about", "#about .inner"], ["skills", "#skills .inner"], ["projects", "#projects .inner"], ["aws", "#aws .inner"], ["terminal", "#terminal .inner"], ["certifications", "#certifications .inner"], ["contact", "#contact .inner"], ["footer", ".footer"]];
   const f = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
-  const stone = 0.2126 * f(0xa3) + 0.7152 * f(0x9d) + 0.0722 * f(0x90);              /* --fg-muted, the dimmest text colour on the page */
+  const muted = (await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--fg-muted").trim())).replace("#", "");   /* read from the page, so the test follows the token */
+  expect(muted).toMatch(/^[0-9a-f]{6}$/i);
+  const stone = 0.2126 * f(parseInt(muted.slice(0, 2), 16)) + 0.7152 * f(parseInt(muted.slice(2, 4), 16)) + 0.0722 * f(parseInt(muted.slice(4, 6), 16));   /* --fg-muted, the dimmest text colour on the page */
   const worstBySection: Record<string, number> = {};
   for (const [name, sel] of targets) {
     const box = await page.evaluate(([s, n]) => {

@@ -16,8 +16,8 @@ const SETTINGS = {
   desktop: { shell: 64, brain: 1400, neighbors: 3, fps: 60, labels: true, field: 46 },
 } as const;
 /* the intro's full-background neural field (the prototype's drifting network, in token colours) */
-/* the field is verdigris, bone and a little copper: no violet, no cyan (palette: docs/design-decisions.md) */
-const FIELD_COLORS = ["95,179,161", "95,179,161", "239,234,223", "217,160,102", "169,226,213"];
+/* the field uses the clip's own colours: cyan-blue, pale ice and a little of its indigo (palette: docs/design-decisions.md) */
+const FIELD_COLORS = ["51,146,235", "51,146,235", "230,238,247", "119,135,238", "173,218,251"];
 const FIELD_LINK = 150;
 interface FieldNode { x: number; y: number; vx: number; vy: number; r: number; c: string; phase: number }
 type Breakpoint = keyof typeof SETTINGS;
@@ -60,7 +60,7 @@ export function createScene(o: SceneOptions) {
   /* interface state of the question lifecycle (see src/mind/state.ts); it only tints and paces the animation */
   let mind: MindState = "idle";
   const tint = { r: 95, g: 179, b: 161 };
-  const TINTS: Record<MindState, [number, number, number]> = { idle: [95, 179, 161], listening: [95, 179, 161], retrieving: [95, 179, 161], answering: [95, 179, 161], uncertain: [226, 162, 59], error: [224, 112, 92] };
+  const TINTS: Record<MindState, [number, number, number]> = { idle: [51, 146, 235], listening: [51, 146, 235], retrieving: [51, 146, 235], answering: [51, 146, 235], uncertain: [226, 162, 59], error: [224, 112, 92] };
   const mindLive = () => mind !== "idle";
   let heroVisible = true, paused = false, destroyed = false;
   /* webMix: 0 = this scene draws the hero, 1 = the WebGL canvas does; it eases between the two so a fallback or a late load never pops */
@@ -232,7 +232,7 @@ export function createScene(o: SceneOptions) {
         const a = proj[e.from], b = proj[e.to], d = (a.s + b.s) / 2, boost = Math.max(a.inf, b.inf, a.ex, b.ex);
         const alpha = (0.05 + d * 0.2 + boost * 0.35) * Math.min(a.a, b.a);
         if (alpha < 0.01) continue;
-        ctx.strokeStyle = `rgba(95,179,161,${alpha})`;
+        ctx.strokeStyle = `rgba(51,146,235,${alpha})`;
         ctx.lineWidth = 0.5 + d * 1.1 + boost * 0.8;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
@@ -283,7 +283,7 @@ export function createScene(o: SceneOptions) {
         if (p.progress < 0) continue;
         const a = proj[p.from], b = proj[p.to], k = p.progress;
         ctx.globalAlpha = Math.min(a.a, b.a);
-        ctx.fillStyle = `rgba(239,234,223,${0.4 + p.strength * 0.45})`;
+        ctx.fillStyle = `rgba(230,238,247,${0.4 + p.strength * 0.45})`;
         ctx.beginPath(); ctx.arc(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k, 2 + (a.s + (b.s - a.s) * k) * 2.4 + p.strength * 1.4, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = 1;
       }
@@ -346,10 +346,10 @@ export function createScene(o: SceneOptions) {
       const r = (1.2 + p.s * 3.2 + glow * 3) * (near ? 1 : 0.8);
       const a = Math.min(1, 0.2 + p.s * 0.6 + glow * 0.4) * p.a;
       if (n.bright || n.label || glow > 0.2) {
-        ctx.fillStyle = `rgba(217,160,102,${(0.06 + glow * 0.14) * (near ? 1 : 0.6) * p.a})`;
+        ctx.fillStyle = `rgba(119,135,238,${(0.06 + glow * 0.14) * (near ? 1 : 0.6) * p.a})`;
         ctx.beginPath(); ctx.arc(p.x, p.y, r * (n.bright ? 3.2 : 2.4), 0, Math.PI * 2); ctx.fill();
       }
-      ctx.fillStyle = n.bright || n.label ? `rgba(239,234,223,${a})` : `rgba(95,179,161,${a})`;
+      ctx.fillStyle = n.bright || n.label ? `rgba(230,238,247,${a})` : `rgba(51,146,235,${a})`;
       ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
     }
   }
@@ -368,9 +368,9 @@ export function createScene(o: SceneOptions) {
       if (placed.some((b) => Math.abs(b.y - p.y) < 16 && x0 < b.x1 + 8 && x1 > b.x0 - 8)) return;
       placed.push({ x0, x1, y: p.y });
       ctx.textAlign = side > 0 ? "left" : "right";
-      ctx.strokeStyle = `rgba(95,179,161,${alpha * 0.5})`; ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(51,146,235,${alpha * 0.5})`; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(p.x + side * 4, p.y); ctx.lineTo(tx - side * 2, p.y); ctx.stroke();
-      ctx.fillStyle = lit > 0.25 ? `rgba(217,160,102,${alpha})` : `rgba(239,234,223,${alpha})`;
+      ctx.fillStyle = lit > 0.25 ? `rgba(119,135,238,${alpha})` : `rgba(230,238,247,${alpha})`;
       ctx.fillText(n.label!, tx, p.y);
     });
   }

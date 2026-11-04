@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
-/* The page's background: a slow close-up of a nerve network, graded to the site's palette (verdigris on graphite) and looped seamlessly
+/* The page's background: a slow close-up of a nerve network, in its original colours (the site's palette is sampled from it) and looped seamlessly
  * (public/page-bg.mp4 and .webm, about 230 kB each, plus a poster frame; rebuilt by scripts/make-page-video.sh). It is one fixed layer behind
- * every section (z-index -1, so it can never paint over text); the sections' own backgrounds are translucent graphite, which is what keeps
+ * every section (z-index -1, so it can never paint over text); the sections' own backgrounds are translucent navy, which is what keeps
  * text readable over it (an e2e test measures every section across the whole loop). It is atmosphere, so it never costs anything that matters:
  *  - with reduced motion, Save-Data or reduced-data it is the still poster, not video, and no video bytes are fetched;
  *  - it plays only while the tab is visible;

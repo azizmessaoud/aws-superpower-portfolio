@@ -35,7 +35,7 @@ renderer.toneMappingExposure = 1.05;
 const dpr = renderer.getPixelRatio();
 
 const scene = new Scene();
-scene.background = new Color("#131210"); /* site --bg */
+scene.background = new Color("#06131f"); /* site --bg */
 
 const camera = new PerspectiveCamera(FOV, W / H, 0.1, 50);
 const aspect = W / H;
@@ -49,11 +49,11 @@ else if (view === "front-quarter") place(Math.cos(a(64)) * R, 0.7, Math.sin(a(64
 else if (view === "three-quarter") place(Math.cos(a(36)) * R, 0.75, Math.sin(a(36)) * R);
 else place(R, -0.25, 0);
 scene.add(camera);
-const key = new DirectionalLight("#efeadf", 3.2); key.position.set(-3.2, 3.6, 2.4); camera.add(key);
-const rim = new DirectionalLight("#d9a066", 2.1); rim.position.set(2.4, 1.2, -4); camera.add(rim);
-const ice = new DirectionalLight("#efeadf", 2.2); ice.position.set(-3, 1.2, -3.2); camera.add(ice);
-const under = new DirectionalLight("#5fb3a1", 0.6); under.position.set(0.5, -3, 1.5); camera.add(under);
-scene.add(new HemisphereLight("#86cfbf", "#131210", 0.2), new AmbientLight("#a39d90", 0.05));
+const key = new DirectionalLight("#e6eef7", 3.2); key.position.set(-3.2, 3.6, 2.4); camera.add(key);
+const rim = new DirectionalLight("#7787ee", 2.1); rim.position.set(2.4, 1.2, -4); camera.add(rim);
+const ice = new DirectionalLight("#e6eef7", 2.2); ice.position.set(-3, 1.2, -3.2); camera.add(ice);
+const under = new DirectionalLight("#3392eb", 0.6); under.position.set(0.5, -3, 1.5); camera.add(under);
+scene.add(new HemisphereLight("#6fb5f6", "#06131f", 0.2), new AmbientLight("#8fa3b8", 0.05));
 
 async function main() {
   const url = tier === "mobile" ? mobileUrl : fullUrl;
@@ -74,7 +74,7 @@ async function main() {
   T.geometryMs = performance.now() - t; t = performance.now();
 
   /* vertex colour: muted blue crowns, deep navy groove bottoms; cerebellum and stem lean violet */
-  const blue = new Color("#5fb3a1").lerp(new Color("#a39d90"), 0.62).multiplyScalar(0.23), violet = new Color("#d9a066").lerp(new Color("#a39d90"), 0.55).multiplyScalar(0.22), groove = new Color("#0c0b0a");
+  const blue = new Color("#3392eb").lerp(new Color("#8fa3b8"), 0.62).multiplyScalar(0.23), violet = new Color("#7787ee").lerp(new Color("#8fa3b8"), 0.55).multiplyScalar(0.22), groove = new Color("#030a12");
   const colors = new Float32Array(brain.sulcus.length * 3), c = new Color(), cv = blue.clone().lerp(violet, 0.65);
   for (let i = 0; i < brain.sulcus.length; i++) {
     c.copy(brain.part[i] === 0 ? blue : cv).lerp(groove, Math.pow(brain.sulcus[i]!, 0.8) * 0.92);

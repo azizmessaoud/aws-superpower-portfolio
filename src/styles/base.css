@@ -41,7 +41,7 @@ button { font: inherit; color: inherit; }
   .dock-brain { margin-left: 0; }
   .nav-links {
     position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; padding: var(--space-2xs) var(--space-md) var(--space-md);
-    background: rgba(19, 18, 16, 0.97); border-bottom: 1px solid var(--border);
+    background: rgba(6, 19, 31, 0.97); border-bottom: 1px solid var(--border);
     opacity: 0; visibility: hidden; transform: translateY(-8px);
     transition: opacity var(--dur-base), transform var(--dur-base) var(--ease-out), visibility 0s var(--dur-base);
   }
@@ -101,7 +101,7 @@ html.intro .hero-inner > * { opacity: 0; transform: translateY(12px); transition
 .hint-q:hover, .suggest-q:hover { border-style: solid; background: var(--glass5); }
 /* nav control: the "Terminal Explorer" link the brain docks into */
 .nav-cta[aria-current="true"] { border-color: var(--accent-hover); background: var(--accent-tint); }
-.dock-brain { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px dashed var(--accent-line); background: radial-gradient(circle, rgba(12, 11, 10, 0.4), rgba(12, 11, 10, 0.9)); transition: border-color var(--dur-slow); }
+.dock-brain { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px dashed var(--accent-line); background: radial-gradient(circle, rgba(3, 10, 18, 0.4), rgba(3, 10, 18, 0.9)); transition: border-color var(--dur-slow); }
 .nav-cta.is-docked .dock-brain { border-style: solid; }
 .nav-cta:hover .dock-brain { border-color: var(--accent); }
 .scroll-hint { position: absolute; left: 50%; bottom: var(--space-xl); transform: translateX(-50%); z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-family: var(--font-m); font-size: 11px; letter-spacing: 0.08em; color: var(--fg-muted); pointer-events: none; }
@@ -207,7 +207,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .terminal-section { background: linear-gradient(180deg, var(--surface-v-a), var(--bg-a)); }
 .terminal-section code { font-family: var(--font-m); color: var(--accent-text); }
 .term-win { max-width: 54rem; border-radius: var(--radius-xl); overflow: hidden; background: var(--term-bg); border: 1px solid var(--border); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); cursor: text; }
-.term-bar { display: flex; align-items: center; gap: 0.45rem; padding: 0.7rem var(--space-md); background: #100f0d; border-bottom: 1px solid var(--border); }
+.term-bar { display: flex; align-items: center; gap: 0.45rem; padding: 0.7rem var(--space-md); background: #07111c; border-bottom: 1px solid var(--border); }
 .dot { width: 11px; height: 11px; border-radius: 50%; }
 .dot { border-radius: 2px; background: var(--border-strong); } /* neutral marks, not the traffic-light dots of an operating system window */
 .term-title { flex: 1; text-align: center; font-family: var(--font-m); font-size: 12px; color: var(--fg-muted); }
@@ -296,7 +296,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 .cert-issuer { font-family: var(--font-m); font-size: 12px; color: var(--accent-text); margin-bottom: var(--space-3xs); }
 .cert-learning { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-xs) var(--space-lg); }
 .cert-learning a { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 44px; padding: var(--space-3xs) 0; color: var(--fg-soft); text-decoration: none; }
-.cert-learning .cert-t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; text-decoration-color: rgba(163, 157, 144, 0.45); transition: color var(--dur-base), text-decoration-color var(--dur-base); }
+.cert-learning .cert-t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; text-decoration-color: rgba(143, 163, 184, 0.45); transition: color var(--dur-base), text-decoration-color var(--dur-base); }
 .cert-learning .cert-m { color: var(--fg-muted); font-size: 13px; }
 .cert-learning a:hover .cert-t, .cert-learning a:focus-visible .cert-t { color: var(--accent-text); text-decoration-color: var(--accent-text); }
 .volunteer { margin-top: var(--space-3xl); }
@@ -360,7 +360,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 }
 
 /* phones: the open menu blurs whatever is behind it, so large headline text does not ghost through */
-@media (max-width: 760px) { .nav-links { background: rgba(19, 18, 16, 0.985); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); } }
+@media (max-width: 760px) { .nav-links { background: rgba(6, 19, 31, 0.985); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); } }
 
 /* results table on phones: each row stacks (the measure on its own line, then three labelled values) so a number is never
    split from its unit and the measure is not squeezed into a sliver. Roles are explicit in the markup, so assistive
@@ -454,7 +454,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
   .pcard-open { align-self: end; justify-self: start; }
 } }
 .pcard .chips { align-content: flex-start; }
-.case-panel { margin-bottom: var(--space-2xl); padding: 0 var(--space-xl); border: 1px solid var(--accent-line); border-radius: var(--radius-lg); background: linear-gradient(180deg, rgba(95, 179, 161, 0.05), transparent 35%); }
+.case-panel { margin-bottom: var(--space-2xl); padding: 0 var(--space-xl); border: 1px solid var(--accent-line); border-radius: var(--radius-lg); background: linear-gradient(180deg, rgba(51, 146, 235, 0.05), transparent 35%); }
 .case-panel .case { padding: var(--space-lg) 0 var(--space-2xl); border-top: 0; }
 .case-close { display: flex; align-items: center; gap: 0.4rem; min-height: 44px; margin: var(--space-sm) 0 0 auto; padding: 0 var(--space-md); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--glass5); color: var(--fg-muted); font-size: var(--text-small); cursor: pointer; transition: color var(--dur-base), border-color var(--dur-base), background var(--dur-base); }
 .case-close:hover { color: var(--fg); border-color: var(--accent); background: var(--glass10); }
@@ -525,7 +525,7 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) { .nav-logo:hover { transform: translateY(-1px) scale(1.06); } }
 
-/* ── 2 Nov (4): the palette is meaning, not decoration. Amber = a limit, brick = an error, stone = not verified, verdigris = interactive or evidence. ── */
+/* ── 2 Nov (4): the palette is meaning, not decoration. Amber = a limit, brick = an error, stone = not verified, accent blue = interactive or evidence. ── */
 .ask-answer.is-not_verified .ask-outcome .icon, .ask-answer.is-not_verified .ask-outcome { color: var(--fg-muted); }
 
 /* ── 2 Nov (5): motion that carries the data. Each picture plays once, when you reach it, and is drawn finished with reduced motion or without script. ── */
@@ -554,7 +554,7 @@ html[data-brain-grab="over"] .hero { cursor: grab; }
 html[data-brain-grab="drag"], html[data-brain-grab="drag"] * { cursor: grabbing !important; -webkit-user-select: none !important; user-select: none !important; }
 
 /* ── 3 Nov (2): the background video is the whole page's. One fixed layer behind everything (z-index -1: below the 3D brain 1, the hero text 2, and every
-   section's content), screen-blended on the ground so its blacks vanish and only the fibres show. Sections have translucent graphite grounds
+   section's content), screen-blended on the ground so its blacks vanish and only the fibres show. Sections have translucent navy grounds
    (--bg-a and friends) that let it through at about 14% and keep text readable; cards stay opaque. The hero adds its own stronger darkening on the
    left, where its text is, and leaves the right open behind the brain. ── */
 .page-bg { position: fixed; inset: 0; z-index: -1; height: 100vh; height: 100lvh; overflow: hidden; pointer-events: none; background: var(--bg); }
@@ -564,9 +564,9 @@ html[data-brain-grab="drag"], html[data-brain-grab="drag"] * { cursor: grabbing 
 .page-bg-video.is-playing { opacity: 0.95; }
 @media (max-width: 760px) { .page-bg-video.is-playing { opacity: 0.7; } }
 .hero-scrim { position: sticky; top: 0; z-index: 0; height: 100vh; height: 100svh; margin-bottom: -100vh; margin-bottom: -100svh; pointer-events: none; background:
-  linear-gradient(90deg, rgba(19, 18, 16, 0.97) 0%, rgba(19, 18, 16, 0.93) 52%, rgba(19, 18, 16, 0.5) 74%, rgba(19, 18, 16, 0.08) 100%),
-  linear-gradient(180deg, rgba(19, 18, 16, 0.75) 0%, rgba(19, 18, 16, 0) 22%, rgba(19, 18, 16, 0) 72%, rgba(19, 18, 16, 0.5) 100%); }
-@media (max-width: 760px) { .hero-scrim { background: linear-gradient(180deg, rgba(19, 18, 16, 0.9) 0%, rgba(19, 18, 16, 0.84) 45%, rgba(19, 18, 16, 0.86) 80%, rgba(19, 18, 16, 0.5) 100%); } }
+  linear-gradient(90deg, rgba(6, 19, 31, 0.97) 0%, rgba(6, 19, 31, 0.93) 52%, rgba(6, 19, 31, 0.5) 74%, rgba(6, 19, 31, 0.08) 100%),
+  linear-gradient(180deg, rgba(6, 19, 31, 0.75) 0%, rgba(6, 19, 31, 0) 22%, rgba(6, 19, 31, 0) 72%, rgba(6, 19, 31, 0.5) 100%); }
+@media (max-width: 760px) { .hero-scrim { background: linear-gradient(180deg, rgba(6, 19, 31, 0.9) 0%, rgba(6, 19, 31, 0.84) 45%, rgba(6, 19, 31, 0.86) 80%, rgba(6, 19, 31, 0.5) 100%); } }
 
 /* the label that follows the pointer over the brain (pointer devices only: it is shown by the same state as the grab cursor) */
 .brain-tip { position: fixed; left: 0; top: 0; z-index: 4; pointer-events: none; opacity: 0; transition: opacity var(--dur-fast); white-space: nowrap; padding: 0.3rem 0.7rem; border: 1px solid var(--accent-line); border-radius: var(--radius-pill); background: var(--surface); color: var(--fg-lead); font-family: var(--font-m); font-size: 12px; letter-spacing: 0.02em; }

@@ -66,7 +66,7 @@ npm run check:budget   # fails if the 3D chunk exceeds 180 kB gzip, or the asset
 
 ## Background video
 
-One 5 s clip (supplied by Aziz, `reference/inputs/cosmos_123539191.mp4`) is the background of the **whole page**: graded to the site's palette and looped seamlessly by `scripts/make-page-video.sh` into `public/page-bg.mp4`, `.webm` and a poster. It is one fixed layer behind every section (`z-index: -1`), behind the 3D brain and the text. The sections' grounds are translucent graphite, which is what lets it through (about 14%) and keeps text readable; cards stay solid. It plays only while the tab is visible, and is a still poster with reduced motion or Save-Data. Text keeps at least 4.5:1 contrast over it in every section and every frame (an e2e test measures all ten regions). Confirm you have the right to publish the clip before the judging window.
+One 5 s clip (supplied by Aziz, `reference/inputs/cosmos_123539191.mp4`) is the background of the **whole page**: in its original colours (no grade; the site's palette is sampled from it) and looped seamlessly by `scripts/make-page-video.sh` into `public/page-bg.mp4`, `.webm` and a poster. It is one fixed layer behind every section (`z-index: -1`), behind the 3D brain and the text. The sections' grounds are translucent navy, which is what lets it through (about 14%) and keeps text readable; cards stay solid. It plays only while the tab is visible, and is a still poster with reduced motion or Save-Data. Text keeps at least 4.5:1 contrast over it in every section and every frame (an e2e test measures all ten regions). Confirm you have the right to publish the clip before the judging window.
 
 ## Demo flow (run on the live URL)
 

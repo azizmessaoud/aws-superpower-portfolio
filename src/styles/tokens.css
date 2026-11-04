@@ -1,50 +1,50 @@
 /* AzizM tokens — the single source of truth for colour, type, spacing, radius, motion and easing.
- * Re-based on 2 Nov 2026: the prototype's navy, violet and cyan with gradients and glows read as generic, so the palette is now a warm
- * graphite with bone text and one verdigris accent (docs/design-decisions.md).
+ * Re-based on 3 Nov 2026: the palette is sampled from the background clip (its own deep navy, cyan-blue strands and indigo highlights),
+ * so the page and the video are one colour world. The prototype's stock violet, gradients and glows stay out (docs/design-decisions.md).
  * Components use these variables only; scripts/contrast-check.ts verifies the text pairs. */
 :root {
   color-scheme: dark;
 
-  /* grounds: a warm graphite, not navy */
-  --bg: #131210;
-  --bg-deep: #0c0b0a;
-  --surface: #1b1a17;
-  --surface-v: #181611;
-  --term-bg: #0a0908;
-  --nav-scrim: rgba(19, 18, 16, 0.9);
+  /* grounds: the clip's deep navy (its darkest pixels average #071a29; these are a touch darker so text keeps its contrast) */
+  --bg: #06131f;
+  --bg-deep: #030a12;
+  --surface: #0c1b2b;
+  --surface-v: #0a1727;
+  --term-bg: #02070c;
+  --nav-scrim: rgba(6, 19, 31, 0.9);
 
   /* the same grounds, translucent: sections use these so the page's background video shows through (about 14%), while cards stay opaque */
-  --bg-a: rgba(19, 18, 16, 0.86);
-  --bg-deep-a: rgba(12, 11, 10, 0.88);
-  --surface-a: rgba(27, 26, 23, 0.88);
-  --surface-v-a: rgba(24, 22, 17, 0.88);
+  --bg-a: rgba(6, 19, 31, 0.86);
+  --bg-deep-a: rgba(3, 10, 18, 0.88);
+  --surface-a: rgba(12, 27, 43, 0.88);
+  --surface-v-a: rgba(10, 23, 39, 0.88);
 
-  /* text: bone */
-  --fg: #efeadf;
-  --fg-lead: rgba(239, 234, 223, 0.8);
-  --fg-soft: #d3cdbf;
-  --fg-muted: #a39d90;
+  /* text: pale ice, a tint of the same hue */
+  --fg: #e6eef7;
+  --fg-lead: rgba(230, 238, 247, 0.8);
+  --fg-soft: #c0cfdf;
+  --fg-muted: #96a9be;
 
-  /* One accent, verdigris (aged copper), for everything interactive and for data. Colour carries meaning here, it is not decoration:
-   * verdigris = interactive or evidence, amber = a limit or caveat, brick = an error, stone (fg-muted, dashed) = not verified. */
-  --accent: #5fb3a1;            /* lines and fills */
-  --accent-text: #86cfbf;       /* accent as text */
-  --accent-bright: #a9e2d5;     /* figures, hover, focus */
-  --accent-tint: rgba(95, 179, 161, 0.12);
-  --accent-line: rgba(95, 179, 161, 0.3);
-  --accent-hover: rgba(95, 179, 161, 0.46);
-  --warm: #d9a066;              /* copper: where a fibre starts (3D), and warm marks */
-  --primary: #efeadf;           /* the main button is bone with ink text */
-  --on-primary: #131210;
+  /* One accent, the cyan-blue of the clip's strands (hue ~209 degrees, measured), for everything interactive and for data. Colour carries meaning here, it is not decoration:
+   * blue = interactive or evidence, amber = a limit or caveat, brick = an error, stone (fg-muted, dashed) = not verified. */
+  --accent: #3392eb;            /* lines and fills */
+  --accent-text: #6fb5f6;       /* accent as text */
+  --accent-bright: #addafb;     /* figures, hover, focus */
+  --accent-tint: rgba(51, 146, 235, 0.12);
+  --accent-line: rgba(51, 146, 235, 0.3);
+  --accent-hover: rgba(51, 146, 235, 0.46);
+  --warm: #7787ee;              /* the clip's indigo highlights: where a fibre starts (3D), and marks that need a second hue */
+  --primary: #e6eef7;           /* the main button is pale ice with navy text */
+  --on-primary: #06131f;
   --signal-red: #e0705c;
   --signal-amber: #e2a23b;
   --signal-green: #8bc79a;
 
   /* lines */
-  --border: rgba(239, 234, 223, 0.09);
-  --border-strong: rgba(239, 234, 223, 0.22);
-  --glass5: rgba(239, 234, 223, 0.045);
-  --glass10: rgba(239, 234, 223, 0.09);
+  --border: rgba(230, 238, 247, 0.09);
+  --border-strong: rgba(230, 238, 247, 0.22);
+  --glass5: rgba(230, 238, 247, 0.045);
+  --glass10: rgba(230, 238, 247, 0.09);
   --focus-ring: var(--accent-bright);
 
   /* no gradients: solid colours only (these names are kept so one rule can still say "the brand colour") */
