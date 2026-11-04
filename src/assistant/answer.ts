@@ -7,6 +7,7 @@ import type { Corpus, Portfolio } from "../content/schema";
 import { LABELS, LABEL_KEYS, PROJECT_NAME, PROOF, type LabelKey } from "../content/labels";
 import { isNear } from "../retrieval/fuzzy";
 import { createRetriever } from "../retrieval/retriever";
+import { createGuard, isInstruction, MIN_COVERAGE } from "./guard";
 
 export type Outcome = "supported" | "contradicted" | "not_verified" | "error";
 export interface Evidence { label: string; url: string }
@@ -30,7 +31,7 @@ const AWS_SERVICES: { name: string; re: RegExp }[] = [
 ];
 const OTHER_ISSUERS = ["aws", "amazon", "google", "gcp", "cisco", "comptia", "pmi", "red hat", "salesforce", "tensorflow", "hashicorp", "snowflake"];
 const ISSUER_ALIAS: Record<string, string> = { azure: "microsoft", oci: "oracle" };
-const CERT_WORDS = /certif|credential|badge|diploma|accredit|\bcerts?\b|\bcourses?\b|\blearning\b|practitioner/i;
+const CERT_WORDS = /certif|credential|badge|diploma|accredit|\bcerts?\b|\bcourses?\b|(?<!machine |deep )\blearning\b|practitioner/i;
 const STOP = new Set(["what", "whats", "what's", "is", "are", "the", "a", "an", "do", "does", "you", "your", "aziz", "azizs", "have", "has", "his", "he", "any", "of", "to", "and", "or", "with", "got", "show", "me", "list", "all", "my", "i", "please", "tell", "about", "certified", "in", "certificate", "certification", "certifications", "certifs", "cert", "certs", "credential", "credentials", "cloud", "practitioner"]);
 /* Everyday shorthand and the commonest slips, applied before routing and retrieval. */
 const SHORTHAND: [RegExp, string][] = [[/\bwhois\b/g, "who is"], [/\b(whats|wats)\b/g, "what is"], [/\bwat\b/g, "what"], [/\bur\b/g, "your"], [/\bu\b/g, "you"], [/\bhe's\b/g, "he is"]];
@@ -42,6 +43,7 @@ const words = (s: string) => s.toLowerCase().replace(/'s\b/g, "").replace(/[^a-z
 
 export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
   const retriever = createRetriever(corpus);
+  const guard = createGuard(corpus, portfolio);
   const { aws, certifications, skills, interview } = portfolio;
   const byPassage = new Map(corpus.passages.map((p) => [p.id, p]));
   const awsStatusEvidence: Evidence = { label: "aws-status.yaml (this site's AWS record)", url: aws.verified[0] ? "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/main/content/aws-status.yaml" : "" };
@@ -189,6 +191,8 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     if (!input) return make({ outcome: "error", intent: "invalid", title: "No question", answer: "Type a question first." });
     if (input.length > MAX_QUESTION) return make({ outcome: "error", intent: "invalid", title: "Question too long", answer: `Questions are limited to ${MAX_QUESTION} characters; this one has ${input.length}.` });
     const q = normalise(input);
+    if (isInstruction(q))
+      return make({ outcome: "not_verified", intent: "instruction", title: "I can't be told what to say", answer: `I answer only from the checked evidence, so I can't change my rules or say something because I'm asked to. ${SUGGEST}`, limitations: ["Every answer here is looked up from the site's checked notes, not written to order."] });
     const project = /traffix|flyrank|fly rank|\bhr\b|document|capstone|ambulance|pedestrian|precision|leakage|ocr/.test(q);
 
     for (const sv of AWS_SERVICES) if (sv.re.test(q) || (sv.name.includes("Bedrock") && near(q, ["bedrock"])) || (sv.name.includes("Lambda") && near(q, ["lambda"]))) return awsService(sv.name);
@@ -200,13 +204,36 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     { const pa = projectAspect(q); if (pa) return pa; }
     if (!project && near(q, ["limitation", "limitations", "weakness", "weaknesses", "caveat"])) return limitations();
     if (!project && (near(q, ["skills", "tools", "stack", "technologies", "technology"]) || /\bskill/.test(q))) return tools();
-    if (near(q, ["contact", "email", "linkedin", "reach", "hiring"]) && !/(email|reach).*(traffix|project)/.test(q))
+    if ((near(q, ["contact", "email", "linkedin", "hiring"]) || /\breach (you|him|aziz|out)\b|\bget in touch\b/.test(q)) && !/(email|reach).*(traffix|project)/.test(q))
       return simple("contact", "Contact", "aziz.messaoud@esprit.tn · calendly.com/aziz-messaoud · github.com/azizmessaoud · linkedin.com/in/azizmessaoud", [
         { label: "Email", url: "mailto:aziz.messaoud@esprit.tn" }, { label: "Book a call", url: "https://calendly.com/aziz-messaoud" }, { label: "GitHub", url: "https://github.com/azizmessaoud" }, { label: "LinkedIn", url: "https://www.linkedin.com/in/azizmessaoud/" }]);
     if (!project && /\b(who (is|are)|about (you|aziz|yourself|him)|tell me about|introduce|describe (you|aziz|yourself))\b/.test(q)) return fromPassage("pr-about", "about");
     if (!project && /\bprojects?\b/.test(q) && !/\b(worst|weakest|best|performed|bad|poor|fail)/.test(q)) return projectsOverview();
 
-    const results = retriever.search(q, 2);
+    const unknown = guard.unknownTerms(q);
+    if (unknown.length)
+      return make({
+        outcome: "not_verified", intent: "retrieval", title: `Nothing verified about ${unknown.map((u) => `“${u}”`).join(", ")}`,
+        answer: `Nothing in the checked evidence mentions ${unknown.map((u) => `“${u}”`).join(" or ")}, so I won't guess. ${SUGGEST}`,
+        limitations: ["Missing evidence, not a 'no': the answer may exist outside what this site can show."],
+      });
+    /* a question naming one project is answered from that project's passages (and the general profile), never from another project's */
+    const named = LABEL_KEYS.filter((k) => PROJECT_WORDS[k].test(q));
+    const scope = named.length === 1 ? { traffix: "traffix", flyrank: "flyrank", hr: "hr-docs" }[named[0]] : undefined;
+    /* a question that only names a project ("Tell me about TraffiX") gets that project's overview, not a search */
+    if (scope && guard.topicTerms(q).length === 0 && /\b(tell me about|about|what is|what's|what does|describe|explain|overview|summari[sz]e|introduce)\b|^(traffix|flyrank|the hr prototype)\??$/.test(q)) return fromPassage({ traffix: "tr-simulation", flyrank: "fr-question", hr: "hr-pipeline" }[named[0]], "project-overview");
+    const found = (scope ? retriever.search(q, 8).filter((r) => r.passage.projectId === scope || r.passage.projectId === "portfolio") : retriever.search(q, 4));
+    /* and only by a passage that itself uses the question's topic words: a word found elsewhere in the notes does not make this passage an answer */
+    const covers = found.map((r) => ({ r, c: guard.coverage(q, r.passage) }));
+    const results = covers.filter((x) => x.c.total === 0 || x.c.covered / x.c.total >= MIN_COVERAGE).map((x) => x.r).slice(0, 2);
+    if (found.length && !results.length) {
+      const miss = [...new Set(covers[0].c.missing)].map((m) => `“${m}”`).join(", ");
+      return make({
+        outcome: "not_verified", intent: "retrieval", title: "Nothing verified that answers this",
+        answer: `The closest notes don't say anything about ${miss}, so I won't answer as if they did. ${SUGGEST}`,
+        limitations: ["Missing evidence, not a 'no': the answer may exist outside what this site can show."],
+      });
+    }
     if (!results.length)
       return make({ outcome: "not_verified", intent: "retrieval", title: "Nothing verified", answer: `No verified passage answers that, so I won't guess. ${SUGGEST}`, limitations: ["Missing evidence, not a 'no': the answer may exist outside what this site can show."] });
     const top = results[0].passage;

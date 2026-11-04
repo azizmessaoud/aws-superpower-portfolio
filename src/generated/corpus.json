@@ -813,6 +813,15 @@
    "accurate",
    "measured"
   ],
+  "accurate": [
+   "precision",
+   "accuracy"
+  ],
+  "test": [
+   "held",
+   "holdout",
+   "unseen"
+  ],
   "validated": [
    "validation",
    "holdout",

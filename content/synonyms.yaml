@@ -13,6 +13,8 @@ leak: [leakage, leaked]
 ambulance: [emergency]
 precision: [precision50]
 accuracy: [accurate, measured]
+accurate: [precision, accuracy]
+test: [held, holdout, unseen]
 validated: [validation, holdout, split]
 # French → English
 anomalie: [anomaly]
