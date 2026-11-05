@@ -1089,9 +1089,18 @@ test("the Ask button shows that it is working, and keeps its accessible name", a
   await page.goto("/");
   const btn = page.getByRole("button", { name: "Ask", exact: true });
   await expect(btn).toHaveAttribute("aria-busy", "false");
+  /* The busy state lasts about 700 ms. Polling for it raced the page: on a busy CPU (software-rendered WebGL) the polling was starved for longer than that
+   * and missed it (about 1 run in 4, on the unmodified code too). A MutationObserver installed before the question is asked records it the moment it is
+   * applied, with all three signs in one read: aria-busy, data-busy and the word "Searching". */
+  await page.evaluate(() => {
+    const w = window as unknown as { __askBusy: boolean };
+    w.__askBusy = false;
+    const b = document.querySelector(".ask-submit")!;
+    const check = () => { if (b.getAttribute("aria-busy") === "true" && b.getAttribute("data-busy") === "true" && /Searching/.test(b.textContent ?? "")) w.__askBusy = true; };
+    new MutationObserver(check).observe(b, { attributes: true, childList: true, subtree: true, characterData: true });
+  });
   await ask(page, "What is the AWS hosting status?");
-  /* both at the same instant, in one read of the page: the busy state lasts about 700 ms, so two separate checks can straddle its end */
-  await page.waitForFunction(() => { const b = document.querySelector(".ask-submit")!; return b.getAttribute("aria-busy") === "true" && b.getAttribute("data-busy") === "true" && /Searching/.test(b.textContent ?? ""); }, null, { polling: "raf", timeout: 10_000 });
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __askBusy: boolean }).__askBusy), { timeout: 10_000, message: "the button was busy, with all three signs at once" }).toBe(true);
   await expect(btn).toHaveAttribute("aria-busy", "false");
   await expect(btn).toContainText("Ask");
 });

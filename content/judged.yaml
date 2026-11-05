@@ -96,3 +96,11 @@
   question: Does he have a PhD?
   relevant: []
   note: added 29 Oct; no evidence
+- id: q27
+  question: How did the RAG assistant's retrieval perform on held-out questions?
+  relevant: [rg-eval]
+  note: added 5 Nov; the held-out result only ties dense search
+- id: q28
+  question: What is the Hit@5 of the hybrid retrieval?
+  relevant: [rg-eval]
+  note: added 5 Nov

@@ -52,3 +52,9 @@
 - { id: PR-03, projectId: portfolio, status: supported, sources: [live-site-data], limitations: ["My own account; the club and organisation pages are linked where they exist."] }
 - { id: PR-04, projectId: portfolio, status: supported, sources: [live-site-page], limitations: ["Working languages as I state them; no test score or level is claimed."] }
 - { id: PR-05, projectId: portfolio, status: caveated, sources: [live-site-page], limitations: ["Only the country is stated; the city differs between my sources."] }
+- id: RG-01
+  projectId: rag
+  status: caveated
+  sources: [rag-evaluation]
+  metric: { name: "Hit@5, hybrid retrieval vs dense search alone", value: "development 0.873 vs 0.732; held-out 0.750 vs 0.750", definition: "Share of questions where at least one passage that must contain the answer is among the top 5 retrieved chunks", conditions: "The team's evaluation of 16 Oct 2026: 71 labelled development questions, 20 held-out questions written after the tuning", baseline: "Dense search on the raw question" }
+  limitations: ["The team's own numbers; this site has not re-run them.", "On the held-out questions the hybrid only ties dense search, and its MRR@5 is lower (0.531 vs 0.635): part of the development gain was overfitting.", "The term maps were built after looking at failures on the development set, the held-out set is small (20), and no evaluation label has been reviewed by a person yet."]

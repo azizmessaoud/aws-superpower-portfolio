@@ -13,6 +13,11 @@
   framing: A local prototype that checks HR documents and explains every flag before a person decides.
   layout: pipeline
   repoUrl: https://github.com/azizmessaoud/hr-anomaly-detection
+- id: rag
+  title: Administrative procedures assistant
+  framing: A team project; I worked on the retrieval (RAG) component. Shown only as a card and a checked passage, not as a case study.
+  layout: none
+  repoUrl: https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant
 - id: portfolio
   title: Across the three projects
   framing: Comparisons that need more than one project.

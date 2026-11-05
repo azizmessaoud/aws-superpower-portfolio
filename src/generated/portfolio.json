@@ -136,7 +136,7 @@
  "smallProjects": [
   {
    "title": "Tunisian Administrative Procedures Assistant",
-   "text": "College team project: a multilingual assistant that helps users navigate administrative procedures. I worked on the retrieval-augmented generation (RAG) component. Implementation details and my contribution are based on my own account; the README says it is not legal advice or official validation.",
+   "text": "College team project: a multilingual assistant for administrative procedures. I worked on the retrieval (RAG) component, my own account. The team's evaluation: hybrid search found a correct passage in the top 5 for 0.873 of 71 development questions (dense alone: 0.732), but only 0.750 on 20 held-out questions, the same as dense alone. Part of the gain was overfitting. Not legal advice.",
    "tags": [
     "RAG",
     "Qdrant",
@@ -144,8 +144,8 @@
     "FastAPI",
     "Telegram"
    ],
-   "link": "View team repository",
-   "href": "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/README.md"
+   "link": "Read the team's evaluation",
+   "href": "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/docs/EVALUATION.md"
   },
   {
    "title": "Breast Cancer ML",

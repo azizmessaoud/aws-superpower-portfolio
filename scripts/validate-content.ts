@@ -10,7 +10,8 @@ const sourceIds = new Set(sources.map((s) => s.id));
 const claimById = new Map(claims.map((c) => [c.id, c]));
 const projectIds = new Set(projects.map((p) => p.id));
 const passageIds = new Set(passages.map((p) => p.id));
-const ALLOWED_URL = /^https:\/\/(github\.com\/azizmessaoud\/|azizmessaoud\.github\.io\/projectx0|builder\.aws\.com\/)/;
+/* Aziz's own repositories, his earlier portfolio, the AWS Builder Center, and exactly one team repository (the administrative procedures assistant, where he worked on the RAG component), pinned by path so no other repository of that owner is accepted. */
+const ALLOWED_URL = /^https:\/\/(github\.com\/azizmessaoud\/|github\.com\/EyaLaourine\/tunisian-administrative-procedures-assistant\/blob\/[0-9a-f]{40}\/|azizmessaoud\.github\.io\/projectx0|builder\.aws\.com\/)/;
 
 for (const s of sources) if (!ALLOWED_URL.test(s.url)) errors.push(`source ${s.id}: URL outside the allowed evidence hosts`);
 for (const c of claims) {

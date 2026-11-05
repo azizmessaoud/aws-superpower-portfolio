@@ -54,3 +54,8 @@
   url: https://azizmessaoud.github.io/projectx0/
   ref: "the rendered earlier portfolio (About, Experience, Volunteering sections), read 29 Oct 2026"
   checkedOn: "2026-10-29"
+- id: rag-evaluation
+  kind: report
+  url: https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/docs/EVALUATION.md
+  ref: "229191a, sections 2 and 6 (evaluation of 16 Oct 2026, written by the team)"
+  checkedOn: "2026-11-05"

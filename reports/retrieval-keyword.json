@@ -121,8 +121,7 @@
       "id": "q12",
       "question": "Comment détectez-vous les anomalies dans les documents RH ?",
       "top": [
-        "hr-pipeline",
-        "hr-accuracy"
+        "hr-pipeline"
       ],
       "rank": 1,
       "ok": true,
@@ -266,12 +265,32 @@
       "rank": null,
       "ok": true,
       "abstain": true
+    },
+    {
+      "id": "q27",
+      "question": "How did the RAG assistant's retrieval perform on held-out questions?",
+      "top": [
+        "rg-eval"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q28",
+      "question": "What is the Hit@5 of the hybrid retrieval?",
+      "top": [
+        "rg-eval"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
     }
   ],
-  "answerable": 23,
-  "hit1": 0.9565217391304348,
+  "answerable": 25,
+  "hit1": 0.96,
   "hit3": 1,
-  "mrr": 0.9782608695652174,
+  "mrr": 0.98,
   "abstainOk": 3,
   "abstainTotal": 3
 }

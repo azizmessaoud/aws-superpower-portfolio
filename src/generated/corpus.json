@@ -757,6 +757,48 @@
     "timezone"
    ],
    "challenges": []
+  },
+  {
+   "id": "rg-eval",
+   "projectId": "rag",
+   "projectTitle": "Administrative procedures assistant",
+   "title": "How the administrative procedures assistant's retrieval was evaluated",
+   "text": "In the team's multilingual assistant for Tunisian administrative procedures, hybrid retrieval (dense search, BM25 and rank fusion, with at most two chunks per document) found a correct passage in the top 5 for 0.873 of 71 labelled development questions, against 0.732 for dense search alone. On 20 held-out questions written after the tuning it scored 0.750, the same as dense search, and ranked the first correct passage lower (MRR@5 0.531 against 0.635). The team's report says part of the development gain was overfitting.",
+   "context": "A college team project. I worked on the retrieval-augmented generation (RAG) component, which is my own account; these are the team's reported results, from its evaluation of 16 Oct 2026.",
+   "limitations": [
+    "The team's own numbers; this site has not re-run them.",
+    "The held-out set is small (20 questions), and the term maps were built after looking at failures on the development set.",
+    "No evaluation label has been reviewed by a person yet; the team's report marks every item's review as pending.",
+    "When the report was written, the running backend still served the earlier code, so this is not a claim about a deployed system."
+   ],
+   "evidence": [
+    {
+     "label": "Report · EVALUATION.md @ 229191a,",
+     "url": "https://github.com/EyaLaourine/tunisian-administrative-procedures-assistant/blob/229191a612e7bb6a5809e8e9203db6b722fb1d8c/docs/EVALUATION.md#2-retrieval-scriptsevaluate_retrievalpy"
+    }
+   ],
+   "tags": [
+    "rag",
+    "retrieval",
+    "hybrid",
+    "bm25",
+    "rrf",
+    "qdrant",
+    "dense",
+    "hit@5",
+    "mrr",
+    "held-out",
+    "heldout",
+    "overfitting",
+    "evaluation",
+    "administrative",
+    "procedures",
+    "tunisian",
+    "assistant",
+    "multilingual",
+    "team"
+   ],
+   "challenges": []
   }
  ],
  "synonyms": {
