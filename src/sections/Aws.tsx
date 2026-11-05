@@ -2,6 +2,7 @@ import type { Portfolio } from "../content/schema";
 import portfolio from "../generated/portfolio.json";
 import Icon from "../ui/Icon";
 import { consoleRecordLine, endpointLine } from "../content/awsRecord";
+import { Reveal } from "../ui/motion";
 
 /* Everything here is read from content/aws-status.yaml. The page never says more than that file proves:
  * a build file is not a deployment, and a planned service is not a connected one. */
@@ -11,8 +12,10 @@ export default function Aws() {
   return (
     <section id="aws" className="section aws" aria-labelledby="aws-title">
       <div className="inner">
+        <Reveal>
         <p className="sec-label">AWS</p>
         <h2 id="aws-title" className="sec-h2">What is running on AWS, and what is not.</h2>
+        </Reveal>
         <div className={`aws-status${aws.deployed ? " is-live" : ""}`} role="status">
           {aws.deployed && aws.liveUrl
             ? <>

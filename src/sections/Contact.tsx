@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import Icon from "../ui/Icon";
+import { Reveal } from "../ui/motion";
 
 const EMAIL = "aziz.messaoud@esprit.tn";
 
@@ -28,9 +29,11 @@ export default function Contact() {
   return (
     <section id="contact" className="section contact" aria-labelledby="contact-title">
       <div className="inner">
+        <Reveal>
         <p className="sec-label">Contact</p>
         <h2 id="contact-title" className="sec-h2">Ask me directly.</h2>
         <p className="sec-lead">For a 2027 PFE internship in AI/ML engineering, applied data science or AI research, email is best, or book a call.</p>
+        </Reveal>
         <div className="contact-grid">
           <div className="email-row glass">
             <Icon name="mail" />

@@ -573,3 +573,7 @@ html[data-brain-grab="drag"], html[data-brain-grab="drag"] * { cursor: grabbing 
 .brain-tip b { font-weight: 500; color: var(--accent-bright); }
 .brain-tip i { font-style: normal; color: var(--fg-muted); }
 html[data-brain-grab="over"] .brain-tip { opacity: 1; }
+
+/* about: the portrait drifts a few pixels while it crosses the screen (Framer Motion, src/ui/motion.tsx); the wrapper keeps the portrait's size */
+.portrait-wrap { width: min(15rem, 100%); }
+.portrait-wrap .portrait { width: 100%; }

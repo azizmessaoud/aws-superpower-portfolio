@@ -1,6 +1,7 @@
 import type { Portfolio } from "../content/schema";
 import portfolio from "../generated/portfolio.json";
 import Icon from "../ui/Icon";
+import { Reveal } from "../ui/motion";
 
 /* Skill cards come from content/skills.yaml (see docs/ADDING-CONTENT.md): each domain names the tools the linked
  * repository shows I used. Team ownership is respected: the RAG assistant is a team project and its card names only
@@ -14,11 +15,13 @@ export default function Skills() {
   return (
     <section id="skills" className="section skills" aria-labelledby="skills-title">
       <div className="inner">
+        <Reveal>
         <p className="sec-label">Tech Superpowers</p>
         <h2 id="skills-title" className="sec-h2">Tools, and where I used each one.</h2>
         <p className="sec-lead">
           Each card links to the repository where I used the tool.
         </p>
+        </Reveal>
         <ul className="skills-grid">
           {DOMAINS.map((d) => (
             <li key={d.title} className="skill-card spot">

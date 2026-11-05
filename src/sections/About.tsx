@@ -1,11 +1,15 @@
+import { Parallax, Reveal } from "../ui/motion";
+
 /* Register rows: ID-01 (ESPRIT, expected 2027), ID-02 (PFE target), ID-04 baseline wording, ID-05 (city shown
  * as Tunisia only), ID-07 (languages), ID-08 (internships; FlyRank dates withheld until D2). */
 export default function About() {
   return (
     <section id="about" className="section about" aria-labelledby="about-title">
       <div className="inner">
-        <p className="sec-label">About</p>
-        <h2 id="about-title" className="sec-h2">I study data science and test my work against a baseline.</h2>
+        <Reveal>
+          <p className="sec-label">About</p>
+          <h2 id="about-title" className="sec-h2">I study data science and test my work against a baseline.</h2>
+        </Reveal>
         <div className="about-grid">
           <div className="about-text">
             <p>
@@ -19,7 +23,9 @@ export default function About() {
             <p className="about-langs">I work in Arabic, French and English.</p>
           </div>
           <div className="about-side">
-            <img className="portrait" src="/portrait.jpg" width="480" height="480" alt="Portrait of Aziz Messaoud" loading="lazy" decoding="async" />
+            <Parallax className="portrait-wrap" range={12}>
+              <img className="portrait" src="/portrait.jpg" width="480" height="480" alt="Portrait of Aziz Messaoud" loading="lazy" decoding="async" />
+            </Parallax>
           <dl className="timeline" aria-label="Internships">
             <div><dt>Sopra HR Software</dt><dd>AI intern · Jul–Sep 2026</dd></div>
             <div><dt>FlyRank AI</dt><dd>Machine-learning intern · remote</dd></div>

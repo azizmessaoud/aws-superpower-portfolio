@@ -5,6 +5,7 @@ import corpusJson from "../generated/corpus.json";
 import portfolioJson from "../generated/portfolio.json";
 import { createTerminal, type Line } from "../terminal/commands";
 import Icon from "../ui/Icon";
+import { Reveal } from "../ui/motion";
 
 const PROMPT = "visitor@explorer:~$";
 const TRY = [
@@ -55,6 +56,7 @@ export default function Terminal({ setMind, reduced }: { setMind: (s: MindState)
   return (
     <section id="terminal" className="section terminal-section" aria-labelledby="terminal-title">
       <div className="inner">
+        <Reveal>
         <p className="sec-label">Command line</p>
         <h2 id="terminal-title" className="sec-h2">The same answers, as a command line</h2>
         <p className="sec-lead">
@@ -63,6 +65,7 @@ export default function Terminal({ setMind, reduced }: { setMind: (s: MindState)
           <code>label flyrank</code>; <code>help</code> lists the rest. It searches {corpusJson.passages.length} verified passages and shows the
           source behind each match, or says that nothing verified answers it. It does not write answers and it does not judge anyone.
         </p>
+        </Reveal>
         <div className="term-win" onClick={(e) => { if (!String(getSelection()) && !(e.target as Element).closest("a")) input.current?.focus(); }}>
           <div className="term-bar" aria-hidden="true">
             <span className="dot r" /><span className="dot y" /><span className="dot g" />

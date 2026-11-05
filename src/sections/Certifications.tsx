@@ -1,6 +1,7 @@
 import type { Portfolio } from "../content/schema";
 import portfolio from "../generated/portfolio.json";
 import Icon from "../ui/Icon";
+import { Reveal } from "../ui/motion";
 
 /* Credentials come from content/certifications.yaml (see docs/ADDING-CONTENT.md); each links to its issuer's page. */
 const { certifications } = portfolio as Portfolio;
@@ -13,12 +14,14 @@ export default function Certifications() {
   return (
     <section id="certifications" className="section certs" aria-labelledby="certs-title">
       <div className="inner">
+        <Reveal>
         <p className="sec-label">Certifications & learning</p>
         <h2 id="certs-title" className="sec-h2">Credentials you can check yourself.</h2>
         <p className="sec-lead">
           {MAIN.length} main credential{MAIN.length === 1 ? "" : "s"} and {word(LEARNING.length)} shorter course{LEARNING.length === 1 ? "" : "s"}. Each one links to the
           issuer's own page, so you don't have to take my word for it.
         </p>
+        </Reveal>
         <ul className="skills-grid">
           {MAIN.map((c) => (
             <li key={c.title} className="skill-card">

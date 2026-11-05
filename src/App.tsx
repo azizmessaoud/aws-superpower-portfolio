@@ -13,6 +13,7 @@ import Contact from "./sections/Contact";
 import Terminal from "./sections/Terminal";
 import { canUseWebglHero } from "./scene3d/capability";
 import PageBackdrop from "./ui/PageBackdrop";
+import { MotionRoot } from "./ui/motion";
 
 const NeuralScene = lazy(() => import("./scene/NeuralScene"));
 /* the 3D hero is a separate, lazily loaded chunk (Three.js and the renderer); the page is complete without it */
@@ -74,6 +75,7 @@ export default function App() {
           </Suspense>
         </SceneBoundary>
       )}
+      <MotionRoot>
       <main id="main">
         <Hero mind={mind} setMind={setMind} reduced={reduced} onLayout={onLayout} />
         <SelectedWork />
@@ -85,6 +87,7 @@ export default function App() {
         <Certifications />
         <Contact />
       </main>
+      </MotionRoot>
       <footer className="footer">
         <p>© 2026 Aziz Messaoud · Built for the AWS Student Builder Challenge</p>
         <nav className="footer-links" aria-label="Footer">
