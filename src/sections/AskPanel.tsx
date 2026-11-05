@@ -4,19 +4,11 @@ import corpusJson from "../generated/corpus.json";
 import portfolioJson from "../generated/portfolio.json";
 import { createAssistant, MAX_QUESTION, type Answer } from "../assistant/answer";
 import { CONTRADICTION, presentAnswer, projectIdOf } from "../assistant/present";
+import { SAMPLES } from "../assistant/samples";
 import { DWELL_MS, nextState, STATE_TEXT, stateForOutcome, type MindState } from "../mind/state";
 import Icon from "../ui/Icon";
 import { CASES } from "./projects/summary";
 
-/* The sample that shows a weaker result is deliberately third-from-last: judges should find it. */
-const SAMPLES = [
-  "What did Aziz personally build in TraffiX?",
-  "Did TraffiX make ambulances faster?",
-  "What is the AWS hosting status?",
-  "Does Aziz use Bedrock?",
-  "What should I ask Aziz in an interview?",
-  "Where did Aziz do internships?",
-];
 /* Which flagship project an answer is about, read from the sources it cites. No match: no link. */
 const REPO_OF: Record<(typeof CASES)[number]["id"], string> = { traffix: "/azizmessaoud/traffix/", flyrank: "/azizmessaoud/flyrank/", hr: "/azizmessaoud/hr-anomaly-detection/" };
 export function projectOf(a: Answer) {

@@ -202,7 +202,7 @@ export function createAssistant(corpus: Corpus, portfolio: Portfolio) {
     if (CERT_WORDS.test(q) || near(q, ["certification", "certificate", "credential", "certified"]) || /\b(oracle|microsoft|azure|databricks|nvidia|kaggle|ibm|google|gcp)\b/.test(q)) return certs(input);
     if (near(q, ["interview"])) return interviewQs();
     { const pa = projectAspect(q); if (pa) return pa; }
-    if (!project && near(q, ["limitation", "limitations", "weakness", "weaknesses", "caveat"])) return limitations();
+    if (!project && near(q, ["limitation", "limitations", "limit", "limits", "weakness", "weaknesses", "caveat"])) return limitations();
     if (!project && (near(q, ["skills", "tools", "stack", "technologies", "technology"]) || /\bskill/.test(q))) return tools();
     if ((near(q, ["contact", "email", "linkedin", "hiring"]) || /\breach (you|him|aziz|out)\b|\bget in touch\b/.test(q)) && !/(email|reach).*(traffix|project)/.test(q))
       return simple("contact", "Contact", "aziz.messaoud@esprit.tn · calendly.com/aziz-messaoud · github.com/azizmessaoud · linkedin.com/in/azizmessaoud", [
