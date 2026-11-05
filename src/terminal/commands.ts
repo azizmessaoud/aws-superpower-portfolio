@@ -13,7 +13,7 @@ const R = "https://github.com/azizmessaoud";
 const PROJECTS: Record<string, { title: string; summary: string; facts: string[]; limits: string[]; evidence: { text: string; href: string } }> = {
   traffix: {
     title: "TraffiX — multi-agent traffic-control simulation",
-    summary: "Six junctions on the real streets of central Tunis, built on SUMO and driven through TraCI. My pair: SUMO, observations, the A1 agent, safety and the controllers.",
+    summary: "Six junctions on the real streets of central Tunis, built on SUMO and driven through TraCI. My part, in my own words: the architecture that stops the system from hallucinating. The README lists me in the Control pair.",
     facts: [
       "≈18 car greens started during a pedestrian crossing per run, vs 331–405 with actuated signals",
       "Pedestrian wait, morning peak: 116.3 s vs 144.1 s",

@@ -285,12 +285,36 @@
       "rank": 1,
       "ok": true,
       "abstain": false
+    },
+    {
+      "id": "q29",
+      "question": "Did Aziz work on preventing hallucination?",
+      "top": [
+        "tr-role",
+        "pr-languages",
+        "pr-experience"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
+    },
+    {
+      "id": "q30",
+      "question": "What was Aziz's part in TraffiX?",
+      "top": [
+        "tr-role",
+        "tr-ambulance",
+        "rg-eval"
+      ],
+      "rank": 1,
+      "ok": true,
+      "abstain": false
     }
   ],
-  "answerable": 25,
-  "hit1": 0.96,
+  "answerable": 27,
+  "hit1": 0.9629629629629629,
   "hit3": 1,
-  "mrr": 0.98,
+  "mrr": 0.9814814814814815,
   "abstainOk": 3,
   "abstainTotal": 3
 }

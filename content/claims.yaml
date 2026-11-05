@@ -21,7 +21,7 @@
   metric: { name: Emergency-vehicle trip time, value: "240.0 s vs 213.2 s (actuated) and 197.0 s (fixed)", definition: Mean trip time of the emergency vehicle, conditions: "Emergency scenario; 3 seeds", baseline: SUMO actuated and fixed-time signals }
   limitations: ["Slower; objective not met; cause unknown."]
 - { id: TR-06, projectId: traffix, status: caveated, sources: [traffix-validation], limitations: ["Three seeds; none significant."] }
-- { id: TR-08, projectId: traffix, status: supported, sources: [traffix-readme], limitations: ["Roles rotate."] }
+- { id: TR-08, projectId: traffix, status: caveated, sources: [traffix-readme], limitations: ["Roles rotate.", "My part is my own account; the README lists me in the Control pair and gives the explanation layer (Synapse) to another pair."] }
 - { id: TR-09, projectId: traffix, status: supported, sources: [traffix-validation, traffix-readme], limitations: [] }
 - { id: FR-07, projectId: flyrank, status: supported, sources: [flyrank-capstone], limitations: ["Observational, not causal."] }
 - id: FR-02

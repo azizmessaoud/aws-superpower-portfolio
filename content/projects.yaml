@@ -1,6 +1,6 @@
 - id: traffix
   title: TraffiX
-  framing: A multi-agent traffic-control simulation on six Tunis junctions. Team course project; my pair owned control.
+  framing: "A multi-agent traffic-control simulation on six Tunis junctions. Team course project of six; my part, in my own words: the architecture that stops the system from hallucinating."
   layout: control-hierarchy
   repoUrl: https://github.com/azizmessaoud/traffix
 - id: flyrank

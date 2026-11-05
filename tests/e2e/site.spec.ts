@@ -477,10 +477,20 @@ test.describe("reduced motion: the state is still readable as text", () => {
   test.use({ reducedMotion: "reduce" });
   test("question, status line and answer work without animation", async ({ page }) => {
     await page.goto("/");
+    /* The status line shows each state for a short time and then falls back (retrieving 0.7 s, not verified 3.2 s). Checking it with separate waits raced those
+     * timers (about 1 run in 8 on a busy CPU, on the unmodified code too), so every text it shows is recorded as it appears and checked afterwards. */
+    await page.evaluate(() => {
+      const w = window as unknown as { __statusSeen: string[] };
+      w.__statusSeen = [];
+      const el = document.querySelector(".ask-status")!;
+      const note = () => { const t = (el.textContent ?? "").trim(); if (t && w.__statusSeen[w.__statusSeen.length - 1] !== t) w.__statusSeen.push(t); };
+      new MutationObserver(note).observe(el, { childList: true, subtree: true, characterData: true });
+    });
     await ask(page, "Does Aziz use Lambda?");
-    await expect(status(page)).toContainText("Retrieving evidence");
     await expect(answerBox(page)).toContainText("Not verified");
-    await expect(status(page)).toContainText("Not verified");
+    const seen = () => page.evaluate(() => (window as unknown as { __statusSeen: string[] }).__statusSeen.join(" | "));
+    await expect.poll(seen, { message: "the status line showed the retrieving state, with animation off" }).toContain("Retrieving evidence");
+    await expect.poll(seen, { message: "and then the not-verified state" }).toContain("Not verified");
   });
 });
 
@@ -580,7 +590,7 @@ test("selected work: three flagships, each with a result, a caveat and a working
   }
   /* ownership is stated only where the evidence records it: TraffiX */
   await expect(page.locator("#selected .selected-part")).toHaveCount(1);
-  await expect(cards.first()).toContainText("The Control pair");
+  await expect(cards.first()).toContainText("The architecture that stops the system from hallucinating");
   await expect(cards.nth(1)).toContainText("observational");
   await expect(cards.nth(2)).toContainText("synthetic");
 });

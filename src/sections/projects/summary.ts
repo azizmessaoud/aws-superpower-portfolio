@@ -31,7 +31,7 @@ export const CASES: CaseSummary[] = [
     kind: "Team simulation · ESPRIT course project · 2026",
     result: "Pedestrian wait fell 19% at the morning peak against SUMO's actuated signals (116.3 s vs 144.1 s), in simulation.",
     caveat: "Ambulance trips were slower in the emergency scenario, and no difference is significant with three seeds.",
-    myPart: "The Control pair with Fares Ben Kacem: SUMO, observations, the A1 agent, safety and the controllers.",
+    myPart: "The architecture that stops the system from hallucinating (my own account). The README lists me in the Control pair with Fares Ben Kacem.",
     figure: { value: "−19%", caption: "pedestrian wait at the morning peak (116.3 s vs 144.1 s), in simulation" },
     compare: { what: "Pedestrian wait, morning peak", unit: " s", better: "lower", rows: [{ label: "Actuated signals", value: 144.1 }, { label: "TraffiX", value: 116.3, ours: true }] },
     blurb: "Six junctions on the real streets of central Tunis, controlled by cooperating agents.",

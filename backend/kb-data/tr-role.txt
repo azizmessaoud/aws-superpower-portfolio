@@ -4,11 +4,12 @@ Project: TraffiX
 
 Passage: My part of the team
 
-Context: Team of six ESPRIT 4DS students; README section 11.
+Context: Team of six ESPRIT 4DS students. The first sentence is my own account; the pair assignment is README section 11.
 
-Verified notes: I worked in the Control pair with Fares Ben Kacem, covering SUMO, observations, the A1 agent, safety and the controllers. Pairs build, test and demo each work item, and roles rotate.
+Verified notes: My part, as I describe it, was the architecture that stops the system from hallucinating. The README lists me in the Control pair with Fares Ben Kacem (SUMO, observations, the A1 agent, safety and the controllers); pairs build, test and demo each work item, and roles rotate.
 
 Limitations:
+- The description of my part is my own account. The README does not name it, and it gives the explanation layer (Synapse) to another pair.
 - Team project of six students; I did not build it alone, and roles rotate, so other pairs also touched these areas.
 
 Evidence:

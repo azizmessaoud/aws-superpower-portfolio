@@ -104,3 +104,11 @@
   question: What is the Hit@5 of the hybrid retrieval?
   relevant: [rg-eval]
   note: added 5 Nov
+- id: q29
+  question: Did Aziz work on preventing hallucination?
+  relevant: [tr-role]
+  note: added 5 Nov; his own account of his part in TraffiX
+- id: q30
+  question: What was Aziz's part in TraffiX?
+  relevant: [tr-role]
+  note: added 5 Nov
