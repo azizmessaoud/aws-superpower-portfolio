@@ -1,21 +1,36 @@
 
-> aws-superpower-portfolio@0.1.0 test
-> vitest run
+ RUN  v2.1.8 C:/Users/dell/Downloads/aws-superpower-portfolio/aws-superpower-portfolio
 
+ ✓ tests/unit/placement.test.ts (9 tests) 21ms
+ ✓ tests/unit/geometry.test.ts (14 tests) 62ms
+ ✓ tests/unit/project-aspect.test.ts (15 tests) 102ms
+ ✓ tests/unit/terminal.test.ts (19 tests) 110ms
+ ✓ tests/unit/human-language.test.ts (21 tests) 144ms
+ ✓ tests/unit/assistant.test.ts (18 tests) 231ms
+ ✓ tests/unit/lookup-lifecycle.test.ts (38 tests) 183ms
+ ✓ tests/unit/ask-precision.test.ts (61 tests) 444ms
+ ✓ tests/unit/present.test.ts (23 tests) 848ms
+   ✓ every follow-up question is answerable, and a project follow-up gets that project's own answer > never errors, never repeats, and a chain two steps deep stays honest 630ms
+ ✓ tests/unit/brain-asset.test.ts (9 tests) 592ms
+ ✓ tests/unit/palette.test.ts (5 tests) 97ms
+ ✓ tests/unit/samples.test.ts (30 tests) 66ms
+ ✓ tests/unit/rag-card.test.ts (7 tests) 51ms
+ ✓ tests/unit/brain-geometry.test.ts (7 tests) 1510ms
+   ✓ procedural brain: anatomy > is two hemispheres with a longitudinal fissure between them, and equal sides 539ms
+   ✓ procedural brain: anatomy > is deterministic for a seed and different for another 397ms
+   ✓ procedural brain: anatomy > is clean data: finite positions, unit normals, sulcus in range, a sensible size 367ms
+ ✓ tests/unit/traffix-role.test.ts (5 tests) 68ms
+ ✓ tests/unit/aws-status.test.ts (5 tests) 29ms
+ ✓ tests/unit/icosphere.test.ts (5 tests) 621ms
+   ✓ icosphere: deterministic indexed topology > n=12: counts, shared vertices, outward winding, a closed surface 483ms
+ ✓ tests/unit/rag-export.test.ts (3 tests) 43ms
+ ✓ tests/unit/mind.test.ts (5 tests) 12ms
+ ✓ tests/unit/retriever.test.ts (8 tests) 72ms
+ ✓ tests/unit/bm25.test.ts (4 tests) 14ms
+ ✓ tests/unit/tokenize.test.ts (3 tests) 13ms
 
- RUN  v2.1.8 /home/user/aws-superpower-portfolio
-
- ✓ tests/unit/human-language.test.ts (21 tests) 38ms
- ✓ tests/unit/assistant.test.ts (17 tests) 49ms
- ✓ tests/unit/terminal.test.ts (19 tests) 40ms
- ✓ tests/unit/mind.test.ts (5 tests) 5ms
- ✓ tests/unit/geometry.test.ts (6 tests) 14ms
- ✓ tests/unit/retriever.test.ts (8 tests) 43ms
- ✓ tests/unit/tokenize.test.ts (3 tests) 5ms
- ✓ tests/unit/bm25.test.ts (4 tests) 6ms
-
- Test Files  8 passed (8)
-      Tests  83 passed (83)
-   Start at  04:00:18
-   Duration  1.23s (transform 385ms, setup 0ms, collect 828ms, tests 200ms, environment 2ms, prepare 723ms)
+ Test Files  22 passed (22)
+      Tests  314 passed (314)
+   Start at  19:46:53
+   Duration  4.88s (transform 2.71s, setup 0ms, collect 9.27s, tests 5.33s, environment 16ms, prepare 11.80s)
 

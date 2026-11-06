@@ -6,20 +6,29 @@
 > aws-superpower-portfolio@0.1.0 validate
 > tsx scripts/validate-content.ts
 
-content validation passed: 22 passages, 25 claims, 26 judged questions
+content validation passed: 23 passages, 26 claims, 30 judged questions
 
 > aws-superpower-portfolio@0.1.0 content
 > tsx scripts/build-corpus.ts
 
-corpus: 22 passages
+corpus: 23 passages
 portfolio: 16 certifications, 4 smaller projects
-vite v5.4.11 building for production...
+[36mvite v5.4.11 [32mbuilding for production...[36m[39m
 transforming...
-✓ 63 modules transformed.
+[32m✓[39m 424 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                        1.29 kB │ gzip:  0.70 kB
-dist/assets/index-Dj1N6_nI.css        27.05 kB │ gzip:  6.03 kB
-dist/assets/NeuralScene-DnLjBDPZ.js   14.51 kB │ gzip:  6.97 kB
-dist/assets/index-K-n2l3Hq.js        229.45 kB │ gzip: 73.86 kB
-✓ built in 1.45s
+[2mdist/[22m[32mindex.html                          [39m[1m[2m  3.06 kB[22m[1m[22m[2m │ gzip:   1.12 kB[22m
+[2mdist/[22m[32massets/brain-mobile-Bvya3gJA.brain  [39m[1m[2m154.50 kB[22m[1m[22m
+[2mdist/[22m[32massets/brain-full-Dz3EZiqM.brain    [39m[1m[2m406.61 kB[22m[1m[22m
+[2mdist/[22m[35massets/index-IOVXOMiz.css           [39m[1m[2m 47.95 kB[22m[1m[22m[2m │ gzip:   9.61 kB[22m
+[2mdist/[22m[36massets/rng-DfIOK9nF.js              [39m[1m[2m  0.27 kB[22m[1m[22m[2m │ gzip:   0.21 kB[22m
+[2mdist/[22m[36massets/NeuralScene-CVohfXKm.js      [39m[1m[2m 15.12 kB[22m[1m[22m[2m │ gzip:   7.18 kB[22m
+[2mdist/[22m[36massets/index-CvDWvzMq.js            [39m[1m[2m397.43 kB[22m[1m[22m[2m │ gzip: 127.19 kB[22m
+[2mdist/[22m[36massets/HeroBrain-tN_19-Mp.js        [39m[1m[33m544.25 kB[39m[22m[2m │ gzip: 138.78 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 5.32s[39m

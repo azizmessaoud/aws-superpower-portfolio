@@ -11,7 +11,7 @@ The mind animation shows interface state only: idle, listening, retrieving evide
 | Item | Status | Proof |
 |---|---|---|
 | Amplify Hosting build specification (`amplify.yml`: `npm ci` → `npm run build` → serve `dist/`) | **Prepared** | the file itself |
-| Public site on AWS Amplify Hosting | **Live** at https://main.d3j3qw8xj45viu.amplifyapp.com/ (Region `eu-north-1`, as stated by Aziz). The address was checked on 2026-10-31: HTTP 200 and the full page rendered. | `endpointCheck` in `content/aws-status.yaml` |
+| Public site on AWS Amplify Hosting | **Live** at https://main.d3j3qw8xj45viu.amplifyapp.com/ (Region `eu-north-1`, as stated by Aziz). The address was checked on 2026-11-06: HTTP 200 and the page rendered in a real browser. | `endpointCheck` in `content/aws-status.yaml` |
 | Amplify console build record (build ID and screenshot) | **Not captured yet** | `consoleRecord` is absent from `content/aws-status.yaml`; the site says so |
 | Amazon Bedrock, AWS Lambda, Amazon API Gateway, S3 / Knowledge Bases | **Planned, not built** | none connected; the answer engine is a deterministic keyword retriever in the browser |
 

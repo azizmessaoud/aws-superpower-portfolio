@@ -1,0 +1,33 @@
+# Re-run of the 5 failures from the full run above, one worker, 6 Nov 2026
+Running 10 tests using 1 worker
+  ok  1 [desktop] › tests\e2e\lookup-states.spec.ts:39:1 › retry repeats the question exactly once and lands on the answer, with focus on it (13.3s)
+  ok  2 [desktop] › tests\e2e\site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow (45.1s)
+  ok  3 [desktop] › tests\e2e\site.spec.ts:462:1 › hero keeps the whole panel inside the viewport (desktop, laptop and phone) (18.5s)
+  ok  4 [desktop] › tests\e2e\site.spec.ts:546:1 › the question box understands typos and a recruiter's questions (17.0s)
+  x   5 [desktop] › tests\e2e\site.spec.ts:1394:1 › 3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click (24.4s)
+  ok  6 [mobile] › tests\e2e\lookup-states.spec.ts:39:1 › retry repeats the question exactly once and lands on the answer, with focus on it (4.7s)
+  ok  7 [mobile] › tests\e2e\site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow (12.4s)
+  ok  8 [mobile] › tests\e2e\site.spec.ts:462:1 › hero keeps the whole panel inside the viewport (desktop, laptop and phone) (27.2s)
+  -   9 [mobile] › tests\e2e\site.spec.ts:546:1 › the question box understands typos and a recruiter's questions
+  -  10 [mobile] › tests\e2e\site.spec.ts:1394:1 › 3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click
+  1) [desktop] › tests\e2e\site.spec.ts:1394:1 › 3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click 
+    Error: expect(received).toBe(expected) // Object.is equality
+    Expected: 1
+    Received: 0
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+      1410 |   await page.mouse.move(R.cx, R.cy, { steps: 4 }); await page.waitForTimeout(300);
+      1411 |   await page.mouse.down(); await page.waitForTimeout(60); await page.mouse.up();
+    > 1412 |   await expect.poll(async () => (await pose()).clicks, { timeout: 5000 }).toBe(1);
+           |                                                                           ^
+      1413 |   expect((await pose()).burst, "it fires").toBeGreaterThan(0.3);
+      1414 |   expect(await page.evaluate(() => document.activeElement?.id), "the question box has the cursor").toBe("hero-ask");
+      1415 |   await expect(page.locator(".ask-status")).toContainText("Listening");
+        at C:\Users\dell\Downloads\aws-superpower-portfolio\aws-superpower-portfolio\tests\e2e\site.spec.ts:1412:75
+    Error Context: test-results\site-3D-hero-hovering-the--51b76-n-box-a-drag-is-not-a-click-desktop\error-context.md
+  1 failed
+    [desktop] › tests\e2e\site.spec.ts:1394:1 › 3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click 
+  2 skipped
+  7 passed (3.2m)
+
+# 3D hero click test alone, desktop project, two more runs: both failed (expected clicks 1, received 0)

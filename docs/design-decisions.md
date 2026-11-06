@@ -43,7 +43,7 @@
 
 ## Not yet decided (needs you)
 
-- D8: which CV to link, if any (the CV linked from the old site has open evidence questions; to be settled before any link is added).
+- D8: which CV to link, if any (the CV linked from the old site has open evidence questions; to be settled before any link is added). Update 6 Nov 2026: a CV PDF and a Contact link were added on the `redesign/on-main` branch (not on `main`). The differences between that PDF and this site's evidence are listed in WRITEUP.md under "What I learned" and are not resolved.
 - Whether to connect retrieval results to node highlighting in the scene (gated until you approve the baseline).
 
 ## 29 Oct (later): one feature, not two

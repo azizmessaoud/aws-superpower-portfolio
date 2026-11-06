@@ -1,3 +1,3 @@
-button audit 2026-11-05 against http://127.0.0.1:4173/
-desktop: 82 interactive elements, 0 flagged
-mobile: 74 interactive elements, 0 flagged
+button audit 2026-11-06 against http://127.0.0.1:4173/
+desktop: 83 interactive elements, 0 flagged
+mobile: 75 interactive elements, 0 flagged

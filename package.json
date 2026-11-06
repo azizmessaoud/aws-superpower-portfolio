@@ -9,7 +9,7 @@
     "validate": "tsx scripts/validate-content.ts",
     "dev": "npm run content && vite",
     "build": "npm run validate && npm run content && tsc --noEmit && vite build",
-    "preview": "vite preview --port 4173 --strictPort",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "build:e2e": "npm run validate && npm run content && vite build --mode e2e --outDir dist-e2e",
     "preview:e2e": "npm run build:e2e && vite preview --outDir dist-e2e --host 127.0.0.1 --port 4175 --strictPort",
     "test": "vitest run",

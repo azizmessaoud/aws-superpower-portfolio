@@ -6,7 +6,7 @@
 > aws-superpower-portfolio@0.1.0 content
 > tsx scripts/build-corpus.ts
 
-corpus: 22 passages
+corpus: 23 passages
 portfolio: 16 certifications, 4 smaller projects
 ┌─────────┬───────┬──────┬───────┬─────────────────────────────────────────────┬────────────────────────────────────────────────────┐
 │ (index) │ id    │ rank │ ok    │ top                                         │ question                                           │
@@ -22,7 +22,7 @@ portfolio: 16 certifications, 4 smaller projects
 │ 8       │ 'q09' │ 1    │ 'yes' │ 'fr-question, fr-p50'                       │ 'Does refreshing a page cause more traffic?'       │
 │ 9       │ 'q10' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy, pr-experience'   │ 'How do you process scanned documents?'            │
 │ 10      │ 'q11' │ 1    │ 'yes' │ 'hr-accuracy, hr-pipeline'                  │ 'What is the OCR accuracy on real documents?'      │
-│ 11      │ 'q12' │ 1    │ 'yes' │ 'hr-pipeline, hr-accuracy'                  │ 'Comment détectez-vous les anomalies dans les doc' │
+│ 11      │ 'q12' │ 1    │ 'yes' │ 'hr-pipeline'                               │ 'Comment détectez-vous les anomalies dans les doc' │
 │ 12      │ 'q13' │ 1    │ 'yes' │ 'hr-runtime'                                │ 'Does the HR system run in production with Postgr' │
 │ 13      │ 'q14' │ '-'  │ 'yes' │ ''                                          │ 'What is your favourite food?'                     │
 │ 14      │ 'q15' │ 1    │ 'yes' │ 'fr-method, fr-question, portfolio-weakest' │ 'How was the ranking model validated on new clien' │
@@ -37,5 +37,9 @@ portfolio: 16 certifications, 4 smaller projects
 │ 23      │ 'q24' │ 1    │ 'yes' │ 'tr-role'                                   │ 'wat did aziz buld in trafix'                      │
 │ 24      │ 'q25' │ 1    │ 'yes' │ 'tr-ambulance'                              │ 'did trafifx make ambulences faster'               │
 │ 25      │ 'q26' │ '-'  │ 'yes' │ ''                                          │ 'Does he have a PhD?'                              │
+│ 26      │ 'q27' │ 1    │ 'yes' │ 'rg-eval'                                   │ "How did the RAG assistant's retrieval perform on" │
+│ 27      │ 'q28' │ 1    │ 'yes' │ 'rg-eval'                                   │ 'What is the Hit@5 of the hybrid retrieval?'       │
+│ 28      │ 'q29' │ 1    │ 'yes' │ 'tr-role, pr-languages, pr-experience'      │ 'Did Aziz work on preventing hallucination?'       │
+│ 29      │ 'q30' │ 1    │ 'yes' │ 'tr-role, tr-ambulance, rg-eval'            │ "What was Aziz's part in TraffiX?"                 │
 └─────────┴───────┴──────┴───────┴─────────────────────────────────────────────┴────────────────────────────────────────────────────┘
-hit@1 0.96 · hit@3 1.00 · MRR 0.978 · answerable 23 · abstentions correct 3/3
+hit@1 0.96 · hit@3 1.00 · MRR 0.981 · answerable 27 · abstentions correct 3/3

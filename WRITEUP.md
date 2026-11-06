@@ -1,8 +1,8 @@
 # Ask Aziz: a portfolio that shows its work (draft for the Builder Center "Your project" entry)
 
-> Status 31 Oct 2026: built and tested locally; code public on GitHub; **hosted with AWS Amplify Hosting** (endpoint checked 2026-10-31). The Amplify console build ID and screenshot are **not captured yet**, so they are marked TODO below. Every `TODO` must be replaced with what actually happened. Don't list an AWS service that wasn't used.
+> Status 6 Nov 2026: built and tested locally; code public on GitHub; **hosted with AWS Amplify Hosting** (address checked 2026-11-06). The Amplify console build ID and screenshot are **not captured**, and this write-up does not claim them. Only AWS services that were actually used are listed.
 
-**Live site:** https://main.d3j3qw8xj45viu.amplifyapp.com/ (AWS Amplify Hosting, Region `eu-north-1`; address checked 2026-10-31, HTTP 200 and the full page rendered). TODO: add the Amplify build ID and console screenshot.
+**Live site:** https://main.d3j3qw8xj45viu.amplifyapp.com/ (AWS Amplify Hosting, Region `eu-north-1`; address checked 2026-11-06: HTTP 200, the page rendered in a real browser). Amplify build ID and console screenshot: not captured.
 **GitHub:** https://github.com/azizmessaoud/aws-superpower-portfolio
 
 ## Problem
@@ -33,7 +33,7 @@ The brain in the hero is built entirely from fibres. There is no solid surface a
 ```
 browser only (static site)
   content/*.yaml  --npm run build (validate, generate data)-->  src/generated/*.json
-  question --> src/assistant/answer.ts (intent routing + BM25 retriever over 22 passages, with typo tolerance)
+  question --> src/assistant/answer.ts (intent routing + BM25 retriever over 23 passages, with typo tolerance)
            --> Answer { outcome, answer, evidence[], limitations[] }
            --> hero panel and terminal (same engine), mind state --> Canvas scene
 
@@ -41,22 +41,24 @@ hosting: GitHub (main) --> AWS Amplify Hosting build (npm ci, npm run build) -->
 ```
 
 - No backend, no model, no network call while answering. `content/aws-status.yaml` is the one place AWS facts live; the build fails if it claims a deployment without a URL and an endpoint check, or a service without evidence.
-- **AWS services actually used: AWS Amplify Hosting only** (console GitHub connection, branch `main`, set up by me following the Day 4 guide). Planned and not built: Amazon API Gateway, AWS Lambda, Amazon Bedrock, S3 or Bedrock Knowledge Bases. If a backend is added later, the browser retriever stays as the fallback. AWS Budgets from Day 1 is account setup: TODO confirm and add a screenshot before listing it.
+- **AWS services actually used: AWS Amplify Hosting only** (console GitHub connection, branch `main`, set up by me following the Day 4 guide). Planned and not built: Amazon API Gateway, AWS Lambda, Amazon Bedrock, S3 or Bedrock Knowledge Bases. If a backend is added later, the browser retriever stays as the fallback. I do not claim an AWS Budgets alert or billing alarm: there is no evidence of one in this repository.
 
 ## What worked
 
 - Treating content as data with a validator: it caught a mismatched source anchor and a withheld metric quoted in a comment on its first run, and it now also guards the AWS claims (checked by editing the files to break each rule, then restoring them).
 - Separating "contradicted" from "not verified". My own test showed the difference matters: "Is TraffiX deployed in Tunis?" is a no (it is a simulation), "Does Aziz use Bedrock?" is "not verified".
-- Local checks on 29 Oct 2026, with logs in `reports/logs/`:
+- Local checks, re-run on 6 Nov 2026 unless the row says otherwise, with logs in `reports/logs/`:
 
 | Check | Result | Log |
 |---|---|---|
-| Vitest (answer engine, typos and recruiter questions, mind state, retrieval, terminal) | 83 passed | `vitest.txt` |
-| Playwright at 1280 and 390 px, incl. axe-core and the demo flow | 66 passed, 8 skipped by design | `playwright.txt` |
-| Content validation | passed (22 passages, 25 claims, 26 judged questions) | `validate.txt` |
-| Contrast, text and focus pairs from the tokens | 38 pass | `contrast.txt` |
-| Retrieval on 26 judged questions (incl. typos and recruiter questions) | hit@1 0.96, hit@3 1.00, MRR 0.978, 3 of 3 no-evidence questions refused | `retrieval-eval.txt` |
+| Vitest (answer engine, typos and recruiter questions, mind state, retrieval, terminal, 3D geometry) | 22 files, 314 tests passed. On this machine (about 2 to 4 GB of 16 GB free) 2 of 5 runs had a test worker run out of memory and did not finish; the other 3 runs passed. | `vitest.txt` |
+| Playwright at 1280 and 390 px, incl. axe-core and the demo flow | Full run: 180 passed, 23 skipped by design, 5 failed (17.3 min). Re-run one at a time, 4 of the 5 passed (the four were an out-of-memory worker crash, a screenshot timeout, and two assertions that timed out after 5 s; I did not find the cause of the last two). The fifth, "3D hero: hovering the brain... a click makes it fire", failed in all 4 runs here. When I sent the same pointer events by hand in a browser, the click fired and focus went to the question box, so I could not show a bug in the feature, and I did not find why the test fails. | `playwright.txt`, `playwright-rerun.txt` |
+| Content validation | passed (23 passages, 26 claims, 30 judged questions) | `validate.txt` |
+| Contrast, text and focus pairs from the tokens (29 Oct, not re-run) | 38 pass | `contrast.txt` |
+| Retrieval on 30 judged questions (27 answerable, 3 with no evidence; incl. typos and recruiter questions) | hit@1 0.96, hit@3 1.00, MRR 0.981, 3 of 3 no-evidence questions refused | `retrieval-eval.txt` |
 | Production build | passed | `build.txt` |
+
+`npm run e2e` could not start its web server on this Windows machine because `vite preview` listened only on IPv6 and the test waited on 127.0.0.1. I added `--host 127.0.0.1` to the `preview` script. The end-to-end build also ran out of memory until I raised Node's heap with `NODE_OPTIONS=--max-old-space-size=4096`.
 
 ## What failed
 
@@ -73,14 +75,16 @@ hosting: GitHub (main) --> AWS Amplify Hosting build (npm ci, npm run build) -->
 
 ## What I learned
 
-- My CVs disagree with my repositories (degree name, city, internship dates, one FlyRank metric, how autonomous the HR pipeline is). I built the site from the repositories and kept the conflicts off the page until I settle them.
+- My CV disagrees with the evidence this site uses. I built the site's answers from my repositories, not from the CV. The CV file is linked from Contact on the `redesign/on-main` branch; it is not on `main` yet. I compared the PDF with the site's passages on 6 Nov 2026 and found these differences:
+  - TraffiX: the CV says I "led" the control subsystem in a 6-person team and labels the project "Live"; the site says I was in the Control pair with Fares Ben Kacem, roles rotate, and the project is a simulation, not a deployment. The CV calls 116.3 s versus 144.1 s the "peak" wait; the site says mean wait in the morning peak, and that no difference is significant with three seeds.
+  - Administrative procedures assistant: the CV quotes only the development result (Hit@5 0.873 against 0.732 on 71 questions). On 20 held-out questions the hybrid scored 0.750, the same as dense search, and the team's report says part of the gain was overfitting.
+  - Dates and names: the CV gives both the Sopra HR Software and the FlyRank internships as Jul–Sep 2026, while the site withholds the FlyRank dates; the CV says "Engineering Degree in Data Science", the site says Data Science Engineering; the CV's profile says "production" AI/ML experience, while the site says the HR system is a demo with in-memory jobs.
+  - Figures that are not in this site's content and that I have not checked against the repositories: 32 features, 30K+ records, 286 chunks, 14 official sources, Mistral 7B.
 - A relevant-looking link is not evidence. Each answer cites the passage's own source and anchor, and a build file is not a deployment.
-- TODO: my own words on what surprised me and what was hard in each project (not written yet).
 
 ## What remains unproven
 
-- **The Amplify console record.** The address serves the site (checked 2026-10-31 through an external renderer), but I have no console build ID or AWS screenshots yet. Live checks of security headers, every link and the demo flow in a private window are NOT RUN against the final build.
-- **Frame rate and smoothness on real phones and laptops.** Everything about the 3D hero was verified in a browser with software WebGL. Bundle size (137 kB gzip for the 3D chunk) and transfer size (407 kB / 155 kB) are measured; frame timing on real GPUs is not.
+- **The Amplify console record.** The address serves the site (checked 2026-11-06 with curl and in a real browser: HTTP 200, all sections rendered, no horizontal overflow at 1280 and 390 px, one question answered, CSP, HSTS and nosniff headers present), but I have no console build ID or AWS screenshots. Every outbound link and a private-window run of the full demo flow have NOT been checked against the final build.- **Frame rate and smoothness on real phones and laptops.** Everything about the 3D hero was verified in a browser with software WebGL. Bundle size (137 kB gzip for the 3D chunk) and transfer size (407 kB / 155 kB) are measured; frame timing on real GPUs is not.
 - The retrieval score is optimistic: I wrote both the judged questions and the passage tags. Nobody else has tested it.
 - Passage text and certification links were copied from my repositories and earlier portfolio on 28-29 Oct 2026 and have not been re-checked at the issuers since.
 - The page-wide motion cannot be stopped by the visitor, and the manual keyboard and screen-reader audit from 28 Oct has not been repeated on the new hero.

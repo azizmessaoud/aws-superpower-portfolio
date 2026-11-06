@@ -1,80 +1,366 @@
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
 
-Running 74 tests using 2 workers
+Running 208 tests using 2 workers
 
-  ✓   2 [mobile] › tests/e2e/site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow (4.3s)
-  ✓   1 [desktop] › tests/e2e/site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow (4.6s)
-  ✓   3 [mobile] › tests/e2e/site.spec.ts:35:1 › full page renders without horizontal overflow (2.6s)
-  ✓   4 [desktop] › tests/e2e/site.spec.ts:35:1 › full page renders without horizontal overflow (3.2s)
-  ✓   5 [mobile] › tests/e2e/site.spec.ts:44:1 › scene stops while the hero is offscreen (2.1s)
-  ✓   6 [desktop] › tests/e2e/site.spec.ts:44:1 › scene stops while the hero is offscreen (2.1s)
-  ✓   7 [mobile] › tests/e2e/site.spec.ts:56:3 › reduced motion › one still frame, no pinning, no pause button, content visible (1.8s)
-  ✓   8 [desktop] › tests/e2e/site.spec.ts:56:3 › reduced motion › one still frame, no pinning, no pause button, content visible (1.8s)
-  ✓  10 [desktop] › tests/e2e/site.spec.ts:68:1 › terminal explorer: evidence with links, honest no-result, suggestions (1.6s)
-  ✓   9 [mobile] › tests/e2e/site.spec.ts:68:1 › terminal explorer: evidence with links, honest no-result, suggestions (2.6s)
-  ✓  11 [desktop] › tests/e2e/site.spec.ts:87:1 › the about section shows my portrait with a text alternative (887ms)
-  ✓  12 [mobile] › tests/e2e/site.spec.ts:87:1 › the about section shows my portrait with a text alternative (820ms)
-  ✓  13 [desktop] › tests/e2e/site.spec.ts:95:1 › there is no pause button; reduced motion is still honoured by the media query (496ms)
-  ✓  14 [mobile] › tests/e2e/site.spec.ts:95:1 › there is no pause button; reduced motion is still honoured by the media query (527ms)
-  ✓  16 [mobile] › tests/e2e/site.spec.ts:100:1 › certifications link out to each issuer (544ms)
-  ✓  15 [desktop] › tests/e2e/site.spec.ts:100:1 › certifications link out to each issuer (627ms)
-  -  17 [mobile] › tests/e2e/site.spec.ts:109:1 › keyboard focus is always visible
-  ✓  18 [desktop] › tests/e2e/site.spec.ts:109:1 › keyboard focus is always visible (1.0s)
-  -  20 [desktop] › tests/e2e/site.spec.ts:123:1 › mobile menu opens, closes with Escape and returns focus
-  -  21 [desktop] › tests/e2e/site.spec.ts:139:1 › touch drag on the hero scrolls the page
-  ✓  19 [mobile] › tests/e2e/site.spec.ts:123:1 › mobile menu opens, closes with Escape and returns focus (1.3s)
-  ✓  23 [mobile] › tests/e2e/site.spec.ts:139:1 › touch drag on the hero scrolls the page (1.2s)
-  ✓  22 [desktop] › tests/e2e/site.spec.ts:150:1 › no layout shift while loading (2.7s)
-  ✓  24 [mobile] › tests/e2e/site.spec.ts:150:1 › no layout shift while loading (2.7s)
-  ✓  25 [desktop] › tests/e2e/site.spec.ts:160:1 › axe-core: no serious or critical violations (5.8s)
-  ✓  27 [desktop] › tests/e2e/site.spec.ts:172:1 › hero text is readable within 800 ms (the intro never hides it for long) (1.2s)
-  ✓  26 [mobile] › tests/e2e/site.spec.ts:160:1 › axe-core: no serious or critical violations (5.7s)
-  ✓  29 [mobile] › tests/e2e/site.spec.ts:172:1 › hero text is readable within 800 ms (the intro never hides it for long) (1.1s)
-  ✓  28 [desktop] › tests/e2e/site.spec.ts:179:1 › runs under the production CSP from customHttp.yml without violations (1.9s)
-  ✓  30 [mobile] › tests/e2e/site.spec.ts:179:1 › runs under the production CSP from customHttp.yml without violations (1.9s)
-  ✓  31 [desktop] › tests/e2e/site.spec.ts:201:1 › the brain docks into the nav's Terminal Explorer link; it is a keyboard-reachable hint (3.1s)
-  ✓  32 [mobile] › tests/e2e/site.spec.ts:201:1 › the brain docks into the nav's Terminal Explorer link; it is a keyboard-reachable hint (3.0s)
-  ✓  33 [desktop] › tests/e2e/site.spec.ts:226:3 › reduced motion dock › still brain docks once the hero leaves; nothing loops (1.8s)
-  ✓  34 [mobile] › tests/e2e/site.spec.ts:226:3 › reduced motion dock › still brain docks once the hero leaves; nothing loops (1.7s)
-  ✓  35 [desktop] › tests/e2e/site.spec.ts:238:1 › the docked brain is actually drawn inside its socket (2.1s)
-  ✓  37 [desktop] › tests/e2e/site.spec.ts:252:1 › skip link is visible whenever it has focus, even after wrapping from the page end (558ms)
-  ✓  36 [mobile] › tests/e2e/site.spec.ts:238:1 › the docked brain is actually drawn inside its socket (2.1s)
-  ✓  39 [mobile] › tests/e2e/site.spec.ts:252:1 › skip link is visible whenever it has focus, even after wrapping from the page end (601ms)
-  ✓  38 [desktop] › tests/e2e/site.spec.ts:261:1 › terminal explorer: keyboard, suggestions, history, no Tab trap, evidence links (1.8s)
-  ✓  40 [mobile] › tests/e2e/site.spec.ts:261:1 › terminal explorer: keyboard, suggestions, history, no Tab trap, evidence links (1.2s)
-  ✓  41 [desktop] › tests/e2e/site.spec.ts:283:1 › tech superpowers: seven cards, every evidenced card links to a repository (911ms)
-  ✓  42 [mobile] › tests/e2e/site.spec.ts:283:1 › tech superpowers: seven cards, every evidenced card links to a repository (838ms)
-  ✓  43 [desktop] › tests/e2e/site.spec.ts:293:1 › the neural field fills the whole hero background, not only the sphere (2.2s)
-  ✓  44 [mobile] › tests/e2e/site.spec.ts:293:1 › the neural field fills the whole hero background, not only the sphere (2.3s)
-  ✓  45 [desktop] › tests/e2e/site.spec.ts:305:1 › the network flows behind the hero text instead of stopping at a box around it (3.3s)
-  ✓  46 [mobile] › tests/e2e/site.spec.ts:305:1 › the network flows behind the hero text instead of stopping at a box around it (3.3s)
-  ✓  47 [desktop] › tests/e2e/site.spec.ts:327:1 › stopping the scroll mid-way never leaves the brain hanging: it finishes the flight (2.0s)
-  ✓  48 [mobile] › tests/e2e/site.spec.ts:327:1 › stopping the scroll mid-way never leaves the brain hanging: it finishes the flight (2.1s)
-  -  50 [mobile] › tests/e2e/site.spec.ts:339:1 › clicking on the hero text still sends a pulse through the network
-  ✓  51 [mobile] › tests/e2e/site.spec.ts:354:1 › the terminal understands a plain question about certifications (1.1s)
-  ✓  49 [desktop] › tests/e2e/site.spec.ts:339:1 › clicking on the hero text still sends a pulse through the network (2.0s)
-  ✓  52 [mobile] › tests/e2e/site.spec.ts:369:1 › every project ends with the same four-part label (554ms)
-  ✓  54 [mobile] › tests/e2e/site.spec.ts:387:1 › hero: the first screen says what the site is and offers the question box (524ms)
-  -  55 [mobile] › tests/e2e/site.spec.ts:395:1 › demo flow: the mind follows the question lifecycle and every answer shows its evidence
-  ✓  53 [desktop] › tests/e2e/site.spec.ts:354:1 › the terminal understands a plain question about certifications (1.6s)
-  ✓  57 [desktop] › tests/e2e/site.spec.ts:369:1 › every project ends with the same four-part label (614ms)
-  ✓  58 [desktop] › tests/e2e/site.spec.ts:387:1 › hero: the first screen says what the site is and offers the question box (561ms)
-  ✓  56 [mobile] › tests/e2e/site.spec.ts:438:1 › the question box refuses over-long input and answers each outcome with its own label (3.3s)
-  ✓  60 [mobile] › tests/e2e/site.spec.ts:448:1 › hero keeps the whole panel inside the viewport (desktop, laptop and phone) (7.6s)
-  ✓  61 [mobile] › tests/e2e/site.spec.ts:464:3 › reduced motion: the state is still readable as text › question, status line and answer work without animation (694ms)
-  -  62 [mobile] › tests/e2e/site.spec.ts:473:1 › keyboard: Tab reaches the question box, samples and answer; Enter submits
-  ✓  63 [mobile] › tests/e2e/site.spec.ts:486:1 › refresh and hash links land on the right section (1.4s)
-  ✓  64 [mobile] › tests/e2e/site.spec.ts:495:1 › the AWS section says not deployed and lists services as planned only (529ms)
-  -  65 [mobile] › tests/e2e/site.spec.ts:505:1 › interacting with the animation never highlights the hero text, but the question box stays selectable
-  -  66 [mobile] › tests/e2e/site.spec.ts:517:1 › the question box understands typos and a recruiter's questions
-  ✓  59 [desktop] › tests/e2e/site.spec.ts:395:1 › demo flow: the mind follows the question lifecycle and every answer shows its evidence (12.9s)
-  ✓  67 [desktop] › tests/e2e/site.spec.ts:438:1 › the question box refuses over-long input and answers each outcome with its own label (3.4s)
-  ✓  68 [desktop] › tests/e2e/site.spec.ts:448:1 › hero keeps the whole panel inside the viewport (desktop, laptop and phone) (7.4s)
-  ✓  69 [desktop] › tests/e2e/site.spec.ts:464:3 › reduced motion: the state is still readable as text › question, status line and answer work without animation (846ms)
-  ✓  70 [desktop] › tests/e2e/site.spec.ts:473:1 › keyboard: Tab reaches the question box, samples and answer; Enter submits (1.9s)
-  ✓  71 [desktop] › tests/e2e/site.spec.ts:486:1 › refresh and hash links land on the right section (1.6s)
-  ✓  72 [desktop] › tests/e2e/site.spec.ts:495:1 › the AWS section says not deployed and lists services as planned only (575ms)
-  ✓  73 [desktop] › tests/e2e/site.spec.ts:505:1 › interacting with the animation never highlights the hero text, but the question box stays selectable (2.0s)
-  ✓  74 [desktop] › tests/e2e/site.spec.ts:517:1 › the question box understands typos and a recruiter's questions (9.5s)
+  ok   1 [desktop] › tests\e2e\lookup-states.spec.ts:18:1 › while the lookup runs, a skeleton stands in for the answer, and it is gone once the answer arrives (11.1s)
 
-  8 skipped
-  66 passed (1.6m)
+<--- Last few GCs --->
+
+[21868:0000021D5032E000]    29502 ms: Scavenge 58.1 (62.6) -> 57.3 (62.6) MB, pooled: 1 MB, 25.32 / 0.00 ms  (average mu = 0.997, current mu = 0.997) task; 
+[21868:0000021D5032E000]    29568 ms: Scavenge 59.1 (62.6) -> 58.0 (64.6) MB, pooled: 0 MB, 8.68 / 0.00 ms  (average mu = 0.997, current mu = 0.997) allocation failure; 
+[21868:0000021D5032E000]    29645 ms: Scavenge 61.5 (64.6) -> 59.3 (67.6) MB, pooled: 0 MB, 23.50 / 0.00 ms  (average mu = 0.997, current mu = 0.997) allocation failure; 
+
+FATAL ERROR: Zone Allocation failed - process out of memory
+----- Native stack trace -----
+
+  ok   3 [desktop] › tests\e2e\lookup-states.spec.ts:28:1 › a lookup that throws shows a failure card apart from 'Not verified', and keeps the question (15.4s)
+ 1: 00007FF7D7EC50BF 
+ 2: 00007FF7D6AEDD27 
+ 3: 00007FF7D6465BC6 
+ 4: 00007FF7D6022006 
+ 5: 00007FF7D6021F47 
+ 6: 00007FF7D780F383 
+ 7: 00007FF7D7816A70 
+ 8: 00007FF7D78167CB 
+ 9: 00007FF7D7829656 
+10: 00007FF7D7855280 
+11: 00007FF7D7815A6E 
+12: 00007FF7D78123DA 
+13: 00007FF7D780EF57 
+14: 00007FF7D780EAC9 
+15: 00007FF7D780E584 
+16: 00007FF7D780D9DF 
+17: 00007FF7D780D65E 
+18: 00007FF7D74FBFE6 
+19: 00007FF7D74F3198 
+20: 00007FF7D74F26A0 
+21: 00007FF7D6A619DF 
+22: 00007FF7D6A26A2D 
+23: 00007FF7D6A26725 
+24: 00007FF7D72DF2CF 
+25: 00007FF7D7E0954B 
+26: 00007FF7D6B43136 
+27: 00007FF7D82035B3 
+28: 00007FF880D6DDA7 BaseThreadInitThunk+23
+29: 00007FF88243EE4C 
+  x    4 [desktop] › tests\e2e\lookup-states.spec.ts:39:1 › retry repeats the question exactly once and lands on the answer, with focus on it (0ms)
+  ok   5 [desktop] › tests\e2e\lookup-states.spec.ts:49:1 › an answer with its source stripped is refused, never shown (7.3s)
+  ok   6 [desktop] › tests\e2e\lookup-states.spec.ts:56:1 › malformed data is refused too (11.2s)
+  ok   7 [desktop] › tests\e2e\lookup-states.spec.ts:62:1 › a slow lookup says so and offers Cancel; cancelling keeps the question in the box (12.4s)
+  ok   8 [desktop] › tests\e2e\lookup-states.spec.ts:76:1 › Escape cancels a lookup in flight (11.8s)
+  ok   9 [desktop] › tests\e2e\lookup-states.spec.ts:85:1 › a lookup that never answers ends as a timeout, not as endless loading (11.3s)
+  ok  10 [desktop] › tests\e2e\lookup-states.spec.ts:92:1 › the public build has no fault injector: the same URL changes nothing (10.4s)
+  x    2 [desktop] › tests\e2e\site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow (1.5m)
+  ok  11 [mobile] › tests\e2e\lookup-states.spec.ts:18:1 › while the lookup runs, a skeleton stands in for the answer, and it is gone once the answer arrives (3.5s)
+  ok  13 [mobile] › tests\e2e\lookup-states.spec.ts:28:1 › a lookup that throws shows a failure card apart from 'Not verified', and keeps the question (7.6s)
+  ok  14 [mobile] › tests\e2e\lookup-states.spec.ts:39:1 › retry repeats the question exactly once and lands on the answer, with focus on it (9.5s)
+  ok  15 [mobile] › tests\e2e\lookup-states.spec.ts:49:1 › an answer with its source stripped is refused, never shown (10.1s)
+  ok  12 [desktop] › tests\e2e\site.spec.ts:35:1 › full page renders without horizontal overflow (33.4s)
+  ok  16 [mobile] › tests\e2e\lookup-states.spec.ts:56:1 › malformed data is refused too (6.9s)
+  ok  17 [desktop] › tests\e2e\site.spec.ts:44:1 › scene stops while the hero is offscreen (11.0s)
+  ok  18 [mobile] › tests\e2e\lookup-states.spec.ts:62:1 › a slow lookup says so and offers Cancel; cancelling keeps the question in the box (8.9s)
+  ok  20 [mobile] › tests\e2e\lookup-states.spec.ts:76:1 › Escape cancels a lookup in flight (3.0s)
+  ok  19 [desktop] › tests\e2e\site.spec.ts:56:3 › reduced motion › one still frame, no pinning, no pause button, content visible (5.3s)
+  ok  21 [mobile] › tests\e2e\lookup-states.spec.ts:85:1 › a lookup that never answers ends as a timeout, not as endless loading (5.8s)
+  ok  23 [mobile] › tests\e2e\lookup-states.spec.ts:92:1 › the public build has no fault injector: the same URL changes nothing (6.5s)
+  ok  22 [desktop] › tests\e2e\site.spec.ts:68:1 › command line: evidence with links, honest no-result, suggestions (21.8s)
+  ok  24 [mobile] › tests\e2e\site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow (18.4s)
+  ok  25 [desktop] › tests\e2e\site.spec.ts:87:1 › the about section shows my portrait with a text alternative (10.3s)
+  ok  27 [desktop] › tests\e2e\site.spec.ts:95:1 › there is no pause button; reduced motion is still honoured by the media query (4.4s)
+  ok  28 [desktop] › tests\e2e\site.spec.ts:100:1 › certifications link out to each issuer (2.6s)
+  ok  29 [desktop] › tests\e2e\site.spec.ts:109:1 › keyboard focus is always visible (6.4s)
+  ok  26 [mobile] › tests\e2e\site.spec.ts:35:1 › full page renders without horizontal overflow (16.7s)
+  -   30 [desktop] › tests\e2e\site.spec.ts:123:1 › mobile menu opens, closes with Escape and returns focus
+  -   32 [desktop] › tests\e2e\site.spec.ts:139:1 › touch drag on the hero scrolls the page
+  ok  31 [mobile] › tests\e2e\site.spec.ts:44:1 › scene stops while the hero is offscreen (3.6s)
+  ok  33 [desktop] › tests\e2e\site.spec.ts:150:1 › no layout shift while loading (6.3s)
+  ok  34 [mobile] › tests\e2e\site.spec.ts:56:3 › reduced motion › one still frame, no pinning, no pause button, content visible (3.7s)
+  ok  36 [mobile] › tests\e2e\site.spec.ts:68:1 › command line: evidence with links, honest no-result, suggestions (9.2s)
+  ok  37 [mobile] › tests\e2e\site.spec.ts:87:1 › the about section shows my portrait with a text alternative (8.9s)
+  ok  38 [mobile] › tests\e2e\site.spec.ts:95:1 › there is no pause button; reduced motion is still honoured by the media query (1.3s)
+  ok  39 [mobile] › tests\e2e\site.spec.ts:100:1 › certifications link out to each issuer (2.2s)
+  -   40 [mobile] › tests\e2e\site.spec.ts:109:1 › keyboard focus is always visible
+  ok  35 [desktop] › tests\e2e\site.spec.ts:160:1 › axe-core: no serious or critical violations (29.9s)
+  ok  42 [desktop] › tests\e2e\site.spec.ts:172:1 › hero text is readable within 800 ms (the intro never hides it for long) (4.0s)
+  ok  41 [mobile] › tests\e2e\site.spec.ts:123:1 › mobile menu opens, closes with Escape and returns focus (9.3s)
+  ok  44 [mobile] › tests\e2e\site.spec.ts:139:1 › touch drag on the hero scrolls the page (4.5s)
+  ok  43 [desktop] › tests\e2e\site.spec.ts:179:1 › runs under the production CSP from customHttp.yml without violations (6.6s)
+  ok  45 [mobile] › tests\e2e\site.spec.ts:150:1 › no layout shift while loading (4.9s)
+  ok  47 [mobile] › tests\e2e\site.spec.ts:160:1 › axe-core: no serious or critical violations (13.1s)
+  ok  48 [mobile] › tests\e2e\site.spec.ts:172:1 › hero text is readable within 800 ms (the intro never hides it for long) (3.1s)
+  ok  46 [desktop] › tests\e2e\site.spec.ts:201:1 › the brain docks into the nav's Ask Aziz link; it is a keyboard-reachable hint (22.1s)
+  ok  49 [mobile] › tests\e2e\site.spec.ts:179:1 › runs under the production CSP from customHttp.yml without violations (4.9s)
+  ok  50 [desktop] › tests\e2e\site.spec.ts:226:3 › reduced motion dock › still brain docks once the hero leaves; nothing loops (5.5s)
+  ok  51 [mobile] › tests\e2e\site.spec.ts:201:1 › the brain docks into the nav's Ask Aziz link; it is a keyboard-reachable hint (5.2s)
+  ok  53 [mobile] › tests\e2e\site.spec.ts:226:3 › reduced motion dock › still brain docks once the hero leaves; nothing loops (2.6s)
+  ok  52 [desktop] › tests\e2e\site.spec.ts:238:1 › the docked brain is actually drawn inside its socket (5.3s)
+  ok  54 [mobile] › tests\e2e\site.spec.ts:238:1 › the docked brain is actually drawn inside its socket (2.2s)
+  ok  55 [desktop] › tests\e2e\site.spec.ts:253:1 › skip link is visible whenever it has focus, even after wrapping from the page end (1.2s)
+  ok  56 [mobile] › tests\e2e\site.spec.ts:253:1 › skip link is visible whenever it has focus, even after wrapping from the page end (1.1s)
+  ok  58 [mobile] › tests\e2e\site.spec.ts:262:1 › command line: keyboard, suggestions, history, no Tab trap, evidence links (7.1s)
+  ok  59 [mobile] › tests\e2e\site.spec.ts:284:1 › tech superpowers: seven cards, every evidenced card links to a repository (2.9s)
+  ok  60 [mobile] › tests\e2e\site.spec.ts:295:1 › 2D hero: the neural field fills the whole hero background, not only the sphere (4.0s)
+  ok  57 [desktop] › tests\e2e\site.spec.ts:262:1 › command line: keyboard, suggestions, history, no Tab trap, evidence links (15.1s)
+  ok  61 [mobile] › tests\e2e\site.spec.ts:307:1 › 2D hero: the network flows behind the hero text instead of stopping at a box around it (4.8s)
+  ok  62 [desktop] › tests\e2e\site.spec.ts:284:1 › tech superpowers: seven cards, every evidenced card links to a repository (5.7s)
+  ok  63 [mobile] › tests\e2e\site.spec.ts:329:1 › stopping the scroll mid-way never leaves the brain hanging: it finishes the flight (2.3s)
+  -   65 [mobile] › tests\e2e\site.spec.ts:341:1 › 2D hero: clicking on the hero text still sends a pulse through the network
+  ok  64 [desktop] › tests\e2e\site.spec.ts:295:1 › 2D hero: the neural field fills the whole hero background, not only the sphere (5.1s)
+  ok  66 [mobile] › tests\e2e\site.spec.ts:366:1 › the terminal understands a plain question about certifications (3.3s)
+  ok  68 [mobile] › tests\e2e\site.spec.ts:381:1 › every project ends with the same four-part label (1.4s)
+  ok  69 [mobile] › tests\e2e\site.spec.ts:400:1 › hero: the first screen says what the site is and offers the question box (1.4s)
+  -   70 [mobile] › tests\e2e\site.spec.ts:408:1 › demo flow: the mind follows the question lifecycle and every answer shows its evidence
+  ok  71 [mobile] › tests\e2e\site.spec.ts:452:1 › the question box refuses over-long input and answers each outcome with its own label (4.2s)
+  ok  67 [desktop] › tests\e2e\site.spec.ts:307:1 › 2D hero: the network flows behind the hero text instead of stopping at a box around it (8.1s)
+  ok  73 [desktop] › tests\e2e\site.spec.ts:329:1 › stopping the scroll mid-way never leaves the brain hanging: it finishes the flight (4.2s)
+  ok  74 [desktop] › tests\e2e\site.spec.ts:341:1 › 2D hero: clicking on the hero text still sends a pulse through the network (8.1s)
+  x   72 [mobile] › tests\e2e\site.spec.ts:462:1 › hero keeps the whole panel inside the viewport (desktop, laptop and phone) (15.6s)
+  ok  76 [mobile] › tests\e2e\site.spec.ts:478:3 › reduced motion: the state is still readable as text › question, status line and answer work without animation (2.9s)
+  -   77 [mobile] › tests\e2e\site.spec.ts:497:1 › keyboard: Tab reaches the question box, samples and answer; Enter submits
+  ok  75 [desktop] › tests\e2e\site.spec.ts:366:1 › the terminal understands a plain question about certifications (12.4s)
+  ok  78 [mobile] › tests\e2e\site.spec.ts:510:1 › refresh and hash links land on the right section (7.6s)
+  ok  80 [mobile] › tests\e2e\site.spec.ts:519:1 › the AWS section records the Amplify deployment and lists the other services as planned only (1.3s)
+  -   81 [mobile] › tests\e2e\site.spec.ts:534:1 › interacting with the animation never highlights the hero text, but the question box stays selectable
+  -   82 [mobile] › tests\e2e\site.spec.ts:546:1 › the question box understands typos and a recruiter's questions
+  ok  83 [mobile] › tests\e2e\site.spec.ts:567:1 › hero: name, direction, PFE availability and two distinct actions are on the first screen (871ms)
+  ok  79 [desktop] › tests\e2e\site.spec.ts:381:1 › every project ends with the same four-part label (16.8s)
+  ok  84 [mobile] › tests\e2e\site.spec.ts:576:1 › selected work: three flagships, each with a result, a caveat and a working link to its case study (11.2s)
+  ok  85 [desktop] › tests\e2e\site.spec.ts:400:1 › hero: the first screen says what the site is and offers the question box (2.4s)
+  ok  86 [mobile] › tests\e2e\site.spec.ts:598:1 › each case study opens with result, caveat and boundary before the long text (8.2s)
+  ok  87 [desktop] › tests\e2e\site.spec.ts:408:1 › demo flow: the mind follows the question lifecycle and every answer shows its evidence (18.3s)
+  ok  88 [mobile] › tests\e2e\site.spec.ts:612:1 › an answer links to its case study; an answer about AWS does not pretend to be a project (12.6s)
+  ok  89 [desktop] › tests\e2e\site.spec.ts:452:1 › the question box refuses over-long input and answers each outcome with its own label (10.1s)
+  ok  90 [mobile] › tests\e2e\site.spec.ts:626:1 › the four result states are labelled in words, and an empty question gets a message, not silence (11.6s)
+  ok  92 [mobile] › tests\e2e\site.spec.ts:644:1 › failure mode: if the animation chunk never loads, the page and the question box still work (3.2s)
+  ok  93 [mobile] › tests\e2e\site.spec.ts:657:1 › failure mode: without JavaScript the visitor is told where the evidence is (1.6s)
+  ok  94 [mobile] › tests\e2e\site.spec.ts:668:1 › the name stays on the first screen even on a short laptop window; only the secondary line yields (1.9s)
+  ok  95 [mobile] › tests\e2e\site.spec.ts:677:1 › sample questions are at least 44 px tall on phones, so they are easy to tap (3.8s)
+  -   96 [mobile] › tests\e2e\site.spec.ts:690:1 › Selected work: kicker, title, result, caveat and links line up across the three cards on desktop
+  ok  97 [mobile] › tests\e2e\site.spec.ts:704:1 › Selected work: the main action is a button-weight link of at least 44 px, the proof link is secondary (2.2s)
+  -   98 [mobile] › tests\e2e\site.spec.ts:712:1 › case studies use one measure on desktop: the Result block, the figures and the label share the column
+  ok  99 [mobile] › tests\e2e\site.spec.ts:726:1 › mobile menu: opaque and blurred, so headline text does not ghost through; items are 44 px tall (2.4s)
+  ok  91 [desktop] › tests\e2e\site.spec.ts:462:1 › hero keeps the whole panel inside the viewport (desktop, laptop and phone) (20.0s)
+  -  100 [mobile] › tests\e2e\site.spec.ts:738:1 › nav: the active section follows the page, and keyboard focus shows a visible ring
+  ok 102 [mobile] › tests\e2e\site.spec.ts:751:1 › results table on a 320 px phone: each row stacks, numbers stay with their units, columns line up, table roles are kept (1.4s)
+  ok 101 [desktop] › tests\e2e\site.spec.ts:478:3 › reduced motion: the state is still readable as text › question, status line and answer work without animation (1.7s)
+  ok 103 [mobile] › tests\e2e\site.spec.ts:776:1 › 3D hero: on by default, it draws real light, and the tier follows the window (5.1s)
+  ok 104 [desktop] › tests\e2e\site.spec.ts:497:1 › keyboard: Tab reaches the question box, samples and answer; Enter submits (5.2s)
+  ok 105 [mobile] › tests\e2e\site.spec.ts:788:1 › 3D hero: the canvas is below the hero text in z-order and clear of every line of text on desktop (5.5s)
+  ok 107 [mobile] › tests\e2e\site.spec.ts:813:1 › 3D hero: a phone gets the lighter asset, and the brain sits below the text (2.2s)
+  ok 108 [mobile] › tests\e2e\site.spec.ts:829:1 › 3D hero: ?tier=full asks for the full asset, and it arrives gzipped (about 400 kB, not megabytes) (2.1s)
+  ok 106 [desktop] › tests\e2e\site.spec.ts:510:1 › refresh and hash links land on the right section (11.0s)
+  ok 109 [mobile] › tests\e2e\site.spec.ts:840:1 › 3D hero fallback: if the asset cannot be fetched, the 2D hero returns and the page still works (1.9s)
+  ok 110 [desktop] › tests\e2e\site.spec.ts:519:1 › the AWS section records the Amplify deployment and lists the other services as planned only (1.4s)
+  ok 111 [mobile] › tests\e2e\site.spec.ts:853:1 › 3D hero fallback: with no WebGL2 the 2D hero is used from the start, with no 3D download (2.3s)
+  ok 112 [desktop] › tests\e2e\site.spec.ts:534:1 › interacting with the animation never highlights the hero text, but the question box stays selectable (4.5s)
+  ok 113 [mobile] › tests\e2e\site.spec.ts:867:1 › 3D hero fallback: ?hero=canvas forces the 2D hero (3.4s)
+  ok 115 [mobile] › tests\e2e\site.spec.ts:874:1 › 3D hero fallback: if the GPU context is lost, the 2D hero takes over (2.6s)
+  ok 116 [mobile] › tests\e2e\site.spec.ts:883:1 › 3D hero: reduced motion draws a still and runs no animation loop (3.5s)
+  ok 117 [mobile] › tests\e2e\site.spec.ts:897:1 › 3D hero: it stops rendering once the hero is scrolled away, and starts again when you return (12.9s)
+  x  114 [desktop] › tests\e2e\site.spec.ts:546:1 › the question box understands typos and a recruiter's questions (20.3s)
+  ok 118 [mobile] › tests\e2e\site.spec.ts:911:1 › 3D hero: the headline, name, actions and question box are all there with the animation switched off (683ms)
+  ok 120 [desktop] › tests\e2e\site.spec.ts:567:1 › hero: name, direction, PFE availability and two distinct actions are on the first screen (2.6s)
+  ok 119 [mobile] › tests\e2e\site.spec.ts:920:1 › 3D hero works under the production Content-Security-Policy and headers (customHttp.yml), with no violations (4.0s)
+  ok 122 [mobile] › tests\e2e\site.spec.ts:946:1 › projects: three short cards; a case study opens only when chosen; closing it returns focus to its card (4.0s)
+  ok 123 [mobile] › tests\e2e\site.spec.ts:968:1 › selected work: each card is a figure, its caption and a short caveat, not a paragraph (3.0s)
+  ok 121 [desktop] › tests\e2e\site.spec.ts:576:1 › selected work: three flagships, each with a result, a caveat and a working link to its case study (11.1s)
+  ok 124 [mobile] › tests\e2e\site.spec.ts:977:1 › a whole card is the link: clicking its empty corner opens the case study (5.8s)
+  ok 126 [mobile] › tests\e2e\site.spec.ts:987:1 › a link to a case study works on first load and opens that study in view (2.8s)
+  ok 127 [mobile] › tests\e2e\site.spec.ts:994:1 › the small picture on each card matches the numbers in its case study, and is hidden from screen readers (838ms)
+  -  128 [mobile] › tests\e2e\site.spec.ts:1000:1 › hover: a card lifts, its border lights, and a nav link underlines
+  -  129 [mobile] › tests\e2e\site.spec.ts:1018:1 › hover with reduced motion: the border changes and nothing moves
+  ok 125 [desktop] › tests\e2e\site.spec.ts:598:1 › each case study opens with result, caveat and boundary before the long text (12.3s)
+  ok 131 [desktop] › tests\e2e\site.spec.ts:612:1 › an answer links to its case study; an answer about AWS does not pretend to be a project (14.8s)
+  ok 130 [mobile] › tests\e2e\site.spec.ts:1032:1 › each opened case study passes axe and does not overflow, at 1280 and at 320 px (25.6s)
+  ok 133 [mobile] › tests\e2e\site.spec.ts:1050:1 › Ask Aziz: a project question gets that project's own answer, as a short list with trust chips and follow-ups (6.1s)
+  ok 132 [desktop] › tests\e2e\site.spec.ts:626:1 › the four result states are labelled in words, and an empty question gets a message, not silence (15.7s)
+  ok 134 [mobile] › tests\e2e\site.spec.ts:1066:1 › Ask Aziz: a follow-up chip asks the next question and the card updates (6.1s)
+  ok 135 [desktop] › tests\e2e\site.spec.ts:644:1 › failure mode: if the animation chunk never loads, the page and the question box still work (6.7s)
+  ok 136 [mobile] › tests\e2e\site.spec.ts:1077:1 › Ask Aziz: when the evidence disagrees with the question, the card says so in one plain line before the facts (4.0s)
+  ok 137 [desktop] › tests\e2e\site.spec.ts:657:1 › failure mode: without JavaScript the visitor is told where the evidence is (694ms)
+  ok 138 [mobile] › tests\e2e\site.spec.ts:1088:1 › Ask Aziz says what it is: looked up in checked evidence, not generated; no 'Terminal Explorer' name is left on the page (2.4s)
+  ok 139 [desktop] › tests\e2e\site.spec.ts:668:1 › the name stays on the first screen even on a short laptop window; only the secondary line yields (2.4s)
+  ok 140 [mobile] › tests\e2e\site.spec.ts:1098:1 › the Ask button shows that it is working, and keeps its accessible name (2.5s)
+  ok 141 [desktop] › tests\e2e\site.spec.ts:677:1 › sample questions are at least 44 px tall on phones, so they are easy to tap (3.9s)
+  ok 142 [mobile] › tests\e2e\site.spec.ts:1118:1 › the answer card eases in, and not at all with reduced motion (3.4s)
+  -  144 [mobile] › tests\e2e\site.spec.ts:1127:1 › every control answers the pointer, is big enough and shows a focus ring (scripts/audit-controls.cjs, desktop and phone)
+  -  145 [mobile] › tests\e2e\site.spec.ts:1138:1 › 3D hero: the brain turns toward the pointer and leans in as it comes close; with reduced motion it stays still
+  ok 143 [desktop] › tests\e2e\site.spec.ts:690:1 › Selected work: kicker, title, result, caveat and links line up across the three cards on desktop (3.6s)
+  ok 147 [desktop] › tests\e2e\site.spec.ts:704:1 › Selected work: the main action is a button-weight link of at least 44 px, the proof link is secondary (2.0s)
+  ok 148 [desktop] › tests\e2e\site.spec.ts:712:1 › case studies use one measure on desktop: the Result block, the figures and the label share the column (2.0s)
+  -  149 [desktop] › tests\e2e\site.spec.ts:726:1 › mobile menu: opaque and blurred, so headline text does not ghost through; items are 44 px tall
+  ok 150 [desktop] › tests\e2e\site.spec.ts:738:1 › nav: the active section follows the page, and keyboard focus shows a visible ring (4.2s)
+  ok 151 [desktop] › tests\e2e\site.spec.ts:751:1 › results table on a 320 px phone: each row stacks, numbers stay with their units, columns line up, table roles are kept (2.5s)
+  ok 146 [mobile] › tests\e2e\site.spec.ts:1166:1 › 3D hero: switching reduced motion on while the page is open keeps the 3D hero (no dead GPU context, no fall back to 2D) (13.9s)
+  ok 153 [mobile] › tests\e2e\site.spec.ts:1181:1 › data motion: the bars grow once when the card is reached, on a true zero baseline, in proportion to the real numbers (6.7s)
+  ok 152 [desktop] › tests\e2e\site.spec.ts:776:1 › 3D hero: on by default, it draws real light, and the tier follows the window (8.2s)
+  ok 154 [mobile] › tests\e2e\site.spec.ts:1201:1 › data motion: with reduced motion the bars are drawn finished from the start (2.7s)
+  ok 155 [desktop] › tests\e2e\site.spec.ts:788:1 › 3D hero: the canvas is below the hero text in z-order and clear of every line of text on desktop (4.0s)
+  ok 156 [mobile] › tests\e2e\site.spec.ts:1209:1 › data motion: the FlyRank picture fills to its 47 hits when reached (2.6s)
+  -  158 [mobile] › tests\e2e\site.spec.ts:1216:1 › the brain stays beside the text, clear of the answer card, while an answer is on screen (a scrolling chip row once pushed it out of its column)
+  -  157 [desktop] › tests\e2e\site.spec.ts:813:1 › 3D hero: a phone gets the lighter asset, and the brain sits below the text
+  ok 159 [mobile] › tests\e2e\site.spec.ts:1228:1 › on a phone no section's content touches the screen edge (Selected work once did) (2.2s)
+  ok 160 [desktop] › tests\e2e\site.spec.ts:829:1 › 3D hero: ?tier=full asks for the full asset, and it arrives gzipped (about 400 kB, not megabytes) (1.2s)
+  -  161 [mobile] › tests\e2e\site.spec.ts:1239:1 › 3D hero: the flight to the nav follows the scroll, in small steps, and goes back along the same path
+  -  163 [mobile] › tests\e2e\site.spec.ts:1273:1 › 3D hero: you can grab and turn the brain; it keeps its momentum, comes back by itself, and does nothing with reduced motion
+  ok 164 [mobile] › tests\e2e\site.spec.ts:1309:1 › page background: a muted, seamless loop plays on one fixed layer behind the whole page, the 3D brain and the text (2.0s)
+  ok 162 [desktop] › tests\e2e\site.spec.ts:840:1 › 3D hero fallback: if the asset cannot be fetched, the 2D hero returns and the page still works (3.8s)
+  ok 165 [mobile] › tests\e2e\site.spec.ts:1331:1 › hero background: with reduced motion or Save-Data it is the still poster, and no video bytes are fetched (7.8s)
+  ok 166 [desktop] › tests\e2e\site.spec.ts:853:1 › 3D hero fallback: with no WebGL2 the 2D hero is used from the start, with no 3D download (8.7s)
+  ok 168 [desktop] › tests\e2e\site.spec.ts:867:1 › 3D hero fallback: ?hero=canvas forces the 2D hero (2.7s)
+  ok 169 [desktop] › tests\e2e\site.spec.ts:874:1 › 3D hero fallback: if the GPU context is lost, the 2D hero takes over (3.1s)
+  ok 170 [desktop] › tests\e2e\site.spec.ts:883:1 › 3D hero: reduced motion draws a still and runs no animation loop (3.4s)
+  ok 167 [mobile] › tests\e2e\site.spec.ts:1349:1 › page background: text stays readable over every section and every part of the loop (the dimmest text keeps 4.5:1 over the brightest fibre behind it) (19.4s)
+  -  172 [mobile] › tests\e2e\site.spec.ts:1394:1 › 3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click
+  ok 171 [desktop] › tests\e2e\site.spec.ts:897:1 › 3D hero: it stops rendering once the hero is scrolled away, and starts again when you return (12.2s)
+  ok 173 [mobile] › tests\e2e\site.spec.ts:1425:1 › 3D hero: tapping the brain on a phone fires it, without raising the keyboard (4.6s)
+  -  175 [mobile] › tests\e2e\site.spec.ts:1439:1 › 3D hero: with reduced motion the brain is not a control (no label, no click, no focus)
+  ok 176 [mobile] › tests\e2e\site.spec.ts:1455:1 › page background: every section's ground is translucent so the video shows through; cards stay opaque (1.8s)
+  ok 174 [desktop] › tests\e2e\site.spec.ts:911:1 › 3D hero: the headline, name, actions and question box are all there with the animation switched off (3.4s)
+  ok 177 [desktop] › tests\e2e\site.spec.ts:920:1 › 3D hero works under the production Content-Security-Policy and headers (customHttp.yml), with no violations (3.7s)
+  ok 178 [desktop] › tests\e2e\site.spec.ts:946:1 › projects: three short cards; a case study opens only when chosen; closing it returns focus to its card (3.1s)
+  ok 179 [desktop] › tests\e2e\site.spec.ts:968:1 › selected work: each card is a figure, its caption and a short caveat, not a paragraph (1.5s)
+  ok 180 [desktop] › tests\e2e\site.spec.ts:977:1 › a whole card is the link: clicking its empty corner opens the case study (6.4s)
+  ok 181 [desktop] › tests\e2e\site.spec.ts:987:1 › a link to a case study works on first load and opens that study in view (4.6s)
+  ok 182 [desktop] › tests\e2e\site.spec.ts:994:1 › the small picture on each card matches the numbers in its case study, and is hidden from screen readers (941ms)
+  ok 183 [desktop] › tests\e2e\site.spec.ts:1000:1 › hover: a card lifts, its border lights, and a nav link underlines (5.3s)
+  ok 184 [desktop] › tests\e2e\site.spec.ts:1018:1 › hover with reduced motion: the border changes and nothing moves (3.3s)
+  ok 185 [desktop] › tests\e2e\site.spec.ts:1032:1 › each opened case study passes axe and does not overflow, at 1280 and at 320 px (22.3s)
+  ok 186 [desktop] › tests\e2e\site.spec.ts:1050:1 › Ask Aziz: a project question gets that project's own answer, as a short list with trust chips and follow-ups (4.3s)
+  ok 187 [desktop] › tests\e2e\site.spec.ts:1066:1 › Ask Aziz: a follow-up chip asks the next question and the card updates (6.3s)
+  ok 188 [desktop] › tests\e2e\site.spec.ts:1077:1 › Ask Aziz: when the evidence disagrees with the question, the card says so in one plain line before the facts (4.6s)
+  ok 189 [desktop] › tests\e2e\site.spec.ts:1088:1 › Ask Aziz says what it is: looked up in checked evidence, not generated; no 'Terminal Explorer' name is left on the page (4.2s)
+  ok 190 [desktop] › tests\e2e\site.spec.ts:1098:1 › the Ask button shows that it is working, and keeps its accessible name (4.4s)
+  ok 191 [desktop] › tests\e2e\site.spec.ts:1118:1 › the answer card eases in, and not at all with reduced motion (6.1s)
+  ok 192 [desktop] › tests\e2e\site.spec.ts:1127:1 › every control answers the pointer, is big enough and shows a focus ring (scripts/audit-controls.cjs, desktop and phone) (55.5s)
+  ok 193 [desktop] › tests\e2e\site.spec.ts:1138:1 › 3D hero: the brain turns toward the pointer and leans in as it comes close; with reduced motion it stays still (1.0m)
+  ok 194 [desktop] › tests\e2e\site.spec.ts:1166:1 › 3D hero: switching reduced motion on while the page is open keeps the 3D hero (no dead GPU context, no fall back to 2D) (13.9s)
+  ok 195 [desktop] › tests\e2e\site.spec.ts:1181:1 › data motion: the bars grow once when the card is reached, on a true zero baseline, in proportion to the real numbers (9.4s)
+  ok 196 [desktop] › tests\e2e\site.spec.ts:1201:1 › data motion: with reduced motion the bars are drawn finished from the start (7.7s)
+  ok 197 [desktop] › tests\e2e\site.spec.ts:1209:1 › data motion: the FlyRank picture fills to its 47 hits when reached (3.3s)
+  ok 198 [desktop] › tests\e2e\site.spec.ts:1216:1 › the brain stays beside the text, clear of the answer card, while an answer is on screen (a scrolling chip row once pushed it out of its column) (9.9s)
+  ok 199 [desktop] › tests\e2e\site.spec.ts:1228:1 › on a phone no section's content touches the screen edge (Selected work once did) (4.6s)
+  ok 200 [desktop] › tests\e2e\site.spec.ts:1239:1 › 3D hero: the flight to the nav follows the scroll, in small steps, and goes back along the same path (38.6s)
+  ok 201 [desktop] › tests\e2e\site.spec.ts:1273:1 › 3D hero: you can grab and turn the brain; it keeps its momentum, comes back by itself, and does nothing with reduced motion (1.2m)
+  ok 202 [desktop] › tests\e2e\site.spec.ts:1309:1 › page background: a muted, seamless loop plays on one fixed layer behind the whole page, the 3D brain and the text (3.5s)
+  ok 203 [desktop] › tests\e2e\site.spec.ts:1331:1 › hero background: with reduced motion or Save-Data it is the still poster, and no video bytes are fetched (7.8s)
+  ok 204 [desktop] › tests\e2e\site.spec.ts:1349:1 › page background: text stays readable over every section and every part of the loop (the dimmest text keeps 4.5:1 over the brightest fibre behind it) (23.4s)
+  x  205 [desktop] › tests\e2e\site.spec.ts:1394:1 › 3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click (17.5s)
+  -  206 [desktop] › tests\e2e\site.spec.ts:1425:1 › 3D hero: tapping the brain on a phone fires it, without raising the keyboard
+  ok 207 [desktop] › tests\e2e\site.spec.ts:1439:1 › 3D hero: with reduced motion the brain is not a control (no label, no click, no focus) (1.8s)
+  ok 208 [desktop] › tests\e2e\site.spec.ts:1455:1 › page background: every section's ground is translucent so the video shows through; cards stay opaque (3.1s)
+
+
+  1) [desktop] › tests\e2e\lookup-states.spec.ts:39:1 › retry repeats the question exactly once and lands on the answer, with focus on it 
+
+    Error: worker process exited unexpectedly (code=134, signal=null)
+
+  2) [desktop] › tests\e2e\site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow 
+
+    Test timeout of 90000ms exceeded.
+
+    Error: page.screenshot: Test timeout of 90000ms exceeded.
+    Call log:
+      - taking page screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+
+
+      11 | test.afterEach(async ({ page }) => expect(errors.get(page)).toEqual([]));
+      12 |
+    > 13 | const shot = (page: Page, name: string, project: string) => page.screenshot({ path: `reports/screens/${project}-${name}.png` });
+         |                                                                  ^
+      14 | const frames = (page: Page) => page.evaluate(() => (window as unknown as { __scene?: { frames: number } }).__scene?.frames ?? -1);
+      15 | const runway = (page: Page) => page.evaluate(() => document.querySelector<HTMLElement>(".hero-runway")!.offsetHeight);
+      16 |
+        at shot (C:\Users\dell\Downloads\aws-superpower-portfolio\aws-superpower-portfolio\tests\e2e\site.spec.ts:13:66)
+        at C:\Users\dell\Downloads\aws-superpower-portfolio\aws-superpower-portfolio\tests\e2e\site.spec.ts:28:9
+
+    Error Context: test-results\site-hero-sequence-start-m-f64e6-ext-stays-clear-no-overflow-desktop\error-context.md
+
+  3) [desktop] › tests\e2e\site.spec.ts:546:1 › the question box understands typos and a recruiter's questions 
+
+    Error: Which languages does he speak?
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: locator('.ask-answer')
+    Expected pattern: /Arabic, French and English/
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Which languages does he speak? locator('.ask-answer') with timeout 5000ms
+      - waiting for locator('.ask-answer')
+
+
+      557 |   for (const [q, text, limit] of cases) {
+      558 |     await ask(page, q);
+    > 559 |     await expect(box, q).toContainText(text);
+          |                          ^
+      560 |     if (limit) await expect(box, q).toContainText(limit);
+      561 |     await page.waitForTimeout(700);
+      562 |   }
+        at C:\Users\dell\Downloads\aws-superpower-portfolio\aws-superpower-portfolio\tests\e2e\site.spec.ts:559:26
+
+    Error Context: test-results\site-the-question-box-unde-4dc0f-and-a-recruiter-s-questions-desktop\error-context.md
+
+  4) [desktop] › tests\e2e\site.spec.ts:1394:1 › 3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      1410 |   await page.mouse.move(R.cx, R.cy, { steps: 4 }); await page.waitForTimeout(300);
+      1411 |   await page.mouse.down(); await page.waitForTimeout(60); await page.mouse.up();
+    > 1412 |   await expect.poll(async () => (await pose()).clicks, { timeout: 5000 }).toBe(1);
+           |                                                                           ^
+      1413 |   expect((await pose()).burst, "it fires").toBeGreaterThan(0.3);
+      1414 |   expect(await page.evaluate(() => document.activeElement?.id), "the question box has the cursor").toBe("hero-ask");
+      1415 |   await expect(page.locator(".ask-status")).toContainText("Listening");
+        at C:\Users\dell\Downloads\aws-superpower-portfolio\aws-superpower-portfolio\tests\e2e\site.spec.ts:1412:75
+
+    Error Context: test-results\site-3D-hero-hovering-the--51b76-n-box-a-drag-is-not-a-click-desktop\error-context.md
+
+  5) [mobile] › tests\e2e\site.spec.ts:462:1 › hero keeps the whole panel inside the viewport (desktop, laptop and phone) 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.ask-answer')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('.ask-answer') with timeout 5000ms
+      - waiting for locator('.ask-answer')
+
+
+      466 |     await page.waitForTimeout(600);
+      467 |     await ask(page, "What did Aziz personally build in TraffiX?");
+    > 468 |     await expect(answerBox(page)).toBeVisible();
+          |                                   ^
+      469 |     const m = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, input: document.querySelector("#hero-ask")!.getBoundingClientRect().bottom, vh: innerHeight, ans: document.querySelector(".ask-answer")!.getBoundingClientRect().bottom }));
+      470 |     expect(m.sw, `${w}px overflow`).toBe(m.cw);
+      471 |     expect(m.input, `${w}x${h}: input below the fold`).toBeLessThan(m.vh);
+        at C:\Users\dell\Downloads\aws-superpower-portfolio\aws-superpower-portfolio\tests\e2e\site.spec.ts:468:35
+
+    Error Context: test-results\site-hero-keeps-the-whole--c2808-t-desktop-laptop-and-phone--mobile\error-context.md
+
+  5 failed
+    [desktop] › tests\e2e\lookup-states.spec.ts:39:1 › retry repeats the question exactly once and lands on the answer, with focus on it 
+    [desktop] › tests\e2e\site.spec.ts:17:1 › hero sequence: start, middle, end; text stays clear; no overflow 
+    [desktop] › tests\e2e\site.spec.ts:546:1 › the question box understands typos and a recruiter's questions 
+    [desktop] › tests\e2e\site.spec.ts:1394:1 › 3D hero: hovering the brain shows what you can do; a click makes it fire and puts the cursor in the question box; a drag is not a click 
+    [mobile] › tests\e2e\site.spec.ts:462:1 › hero keeps the whole panel inside the viewport (desktop, laptop and phone) 
+  23 skipped
+  180 passed (17.3m)
+exit 1

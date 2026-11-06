@@ -321,13 +321,13 @@
   }
  ],
  "aws": {
-  "checkedOn": "2026-10-31",
+  "checkedOn": "2026-11-06",
   "deployed": true,
   "liveUrl": "https://main.d3j3qw8xj45viu.amplifyapp.com/",
   "endpointCheck": {
-   "on": "2026-10-31",
-   "method": "Fetched and rendered by an external page renderer (the checking machine could not reach the host directly)",
-   "result": "HTTP 200 and the complete portfolio rendered (hero, projects, AWS section, terminal, contact)."
+   "on": "2026-11-06",
+   "method": "Fetched with curl, then loaded and used in a real browser (the built-in browser of the Claude desktop app)",
+   "result": "HTTP 200; the hero and the seven sections I looked for (selected work, about, skills, projects, AWS, certifications, contact) rendered, with no horizontal overflow at 1280 and 390 px; the question 'Does Aziz use Bedrock?' returned Not verified. The security headers CSP, HSTS and nosniff were present."
   },
   "setupNote": "Set up by Aziz in the AWS Console (Amplify Hosting, GitHub connection, branch main, Region eu-north-1, project Stack of Dreams), following the Day 4 guide. That is his account of the setup; no console record backs it here yet.",
   "buildChain": [
@@ -341,8 +341,8 @@
     "href": "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/amplify.yml"
    },
    {
-    "text": "The site is a static React and TypeScript build with no backend: package.json lists react and react-dom as its only dependencies.",
-    "href": "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0fa4d7058039ef0beadab0a39a609633d602f082/package.json"
+    "text": "The site is a static React and TypeScript build with no backend: package.json lists no AWS SDK and no server framework, so the browser makes no AWS calls.",
+    "href": "https://github.com/azizmessaoud/aws-superpower-portfolio/blob/0ee0b17179748f011c6f1f00f1f0dac7a89d2194/package.json"
    }
   ],
   "connected": [
