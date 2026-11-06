@@ -577,3 +577,32 @@ html[data-brain-grab="over"] .brain-tip { opacity: 1; }
 /* about: the portrait drifts a few pixels while it crosses the screen (Framer Motion, src/ui/motion.tsx); the wrapper keeps the portrait's size */
 .portrait-wrap { width: min(15rem, 100%); }
 .portrait-wrap .portrait { width: 100%; }
+
+/* ── lookup states: loading skeleton, failure with retry and cancel, and the shared action-button model ──
+ * Motion is opacity and transform only. Every state also differs by icon and words, so colour is never the only cue,
+ * and the reduced-motion rule leaves each state readable as a still frame. */
+.act { justify-content: center; }
+.act .icon { width: 1.1em; height: 1.1em; flex: none; }
+.act[data-state="loading"] { cursor: progress; }
+.act[data-state="disabled"] { cursor: not-allowed; opacity: 0.6; }
+.act[data-state="loading"] .icon { animation: act-spin 0.9s linear infinite; }
+.act[data-state="error"] { box-shadow: 0 0 0 2px var(--signal-red); }
+.act[aria-disabled="true"]:active { transform: none; }
+@keyframes act-spin { to { transform: rotate(360deg); } }
+
+.ask-skeleton { flex: 0 1 auto; min-height: 0; overflow: hidden; margin-top: var(--space-xs); padding: var(--space-md) var(--space-lg); background: var(--surface); border: 1px solid var(--border-strong); border-left: 3px solid var(--accent); border-radius: var(--radius-md); }
+.sk-bars { display: grid; gap: var(--space-xs); align-content: start; }
+.sk { display: block; height: 10px; border-radius: var(--radius-xs); background: var(--glass10); animation: sk-pulse 1.2s ease-in-out infinite; }
+.sk-outcome { width: 5.5rem; height: 9px; }
+.sk-title { width: 62%; height: 16px; }
+.sk-short { width: 58%; }
+@keyframes sk-pulse { 50% { opacity: 0.45; } }
+.ask-slow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); margin: 0 0 var(--space-sm); }
+
+.ask-kept { color: var(--fg); font-family: var(--font-m); font-size: 13px; }
+.ask-actions { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-sm); }
+.ask-note { margin-top: var(--space-xs); font-size: var(--text-small); line-height: 1.6; color: var(--fg-muted); }
+.ask-answer.is-error .ask-outcome { color: var(--signal-red); }
+.ask-detail { margin-top: var(--space-sm); font-size: 12px; color: var(--fg-muted); }
+.ask-detail summary { cursor: pointer; display: flex; align-items: center; min-height: 44px; }
+.ask-detail code { display: block; margin-top: var(--space-2xs); font-family: var(--font-m); color: var(--fg-soft); word-break: break-word; }

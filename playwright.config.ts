@@ -7,7 +7,11 @@ export default defineConfig({
   reporter: [["list"]],
   /* software WebGL, so the 3D hero can run in a headless browser with no GPU (slow, but real WebGL2) */
   use: { baseURL: "http://127.0.0.1:4173", launchOptions: { args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] } },
-  webServer: { command: "npm run preview", url: "http://127.0.0.1:4173", reuseExistingServer: true, timeout: 60_000 },
+  webServer: [
+    { command: "npm run preview", url: "http://127.0.0.1:4173", reuseExistingServer: true, timeout: 60_000 },
+    /* a second build (mode "e2e") that carries the fault injector used by tests/e2e/lookup-states.spec.ts; the public build never has it */
+    { command: "npm run preview:e2e", url: "http://127.0.0.1:4175", reuseExistingServer: true, timeout: 120_000 },
+  ],
   projects: [
     { name: "desktop", use: { viewport: { width: 1280, height: 860 } } },
     { name: "mobile", use: { viewport: { width: 390, height: 860 }, hasTouch: true, isMobile: true } },

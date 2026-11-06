@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Corpus, Portfolio } from "../content/schema";
 import corpusJson from "../generated/corpus.json";
 import portfolioJson from "../generated/portfolio.json";
@@ -6,7 +6,11 @@ import { createAssistant, MAX_QUESTION, type Answer } from "../assistant/answer"
 import { CONTRADICTION, presentAnswer, projectIdOf } from "../assistant/present";
 import { SAMPLES } from "../assistant/samples";
 import { DWELL_MS, nextState, STATE_TEXT, stateForOutcome, type MindState } from "../mind/state";
+import { faultFromUrl, withFault } from "../dev/sabotage";
+import { createSession, type Engine, type Phase } from "../retrieval/session";
+import type { ActionState } from "../ui/ActionButton";
 import Icon from "../ui/Icon";
+import { ResultSkeleton, RetrievalErrorCard } from "../ui/retrieval";
 import { CASES } from "./projects/summary";
 
 /* Which flagship project an answer is about, read from the sources it cites. No match: no link. */
@@ -22,65 +26,94 @@ const OUTCOME: Record<Answer["outcome"], string> = {
   not_verified: "Not verified",
   error: "Could not answer",
 };
-/* One question per interval: the same limit an API Gateway throttle would impose if a backend is added later. */
-const MIN_GAP_MS = 600;
-
 interface Props { mind: MindState; setMind: (s: MindState) => void; reduced: boolean; onLayout: () => void }
 
 /* The question box. The mind's state follows the question lifecycle (listening, retrieving, then answering or
  * uncertain) and is also written out as text, so the state is never conveyed by animation alone. */
 export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
   const assistant = useMemo(() => createAssistant(corpusJson as Corpus, portfolioJson as Portfolio), []);
+  const reducedRef = useRef(reduced);
+  reducedRef.current = reduced;
+
+  /* Fault injection exists only in `npm run dev` and the e2e build; the production build compiles this to `null`. */
+  const injected = import.meta.env.DEV || import.meta.env.MODE === "e2e" ? faultFromUrl() : null;
+  /* A retrieval session owns the lifecycle: the lookup, its dwell, the slow notice, the timeout, retry and cancel. One question per
+   * 600 ms, the limit an API Gateway throttle would impose if a backend is added later. This component only renders it. */
+  const session = useMemo(() => {
+    const base: Engine = (q) => assistant.ask(q);
+    return createSession({
+      engine: injected ? withFault(base, injected.fault) : base,
+      minDwellMs: () => (reducedRef.current ? 200 : DWELL_MS.retrieving),
+      timeoutMs: injected?.timeoutMs,
+    });
+  }, [assistant, injected?.fault, injected?.timeoutMs]);
+  useEffect(() => () => session.destroy(), [session]);
+  const snap = useSyncExternalStore(session.subscribe, session.getState);
+  const busy = snap.phase === "submitted" || snap.phase === "retrieving";
+
   const [value, setValue] = useState("");
-  const [shown, setShown] = useState<Answer | null>(null);
+  /* an empty question gets the engine's own message at once, not silence; it is not a lookup, so it lives outside the session */
+  const [emptyCard, setEmptyCard] = useState<Answer | null>(null);
   const [answerNo, setAnswerNo] = useState(0); /* a new key per answer, so the card's entrance plays every time */
+  const input = useRef<HTMLInputElement>(null);
+  const answerRef = useRef<HTMLElement>(null);
   const timers = useRef<number[]>([]);
-  const lastAt = useRef(-Infinity);
   const lastAsked = useRef("");
   const stateRef = useRef(mind);
   stateRef.current = mind;
+  const prevPhase = useRef<Phase>("idle");
 
   const clear = () => { timers.current.forEach(clearTimeout); timers.current = []; };
   useEffect(() => clear, []);
-  useEffect(() => { onLayout(); }, [shown, onLayout]);
   const later = (fn: () => void, ms: number) => { timers.current.push(window.setTimeout(fn, ms)); };
+  const shown: Answer | null = emptyCard ?? (snap.phase === "results" ? snap.answer ?? null : null);
+  useEffect(() => { onLayout(); }, [shown, snap.phase, snap.failure, snap.slow, onLayout]);
+
+  /* Map the lifecycle onto the mind's state, which is also written out as text. */
+  useEffect(() => {
+    const was = prevPhase.current, p = snap.phase;
+    prevPhase.current = p;
+    if (p === was) return;
+    const wasBusy = was === "submitted" || was === "retrieving";
+    if (p === "submitted" || p === "retrieving") {
+      if (!wasBusy) { clear(); setMind(nextState(stateRef.current, { type: "submit" })); }
+      return;
+    }
+    const settle = (s: MindState) => { setMind(s); later(() => setMind(nextState(s, { type: "settle" })), reducedRef.current ? 1500 : DWELL_MS[s]); };
+    if (p === "results" && snap.answer) {
+      setAnswerNo((n) => n + 1);
+      settle(stateForOutcome(snap.answer.outcome));
+      /* After a retry the focused Retry button is replaced by the answer: put focus on the answer, not on <body>. */
+      if (snap.retried) later(() => answerRef.current?.focus({ preventScroll: true }), 0);
+    } else if (p === "error") settle("error");
+    else if (wasBusy && p === "idle") setMind("idle");            /* cancelled */
+  }, [snap.phase, snap.answer, snap.retried, setMind]);
 
   function submit(q: string) {
     const text = q.trim();
     if (!text) {
-      /* an empty question gets the engine's own message, not silence */
       clear();
-      setShown(assistant.ask("")); setAnswerNo((n) => n + 1);
+      setEmptyCard(assistant.ask("")); setAnswerNo((n) => n + 1);
       const next = stateForOutcome("error");
       setMind(next);
-      later(() => setMind(nextState(next, { type: "settle" })), reduced ? 1500 : DWELL_MS[next]);
+      later(() => setMind(nextState(next, { type: "settle" })), reducedRef.current ? 1500 : DWELL_MS[next]);
       return;
     }
-    const now = performance.now();
-    if (now - lastAt.current < MIN_GAP_MS) return;
-    lastAt.current = now;
-    lastAsked.current = text;
-    clear();
-    setShown(null);
-    setMind(nextState(stateRef.current, { type: "submit" }));
-    const answer = assistant.ask(text);
-    const dwell = reduced ? 200 : DWELL_MS.retrieving;
-    later(() => {
-      setShown(answer); setAnswerNo((n) => n + 1);
-      const next = stateForOutcome(answer.outcome);
-      setMind(next);
-      later(() => setMind(nextState(next, { type: "settle" })), reduced ? 1500 : DWELL_MS[next]);
-    }, dwell);
+    const r = session.submit(text);
+    if (r === "started") { lastAsked.current = text; setEmptyCard(null); }
+    if (r === "invalid") input.current?.focus();
   }
+  const retryState: ActionState = busy ? "loading" : snap.phase === "error" && snap.retried ? "error" : "idle";
 
   return (
     <div className="ask" id="ask">
       <form className="ask-form" role="search" onSubmit={(e) => { e.preventDefault(); submit(value); }}>
         <label htmlFor="hero-ask" className="ask-label">Ask Aziz anything · answers come from checked evidence</label>
         <div className="ask-row">
-          <input id="hero-ask" className="ask-input" type="search" value={value} maxLength={MAX_QUESTION} autoComplete="off"
+          <input ref={input} id="hero-ask" className="ask-input" type="search" value={value} maxLength={MAX_QUESTION} autoComplete="off"
             placeholder="e.g. Did TraffiX make ambulances faster?"
             onChange={(e) => { setValue(e.target.value); setMind(nextState(stateRef.current, { type: "type", empty: !e.target.value })); }}
+            onKeyDown={(e) => { if (e.key === "Escape" && busy) { e.preventDefault(); session.cancel(); } }}
             onFocus={() => setMind(nextState(stateRef.current, { type: "focus" }))}
             onBlur={() => setMind(nextState(stateRef.current, { type: "blur" }))} />
           <button className="btn-primary ask-submit" type="submit" aria-label="Ask" aria-busy={mind === "retrieving"} data-busy={mind === "retrieving"}>
@@ -99,13 +132,18 @@ export default function AskPanel({ mind, setMind, reduced, onLayout }: Props) {
         <span className="ask-how-long">Looked up in this site's checked evidence, not generated by a language model. Each answer links to its source; when nothing matches, it says so.</span>
         <span className="ask-how-short">Looked up, not generated by a language model.</span>
       </p>
-      {shown && (() => {
+      {busy && !snap.failure && <ResultSkeleton slow={snap.slow} onCancel={() => session.cancel()} />}
+      {snap.failure && !emptyCard && (
+        <RetrievalErrorCard failure={snap.failure} retryState={retryState} slow={snap.slow} sectionRef={answerRef}
+          onRetry={() => session.retry()} onCancel={() => session.cancel()} />
+      )}
+      {shown && !snap.failure && (() => {
         const pid = projectIdOf(shown);
         const pr = presentAnswer(shown, pid);
         const asked = lastAsked.current.toLowerCase();
         const next = pr.followUps.filter((f) => f.toLowerCase() !== asked);
         return (
-        <section key={answerNo} className={`ask-answer is-${shown.outcome}`} aria-label="Answer" tabIndex={0}>
+        <section ref={answerRef} key={answerNo} className={`ask-answer is-${shown.outcome}`} aria-label="Answer" tabIndex={0}>
           <p className="ask-outcome"><Icon name={VERDICT_ICON[shown.outcome]} /> {OUTCOME[shown.outcome]}</p>
           <h2 className="ask-title">{shown.title}</h2>
           {shown.outcome === "contradicted" && <p className="ask-premise"><Icon name="alert" /> {CONTRADICTION}</p>}

@@ -12,6 +12,7 @@ amplify/backend/amplify-meta.json
 # build output and caches
 node_modules/
 dist/
+dist-e2e/
 coverage/
 playwright-report/
 test-results/

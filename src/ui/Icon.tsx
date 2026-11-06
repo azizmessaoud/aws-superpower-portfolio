@@ -21,6 +21,8 @@ const PATHS = {
   api: "M8 9l-4 3 4 3M16 9l4 3-4 3M14 5l-4 14",
   toolkit: "M3 7h18v12H3zM8 7V5h8v2M3 12h18",
   terminal: "M4 17l6-6-6-6M12 19h8",
+  retry: "M3 12a9 9 0 1 0 3-6.7M3 4v5h5",
+  busy: "M12 3a9 9 0 1 0 9 9",
 } as const;
 
 export default function Icon({ name }: { name: keyof typeof PATHS }) {
