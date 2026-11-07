@@ -267,7 +267,17 @@ figcaption { font-family: var(--font-m); font-size: 12px; color: var(--fg-muted)
   .hero-lead { display: none; }
 }
 
-@media (max-height: 700px) { .ask-samples li:nth-child(n + 3) { display: none; } .hero-inner .eyebrow-role, .hero-inner .hero-avail { display: none; } } /* the name always shows; only the secondary line yields on short screens */
+/* The hero is pinned (a sticky stage exactly one screen tall, overflow hidden), so anything below the fold can never be scrolled to: it is simply cut off.
+ * On a short window the hero therefore gives things up, lowest priority first, so the question box and what is left of the stack always fit.
+ * Order (heights measured at 1366 and 1024 px wide): extra sample rows, the role line and availability, the "looked up, not generated" note,
+ * the sample questions, the intro paragraph, the two buttons. The name, headline and question box never go. */
+@media (max-height: 800px) { .ask-samples li:nth-child(n + 3) { display: none; } }
+@media (max-height: 700px) { .hero-inner .eyebrow-role, .hero-inner .hero-avail { display: none; } } /* the name always shows; only the secondary line yields on short screens */
+@media (max-height: 660px) { .hero-inner .ask-how { display: none; } }
+@media (max-height: 610px) { .hero-inner .ask-samples { display: none; } }
+@media (max-height: 540px) { .hero-inner .hero-lead { display: none; } }
+@media (max-height: 520px) { .hero-inner .hero-actions { display: none; } }
+@media (max-height: 745px) and (max-width: 380px) { .hero-inner .ask-how { display: none; } } /* a 360 px phone wraps the note onto more lines */
 /* once an answer is on screen the intro paragraph makes room for it */
 .hero-inner:has(.ask-answer) .hero-lead, .hero-inner:has(.ask-answer) .hero-avail, .hero-inner:has(.ask-answer) .hero-actions { display: none; }
 

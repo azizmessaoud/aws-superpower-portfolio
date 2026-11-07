@@ -1498,3 +1498,29 @@ test("Contact: the CV can be opened in a new tab and downloaded, from the same f
   const [dl] = await Promise.all([page.waitForEvent("download"), download.click()]);
   expect(dl.suggestedFilename()).toBe("Aziz-Messaoud-CV.pdf");
 });
+
+test("hero: on a short window nothing the visitor can see is cut off at the bottom (the hero is pinned, so it could never be scrolled to)", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "sizes are set explicitly below");
+  test.setTimeout(120_000);
+  /* the reported case was about 1366 x 560: the first row of sample questions showed a sliver and the rest was cut off */
+  const sizes: Array<[number, number]> = [[1366, 560], [1366, 600], [1366, 640], [1280, 720], [1536, 730], [1024, 640], [1024, 500], [820, 611], [390, 700], [360, 730], [360, 520]];
+  await page.goto("/?gov=off");
+  for (const [w, h] of sizes) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.waitForTimeout(400);
+    const cut = await page.evaluate(() => {
+      const bad: string[] = [];
+      const check = (name: string, el: Element) => {
+        if (!el.getClientRects().length) return;                      /* hidden on purpose: fine */
+        const b = el.getBoundingClientRect();
+        if (b.bottom > innerHeight + 1) bad.push(`${name} ends at ${Math.round(b.bottom)}px, window is ${innerHeight}px`);
+      };
+      const one = document.querySelector("#hero-ask"); if (one) check("question box", one);
+      const status = document.querySelector(".ask-status"); if (status) check("status line", status);
+      document.querySelectorAll(".ask-samples .suggest-q").forEach((c) => check(`sample "${(c.textContent ?? "").slice(0, 18)}"`, c));
+      const how = document.querySelector(".hero-inner .ask-how"); if (how) check("the 'looked up' note", how);
+      return bad;
+    });
+    expect(cut, `at ${w}x${h}`).toEqual([]);
+  }
+});
