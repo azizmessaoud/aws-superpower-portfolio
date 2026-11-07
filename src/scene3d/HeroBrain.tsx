@@ -13,7 +13,8 @@ import { BufferAttribute, BufferGeometry, Group, PerspectiveCamera, Scene as Thr
 import type { Scene as HeroScene } from "../scene/scene";
 import type { MindState } from "../mind/state";
 import { loadBrain } from "./brainAsset";
-import { chooseTier } from "./capability";
+import { chooseTier, isSoftwareRenderer } from "./capability";
+import { createGovernor } from "./governor";
 import { createFiberLayers, createGhostBody, createParticles } from "./layers";
 import { CANVAS_PER_R, heroTransform, placeBrain } from "./placement";
 import fullUrl from "./assets/brain-full.brain?url";
@@ -71,6 +72,13 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
       catch { fail("no WebGL"); return; }
       undo.push(() => { renderer.dispose(); renderer.forceContextLoss(); }); /* hand the GPU context back at once */
       renderer.setClearColor(0x000000, 0);
+      /* ?gov=off (the tests) turns the governor and this check off together */
+      const governorOn = new URLSearchParams(location.search).get("gov") !== "off";
+      if (governorOn) {
+        const gl = renderer.getContext(), info = gl.getExtension("WEBGL_debug_renderer_info");
+        const gpu = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+        if (isSoftwareRenderer(gpu)) { fail(`software renderer: ${gpu}`); return; } /* no GPU acceleration: the 2D hero, at once, not after seconds of a stalled page */
+      }
       const onLost = (e: Event) => { e.preventDefault(); fail("WebGL context lost"); };
       el.addEventListener("webglcontextlost", onLost);
       undo.push(() => el.removeEventListener("webglcontextlost", onLost));
@@ -100,9 +108,10 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
 
       const baseGain = tier === "mobile" ? 2.5 : 1.7;
       const mood = { gain: baseGain, pulseOn: 1, speed: 0.7, gap: 5 };
-      let dpr = Math.min(window.devicePixelRatio || 1, tier === "mobile" ? 1.5 : 1.75);
+      /* 1.25 at most: the strands are thin light on a dark ground, so the extra pixels of a 1.75 canvas (3x the fill of 1.0) cost far more than they show */
+      let dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       let curS = 0, clock = 0, last = 0, t0 = 0, frames = 0, level = 0, degraded = false, drawn = false;
-      const dts: number[] = [];
+      const governor = createGovernor();
       /* the pointer, relative to the brain itself: where it is (x, y, -1..1), and how close (near, 0..1). Springs, so the motion is the same at any frame rate. */
       const pointer = { x: 0, y: 0, tx: 0, ty: 0, near: 0, tnear: 0, hold: 0 };
       /* grab and turn: a press on the brain starts a drag that follows the hand, keeps its momentum when let go, and eases back to rest by itself */
@@ -110,9 +119,8 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
       /* a click on the brain makes it fire: many pulses racing along the fibres, easing off over about two seconds */
       const burst = { v: 0, count: 0 }; const tap = { id: -1, x: 0, y: 0, t: 0 };
       const YAW_MAX = 1.15, PITCH_MAX = 0.5;
-      const governorOn = new URLSearchParams(location.search).get("gov") !== "off";
 
-      const draw = (time: number, dt = 0.016, reveal = 1) => {
+      const draw =(time: number, dt = 0.016, reveal = 1) => {
         const target = MOODS[mindRef.current], k = 1 - Math.exp(-dt * 4);
         flash.current *= Math.exp(-dt * 2.2);
         burst.v *= Math.exp(-dt * 1.5);
@@ -175,19 +183,21 @@ export default function HeroBrain({ scene, reduced, mind, onFail }: Props) {
           const time = (now - t0) / 1000;
           const reveal = easeInOut(clamp((time - 0.15) / REVEAL_SECONDS, 0, 1));
           if (!layout(reveal)) { last = 0; return; } /* off screen or docked: park; a scroll wakes it */
-          const dt = last ? Math.min((now - last) / 1000, 0.1) : 0.016; last = now;
+          /* While the brain flies to the nav it is only moved by CSS (layout() above), so the last drawn picture is carried along and nothing is
+           * redrawn: the flight costs no GPU time and stays smooth however slow the machine is. Drawing resumes when it lands or flies back. */
+          const flight = scene.getHeroState().travel;
+          if (drawn && !reduced && flight > 0.002 && flight < 0.998) { last = 0; raf = requestAnimationFrame(tick); return; }
+          const seconds = last ? (now - last) / 1000 : 0;
+          const dt = last ? Math.min(seconds, 0.1) : 0.016; last = now;
           draw(time, dt, reveal);
           sizeChanged = false;
           frames++;
-          /* the governor: judge the frame rate after the first frames, step the quality down once, and give up if it is still slow */
-          if (governorOn && frames > 30 && level < 2) {
-            dts.push(dt);
-            if (dts.length >= 90) {
-              const med = [...dts].sort((a, b) => a - b)[dts.length >> 1]!; dts.length = 0;
-              if (level === 0 && med > 0.032) { level = 1; degraded = true; dpr = 1; renderer.setPixelRatio(1); renderer.setSize(curS, curS, false); parts.setAmount(0); fib.setBeads(false); }
-              else if (level === 1 && med > 0.055) { fail("frames too slow"); return; }
-              else level = 2;
-            }
+          /* the governor: judge the real frame rate, step the quality down once, and give up if it is still slow */
+          if (governorOn && seconds > 0) {
+            const verdict = governor.feed(seconds);
+            level = governor.level;
+            if (verdict === "degrade") { degraded = true; dpr = 1; renderer.setPixelRatio(1); renderer.setSize(curS, curS, false); parts.setAmount(0); fib.setBeads(false); }
+            else if (verdict === "fail") { fail("frames too slow"); return; }
           }
           raf = requestAnimationFrame(tick);
         } catch (e) { fail(`render: ${(e as Error).message}`); }

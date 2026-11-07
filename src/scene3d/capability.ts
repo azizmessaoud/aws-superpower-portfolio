@@ -21,6 +21,13 @@ export function canUseWebglHero(): boolean {
   return true;
 }
 
+/** True when WebGL is drawn by the CPU (browser hardware acceleration off, a blocklisted GPU, a virtual machine). The brain needs a real
+ * GPU: on a software renderer each frame takes 100 ms or more and the whole page, typing included, stalls behind it. Matched on the
+ * renderer name the browser reports; an unknown name is treated as a real GPU. */
+export function isSoftwareRenderer(name: string): boolean {
+  return /swiftshader|llvmpipe|softpipe|lavapipe|basic render|software/i.test(name);
+}
+
 /** Which baked asset to load. Small windows and modest hardware get the lighter one; a ?tier= override exists for testing. */
 export function chooseTier(): Tier {
   const forced = new URLSearchParams(location.search).get("tier");

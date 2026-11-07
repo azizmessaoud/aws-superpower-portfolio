@@ -45,7 +45,8 @@ export default function Contact() {
           <p id="copy-status" className="copy-status" role="status" aria-live="polite">{msg}</p>
           <ul className="contact-links">
             <li><a href={`mailto:${EMAIL}`}>Email</a></li>
-            <li><a href="/aziz-messaoud-cv.pdf" download>CV (PDF)</a></li>
+            <li><a href="/aziz-messaoud-cv.pdf" target="_blank" rel="noopener" aria-label="Open CV (PDF), opens in a new tab">Open CV</a></li>
+            <li><a href="/aziz-messaoud-cv.pdf" download="Aziz-Messaoud-CV.pdf">Download CV</a></li>
             <li><a href="https://calendly.com/aziz-messaoud">Book a call</a></li>
             <li><a href="https://github.com/azizmessaoud">GitHub</a></li>
             <li><a href="https://www.linkedin.com/in/azizmessaoud/">LinkedIn</a></li>

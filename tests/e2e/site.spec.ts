@@ -43,7 +43,10 @@ test("full page renders without horizontal overflow", async ({ page }, info) => 
 
 test("scene stops while the hero is offscreen", async ({ page }) => {
   await page.goto("/");
-  await page.waitForTimeout(600);
+  /* wait until the hero has settled on its mode: with no GPU acceleration (this test browser) the 3D brain is dropped at start and the
+   * 2D scene spends about half a second easing back, which is not what this test is about */
+  await page.waitForFunction(() => ["webgl", "canvas"].includes(document.documentElement.dataset.brain ?? ""), null, { timeout: 30_000 });
+  await page.waitForTimeout(1500);
   await page.evaluate(() => scrollTo({ top: document.getElementById("projects")!.offsetTop, behavior: "instant" }));
   await page.waitForTimeout(400);
   const f = await frames(page);
@@ -1467,4 +1470,31 @@ test("page background: every section's ground is translucent so the video shows 
   /* cards are solid: the video never shows through a card, so card text is as readable as before */
   const cards = await page.evaluate(() => [".selected-card", ".skill-card", ".pcard", ".cert-card"].map((sel) => { const e = document.querySelector(sel); return e ? { sel, bg: getComputedStyle(e).backgroundColor } : null; }).filter(Boolean));
   for (const c of cards as { sel: string; bg: string }[]) expect(Math.min(...alphas(c.bg)), `${c.sel} is opaque`).toBe(1);
+});
+
+test("Contact: the CV can be opened in a new tab and downloaded, from the same file", async ({ page, request }) => {
+  await page.goto("/?gov=off");
+  const contact = page.locator("#contact");
+  const open = contact.getByRole("link", { name: /Open CV/ });
+  const download = contact.getByRole("link", { name: "Download CV" });
+  await open.scrollIntoViewIfNeeded();
+  await expect(open).toBeVisible();
+  await expect(download).toBeVisible();
+  /* open: a new tab, no download attribute, and the tab does not get a handle back to this page */
+  await expect(open).toHaveAttribute("href", "/aziz-messaoud-cv.pdf");
+  await expect(open).toHaveAttribute("target", "_blank");
+  await expect(open).toHaveAttribute("rel", /noopener/);
+  expect(await open.getAttribute("download")).toBeNull();
+  /* download: the same file, saved under a readable name, in the same tab */
+  await expect(download).toHaveAttribute("href", "/aziz-messaoud-cv.pdf");
+  expect(await download.getAttribute("download")).toBe("Aziz-Messaoud-CV.pdf");
+  expect(await download.getAttribute("target")).toBeNull();
+  /* the file is really a PDF */
+  const res = await request.get("/aziz-messaoud-cv.pdf");
+  expect(res.status()).toBe(200);
+  expect(res.headers()["content-type"]).toContain("pdf");
+  expect((await res.body()).subarray(0, 5).toString()).toBe("%PDF-");
+  /* a click on Download starts a real download with that name */
+  const [dl] = await Promise.all([page.waitForEvent("download"), download.click()]);
+  expect(dl.suggestedFilename()).toBe("Aziz-Messaoud-CV.pdf");
 });
