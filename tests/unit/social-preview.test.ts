@@ -61,6 +61,20 @@ describe("link preview tags in index.html", () => {
     expect(statSync(path).size).toBeLessThan(300 * 1024); /* well under the 5 MB limits; small cards load fast */
   });
 
+  it("keeps the head pure ASCII, so a crawler that guesses the wrong character set cannot garble the title (the server sends no charset)", () => {
+    const head = html.split("</head>")[0]!;
+    const nonAscii = [...head].filter((c) => c.charCodeAt(0) > 127);
+    expect(nonAscii).toEqual([]);
+    expect(tag("property", "og:title")).toContain("&#183;");
+  });
+
+  it("has a robots.txt that lets crawlers in, instead of the single-page app answering that address with the home page", () => {
+    const robots = readFileSync(new URL("../../public/robots.txt", import.meta.url), "utf8");
+    expect(robots).toMatch(/^User-agent:\s*\*/m);
+    expect(robots).toMatch(/^Allow:\s*\/\s*$/m);
+    expect(robots).not.toMatch(/^Disallow:\s*\/\s*$/m);
+  });
+
   it("makes no claim in the preview text that the page itself does not make", () => {
     /* the description is the one already shown in the page's own meta description; it must not mention an AWS service or a metric */
     const text = [tag("property", "og:title"), tag("property", "og:description")].join(" ");
